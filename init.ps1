@@ -52,3 +52,4 @@ Write-Host "   3. Accede a:" -ForegroundColor White
 Write-Host "      - Frontend público: http://127.0.0.1:8000/" -ForegroundColor Gray
 Write-Host "      - Panel de staff: http://127.0.0.1:8000/staff/`n" -ForegroundColor Gray
 
+

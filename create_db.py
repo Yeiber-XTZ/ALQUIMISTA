@@ -77,3 +77,4 @@ if __name__ == '__main__':
     print("🔧 Creando base de datos MySQL...")
     create_database()
 
+

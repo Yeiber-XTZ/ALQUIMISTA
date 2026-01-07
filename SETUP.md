@@ -135,3 +135,4 @@ ALQUIMISTA/
 4. Sube imágenes para las facetas y hitos
 5. ¡Disfruta del scroll horizontal en el frontend!
 
+

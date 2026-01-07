@@ -26,20 +26,15 @@ def index(request):
         )
     )
     
-    # Para cada faceta, obtener sus hitos activos ordenados
+    # Para cada faceta, obtener sus hitos activos ordenados y calcular total de slides
     for facet in facets:
         facet.hitos_activos = list(facet.hitos.all())
-    
-    # Calcular total de diapositivas: 1 (título de faceta) + hitos para cada faceta
-    total_diapositivas = 0
-    for facet in facets:
-        total_diapositivas += 1  # Título de faceta
-        total_diapositivas += len(facet.hitos_activos)  # Hitos
+        # Calcular total de slides para esta faceta: 1 (título) + hitos
+        facet.total_slides = 1 + len(facet.hitos_activos)
     
     context = {
         'facets': facets,
         'site_settings': site_settings,
-        'total_diapositivas': total_diapositivas,
     }
     return render(request, 'core/index.html', context)
 

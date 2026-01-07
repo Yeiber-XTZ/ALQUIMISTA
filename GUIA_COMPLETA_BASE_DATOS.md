@@ -561,3 +561,4 @@ Una vez que la base de datos esté creada y las migraciones ejecutadas:
 
 ¡Listo! Si sigues estos pasos detalladamente, deberías poder crear la base de datos sin problemas. Si encuentras algún error específico, consulta la sección "Solución de Problemas" o compárteme el mensaje de error exacto.
 
+

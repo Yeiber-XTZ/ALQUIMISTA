@@ -90,3 +90,4 @@ CREATE DATABASE alquimista_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 python manage.py check && python manage.py makemigrations && python manage.py migrate
 ```
 
+

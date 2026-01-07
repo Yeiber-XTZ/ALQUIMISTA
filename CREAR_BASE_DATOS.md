@@ -138,3 +138,4 @@ COLLATE utf8mb4_unicode_ci;
 SHOW DATABASES LIKE 'alquimista_db';
 ```
 
+

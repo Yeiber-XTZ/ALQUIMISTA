@@ -233,16 +233,27 @@
             60% { transform: translateX(-50%) translateY(-5px); }
         }
         
-        /* Gallery Wrapper - Contenedor Horizontal */
-        .gallery-wrapper {
-            display: flex;
-            width: calc(100vw * {{ total_diapositivas|default:1 }});
+        /* Contenedor de Faceta Individual - Scroll Horizontal */
+        .facet-scroll-container {
+            width: 100vw;
+            min-height: 100vh;
             position: relative;
             background: #000000;
+            overflow: hidden;
+        }
+        
+        /* Gallery Wrapper - Contenedor Horizontal por Faceta */
+        .facet-gallery-wrapper {
+            display: flex;
+            position: relative;
+            background: #000000;
+            will-change: transform;
+            height: 100vh;
         }
         
         /* Diapositiva de Hito - Estilo Presentación */
         .milestone-slide {
+            flex: 0 0 100vw;
             min-width: 100vw;
             width: 100vw;
             height: 100vh;
@@ -371,30 +382,75 @@
             height: 100vh;
         }
         
-        /* Título de Faceta (aparece antes de los hitos) */
+        /* Título de Faceta - Layout tipo LeBron (Texto izquierda, Imagen derecha) */
         .facet-title-slide {
             flex: 0 0 100vw;
+            min-width: 100vw;
             width: 100vw;
             height: 100vh;
             position: relative;
+            display: grid;
+            grid-template-columns: 50% 50%;
+            background: #000000;
             overflow: hidden;
+        }
+        
+        .facet-title-content {
+            position: relative;
             display: flex;
             flex-direction: column;
-            align-items: center;
             justify-content: center;
-            background: #000000;
+            align-items: flex-start;
+            padding: 4rem;
+            z-index: 2;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
         
         .facet-title-slide h2 {
-            font-size: clamp(4rem, 12vw, 15rem);
-            font-weight: 900;
             font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(1.5rem, 4vw, 3.5rem);
+            font-weight: 700;
             letter-spacing: 0.1em;
             text-transform: uppercase;
             color: #FFFFFF;
-            text-align: center;
-            line-height: 0.9;
-            text-shadow: 0 0 60px rgba(184, 33, 42, 0.25);
+            line-height: 1.2;
+            margin-bottom: 1rem;
+        }
+        
+        .facet-title-slide .facet-title-small {
+            font-size: clamp(0.75rem, 1.5vw, 1rem);
+            font-weight: 400;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 0.5rem;
+        }
+        
+        .facet-title-image-section {
+            position: relative;
+            overflow: hidden;
+            height: 100vh;
+            z-index: 10;
+            background: #000000;
+        }
+        
+        .facet-title-image-section .facet-bg {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+            object-position: center !important;
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            opacity: 1 !important;
+            z-index: 10 !important;
+            filter: none !important;
+            transform: none !important;
+            transition: none !important;
+            will-change: auto !important;
+            filter: brightness(1) contrast(1) saturate(1) !important;
         }
         
         .facet-section {
@@ -409,13 +465,13 @@
             background: #000000;
         }
         
-        /* Efecto Parallax en Imágenes de Fondo */
-        .facet-bg {
+        /* Efecto Parallax en Imágenes de Fondo (ya no se usa) */
+        .facet-bg:not(.facet-title-image-section .facet-bg) {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
-            height: 120%;
+            height: 100%;
             object-fit: cover;
             will-change: transform;
             opacity: 0.25;
@@ -656,49 +712,52 @@
         }
         
         /* Timeline de Progreso */
-        .progress-timeline {
+        /* Barra de Progreso por Faceta - Estilo LeBron (Parte Superior) */
+        .facet-progress-container {
             position: fixed;
-            bottom: 0;
+            top: 0;
             left: 0;
             right: 0;
             height: 4px;
-            background: rgba(255, 255, 255, 0.1);
-            z-index: 1000;
+            background: rgba(255, 255, 255, 0.2);
+            z-index: 2500;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            pointer-events: none;
         }
         
-        .progress-bar {
+        .facet-progress-container.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .facet-progress-bar {
             height: 100%;
-            background: linear-gradient(90deg, var(--color-tertiary), #FFFFFF);
+            background: rgba(255, 255, 255, 1);
             width: 0%;
             transition: width 0.3s ease;
         }
         
-        .progress-dots {
-            position: fixed;
-            right: 2rem;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
+        .facet-progress-label {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 700;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            font-family: 'Space Grotesk', sans-serif;
+            white-space: nowrap;
+            pointer-events: none;
         }
         
-        .progress-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.18);
-            border: 2px solid rgba(255, 255, 255, 0.35);
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-        
-        .progress-dot.active {
-            background: var(--color-tertiary);
-            border-color: #FFFFFF;
-            transform: scale(1.5);
-            box-shadow: 0 0 20px rgba(184, 33, 42, 0.5);
+        .facet-progress-container.active .facet-progress-label {
+            opacity: 1;
         }
         
         /* (Sección de contacto eliminada de la portada) */
@@ -1136,8 +1195,13 @@
                 font-size: 3rem;
             }
             
-            .progress-dots {
-                display: none;
+            .facet-progress-container {
+                height: 3px;
+            }
+            
+            .facet-progress-label {
+                bottom: -20px;
+                font-size: 0.6rem;
             }
             
             .hero-logo-fixed {
@@ -1228,104 +1292,128 @@
         </div>
     </section>
 
-    <!-- Timeline de Progreso -->
-    <div class="progress-timeline">
-        <div class="progress-bar" id="progressBar"></div>
+    <!-- Barras de Progreso (Fuera del contenedor, una por faceta) -->
+    {% for facet in facets %}
+    <div class="facet-progress-container" 
+         id="facetProgress{{ forloop.counter0 }}"
+         data-facet="{{ facet.slug }}">
+        <div class="facet-progress-label">{{ facet.titulo }}</div>
+        <div class="facet-progress-bar" id="facetProgressBar{{ forloop.counter0 }}"></div>
     </div>
+    {% endfor %}
 
-    <!-- Dots de Progreso -->
-    <div class="progress-dots" id="progressDots"></div>
-
-    <!-- Contenedor Principal - Horizontal Scroll -->
-    <div id="horizontal-scroll-container" class="relative">
-        <div class="gallery-wrapper" id="galleryWrapper">
-            {% for facet in facets %}
-            <!-- Título de la Faceta (Diapositiva de Presentación) -->
-            <section class="facet-title-slide" data-facet="{{ facet.slug }}" data-type="facet-title">
-                {% if facet.imagen_hero %}
-                <img src="{{ facet.imagen_hero.url }}" 
-                     alt="{{ facet.titulo }}" 
-                     class="facet-bg"
-                     data-speed="0.5">
-                {% endif %}
-                <h2 class="hologram-effect">{{ facet.titulo }}</h2>
-            </section>
+    <!-- Contenedores de Facetas - Scroll Vertical entre ellas -->
+    <div id="facets-vertical-container">
+        {% for facet in facets %}
+        <!-- Contenedor de Faceta - Scroll Horizontal Individual -->
+        <div class="facet-scroll-container" 
+             id="facetContainer{{ forloop.counter0 }}"
+             data-facet="{{ facet.slug }}"
+             data-total-slides="{{ facet.total_slides|default:1 }}">
             
-            <!-- Cada Hito es una Diapositiva Completa -->
-            {% if facet.hitos_activos %}
-                {% for milestone in facet.hitos_activos %}
-                <section class="milestone-slide" 
-                         data-facet="{{ facet.slug }}" 
-                         data-milestone="{{ milestone.id }}"
-                         data-type="milestone">
+            <div class="facet-gallery-wrapper" 
+                 id="facetGallery{{ forloop.counter0 }}"
+                 style="width: calc(100vw * {{ facet.total_slides|default:1 }});">
+                
+                <!-- Título de la Faceta (Layout tipo LeBron) -->
+                <section class="facet-title-slide" data-type="facet-title">
+                    <!-- Sección de Texto (Izquierda) -->
+                    <div class="facet-title-content">
+                        <div class="facet-title-small">THE</div>
+                        <h2>{{ facet.titulo }}</h2>
+                    </div>
                     
-                    {% if milestone.imagen or milestone.imagenes_activas %}
-                    <!-- Layout: Imagen Izquierda + Panel Texto Derecho -->
-                    <div class="milestone-slide-layout">
-                        <!-- Sección de Imagen (Izquierda) -->
-                        <div class="milestone-slide-image-section">
-                            <div class="milestone-slide-image-container">
-                                {% if milestone.imagen %}
-                                <img src="{{ milestone.imagen.url }}" 
-                                     alt="{{ milestone.titulo }}" 
-                                     class="milestone-slide-main-image">
-                                {% elif milestone.imagenes_activas %}
-                                <img src="{{ milestone.imagenes_activas.0.imagen.url }}" 
-                                     alt="{{ milestone.titulo }}" 
-                                     class="milestone-slide-main-image">
+                    <!-- Sección de Imagen (Derecha) -->
+                    <div class="facet-title-image-section">
+                        {% if facet.imagen_hero %}
+                        <img src="{{ facet.imagen_hero.url }}" 
+                             alt="{{ facet.titulo }}" 
+                             class="facet-bg">
+                        {% else %}
+                        <div style="width:100%; height:100%; background: linear-gradient(135deg, #1a1a1a 0%, #000 100%);"></div>
+                        {% endif %}
+                    </div>
+                </section>
+                
+                <!-- Cada Hito es una Diapositiva Completa -->
+                {% if facet.hitos_activos %}
+                    {% for milestone in facet.hitos_activos %}
+                    <section class="milestone-slide" 
+                             data-milestone="{{ milestone.id }}"
+                             data-type="milestone">
+                        
+                        {% if milestone.imagen or milestone.imagenes_activas %}
+                        <!-- Layout: Imagen Izquierda + Panel Texto Derecho -->
+                        <div class="milestone-slide-layout">
+                            <!-- Sección de Imagen (Izquierda) -->
+                            <div class="milestone-slide-image-section">
+                                <div class="milestone-slide-image-container">
+                                    {% if milestone.imagen %}
+                                    <img src="{{ milestone.imagen.url }}" 
+                                         alt="{{ milestone.titulo }}" 
+                                         class="milestone-slide-main-image">
+                                    {% elif milestone.imagenes_activas %}
+                                    <img src="{{ milestone.imagenes_activas.0.imagen.url }}" 
+                                         alt="{{ milestone.titulo }}" 
+                                         class="milestone-slide-main-image">
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- Galería de Imágenes Adicionales (si hay más de una) -->
+                                {% if milestone.imagenes_activas|length > 1 %}
+                                <div class="milestone-slide-gallery">
+                                    {% for img in milestone.imagenes_activas|slice:"1:6" %}
+                                    <div class="milestone-slide-gallery-item" onclick="changeMainImage(this, '{{ img.imagen.url }}')">
+                                        <img src="{{ img.imagen.url }}" alt="Imagen {{ forloop.counter }}">
+                                    </div>
+                                    {% endfor %}
+                                </div>
                                 {% endif %}
                             </div>
                             
-                            <!-- Galería de Imágenes Adicionales (si hay más de una) -->
-                            {% if milestone.imagenes_activas|length > 1 %}
-                            <div class="milestone-slide-gallery">
-                                {% for img in milestone.imagenes_activas|slice:"1:6" %}
-                                <div class="milestone-slide-gallery-item" onclick="changeMainImage(this, '{{ img.imagen.url }}')">
-                                    <img src="{{ img.imagen.url }}" alt="Imagen {{ forloop.counter }}">
+                            <!-- Sección de Texto (Derecha) -->
+                            <div class="milestone-slide-text-section">
+                                {% if milestone.año %}
+                                <div class="milestone-slide-year">{{ milestone.año }}</div>
+                                {% endif %}
+                                <h3 class="milestone-slide-title">{{ milestone.titulo }}</h3>
+                                {% if milestone.descripcion %}
+                                <div class="milestone-slide-description">
+                                    {{ milestone.descripcion|linebreaks }}
                                 </div>
-                                {% endfor %}
+                                {% endif %}
                             </div>
-                            {% endif %}
                         </div>
-                        
-                        <!-- Sección de Texto (Derecha) -->
-                        <div class="milestone-slide-text-section">
+                        {% else %}
+                        <!-- Layout Alternativo: Texto Centrado (sin imagen) -->
+                        <div class="milestone-slide-centered">
                             {% if milestone.año %}
                             <div class="milestone-slide-year">{{ milestone.año }}</div>
                             {% endif %}
                             <h3 class="milestone-slide-title">{{ milestone.titulo }}</h3>
                             {% if milestone.descripcion %}
-                            <div class="milestone-slide-description">
+                            <div class="milestone-slide-description" style="max-width: 800px;">
                                 {{ milestone.descripcion|linebreaks }}
                             </div>
                             {% endif %}
                         </div>
-                    </div>
-                    {% else %}
-                    <!-- Layout Alternativo: Texto Centrado (sin imagen) -->
-                    <div class="milestone-slide-centered">
-                        {% if milestone.año %}
-                        <div class="milestone-slide-year">{{ milestone.año }}</div>
                         {% endif %}
-                        <h3 class="milestone-slide-title">{{ milestone.titulo }}</h3>
-                        {% if milestone.descripcion %}
-                        <div class="milestone-slide-description" style="max-width: 800px;">
-                            {{ milestone.descripcion|linebreaks }}
-                        </div>
-                        {% endif %}
-                    </div>
-                    {% endif %}
-                </section>
-                {% endfor %}
-            {% endif %}
-            {% empty %}
-            <!-- Estado Vacío -->
-            <section class="facet-title-slide">
-                <h2>ALQUIMISTA</h2>
-                <p class="text-xl text-gray-400" style="margin-top: 2rem;">No hay contenido disponible</p>
-            </section>
-            {% endfor %}
+                    </section>
+                    {% endfor %}
+                {% endif %}
+            </div>
         </div>
+        {% empty %}
+        <!-- Estado Vacío -->
+        <div class="facet-scroll-container">
+            <div class="facet-gallery-wrapper">
+                <section class="facet-title-slide">
+                    <h2>ALQUIMISTA</h2>
+                    <p class="text-xl text-gray-400" style="margin-top: 2rem;">No hay contenido disponible</p>
+                </section>
+            </div>
+        </div>
+        {% endfor %}
     </div>
 
     <!-- Footer Innovador (sin derechos reservados) -->
@@ -1452,164 +1540,124 @@
             }
         }
         
-        const totalDiapositivas = {{ total_diapositivas|default:1 }};
+        // Inicializar scroll horizontal para cada faceta individualmente
+        const facetContainers = document.querySelectorAll('.facet-scroll-container');
         
-        if (totalDiapositivas > 1) {
-            const galleryWrapper = document.getElementById('galleryWrapper');
-            const horizontalContainer = document.getElementById('horizontal-scroll-container');
-            const progressBar = document.getElementById('progressBar');
-            const progressDots = document.getElementById('progressDots');
-            // Calcular ancho total basado en el número de diapositivas
-            const totalWidth = totalDiapositivas * window.innerWidth;
-            
-            // Crear dots de progreso para cada diapositiva
-            const slides = document.querySelectorAll('.facet-title-slide, .milestone-slide');
-            slides.forEach((slide, i) => {
-                const dot = document.createElement('div');
-                dot.className = 'progress-dot';
-                dot.dataset.index = i;
-                dot.addEventListener('click', () => {
-                    const scrollAmount = i * window.innerWidth;
-                    window.scrollTo({
-                        top: scrollAmount,
-                        behavior: 'smooth'
-                    });
-                });
-                progressDots.appendChild(dot);
-            });
-            
+        console.log('Contenedores de facetas encontrados:', facetContainers.length);
+        
+        if (facetContainers.length > 0) {
             // Links dinámicos del menú para cada faceta
-            const facetTitles = document.querySelectorAll('.facet-title-slide');
-            facetTitles.forEach((facetSlide, i) => {
-                const facetTitle = facetSlide.querySelector('h2');
-                if (facetTitle) {
-                    const slideIndex = Array.from(slides).indexOf(facetSlide);
-                    const a = document.createElement('a');
-                    a.href = '#';
-                    a.className = 'menu-link';
-                    a.textContent = facetTitle.textContent.trim();
-                    a.dataset.index = slideIndex;
-                    a.addEventListener('click', (ev) => {
-                        ev.preventDefault();
-                        const scrollAmount = slideIndex * window.innerWidth;
-                        window.scrollTo({ top: scrollAmount, behavior: 'smooth' });
-                        hamburgerBtn.classList.remove('active');
-                        menuOverlay.classList.remove('open');
-                    });
-                    menuLinks.appendChild(a);
-                }
-            });
-            
-            // Scroll Horizontal con Pinning
-            const horizontalScroll = gsap.to(galleryWrapper, {
-                x: () => -(totalWidth - window.innerWidth),
-                ease: "none",
-                scrollTrigger: {
-                    trigger: horizontalContainer,
-                    pin: true,
-                    scrub: 0.5,
-                    start: "top top",
-                    end: () => `+=${totalWidth - window.innerWidth}`,
-                    invalidateOnRefresh: true,
-                    anticipatePin: 1,
-                    onUpdate: (self) => {
-                        // Actualizar barra de progreso
-                        const progress = self.progress;
-                        progressBar.style.width = (progress * 100) + '%';
-                        
-                        // Actualizar dots activos
-                        const currentIndex = Math.round(progress * (totalDiapositivas - 1));
-                        document.querySelectorAll('.progress-dot').forEach((dot, i) => {
-                            if (i === currentIndex) {
-                                dot.classList.add('active');
-                            } else {
-                                dot.classList.remove('active');
-                            }
+            facetContainers.forEach((facetContainer, facetIndex) => {
+                const facetTitleSlide = facetContainer.querySelector('.facet-title-slide');
+                if (facetTitleSlide) {
+                    const facetTitle = facetTitleSlide.querySelector('h2');
+                    if (facetTitle) {
+                        const a = document.createElement('a');
+                        a.href = '#';
+                        a.className = 'menu-link';
+                        a.textContent = facetTitle.textContent.trim();
+                        a.dataset.facet = facetIndex;
+                        a.addEventListener('click', (ev) => {
+                            ev.preventDefault();
+                            facetContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            hamburgerBtn.classList.remove('active');
+                            menuOverlay.classList.remove('open');
                         });
+                        menuLinks.appendChild(a);
                     }
                 }
             });
             
-            // Efecto Parallax en Imágenes de Fondo de Facetas
-            document.querySelectorAll('.facet-bg').forEach((bg, index) => {
-                gsap.to(bg, {
-                    y: "30%",
-                    ease: "none",
-                    scrollTrigger: {
-                        trigger: bg.closest('.facet-title-slide'),
-                        start: "left left",
-                        end: "right left",
-                        scrub: true,
-                        containerAnimation: horizontalScroll
-                    }
-                });
+            // Configurar scroll horizontal para cada faceta individual
+            facetContainers.forEach((facetContainer, facetIndex) => {
+                const galleryWrapper = facetContainer.querySelector('.facet-gallery-wrapper');
+                const totalSlides = parseInt(facetContainer.getAttribute('data-total-slides') || '1');
+                const progressContainer = document.getElementById(`facetProgress${facetIndex}`);
+                const progressBar = document.getElementById(`facetProgressBar${facetIndex}`);
+                
+                if (totalSlides > 1 && galleryWrapper && progressContainer && progressBar) {
+                    const totalWidth = totalSlides * window.innerWidth;
+                    const horizontalWidth = totalWidth - window.innerWidth;
+                    
+                    // Asegurar que el gallery wrapper tenga el ancho correcto
+                    galleryWrapper.style.width = `${totalWidth}px`;
+                    
+                    console.log(`Faceta ${facetIndex} - Total slides: ${totalSlides}, Ancho total: ${totalWidth}, Ancho horizontal: ${horizontalWidth}`);
+                    
+                    // Scroll Horizontal con Pinning para esta faceta
+                    const horizontalScroll = gsap.to(galleryWrapper, {
+                        x: () => -horizontalWidth,
+                        ease: "none",
+                        scrollTrigger: {
+                            trigger: facetContainer,
+                            pin: true,
+                            scrub: 0.1,
+                            start: "top top",
+                            end: () => `+=${horizontalWidth}`,
+                            invalidateOnRefresh: true,
+                            anticipatePin: 1,
+                            onEnter: () => {
+                                // Activar barra de progreso cuando entramos a la faceta
+                                progressContainer.classList.add('active');
+                            },
+                            onLeave: () => {
+                                // Desactivar barra de progreso cuando salimos de la faceta (scroll vertical a la siguiente)
+                                progressContainer.classList.remove('active');
+                                progressBar.style.width = '0%';
+                            },
+                            onLeaveBack: () => {
+                                // Desactivar barra de progreso cuando volvemos hacia atrás
+                                progressContainer.classList.remove('active');
+                                progressBar.style.width = '0%';
+                            },
+                            onUpdate: (self) => {
+                                // Actualizar barra de progreso según el progreso dentro de la faceta
+                                if (self.isActive) {
+                                    const progress = self.progress;
+                                    progressBar.style.width = (progress * 100) + '%';
+                                }
+                            }
+                        }
+                    });
+                    
+                    // Sin efecto parallax - imágenes fijas en primer plano
+                    
+                    // Sin animaciones de entrada - todo fluido y preciso
+                }
             });
             
-            // Animaciones de Entrada para Diapositivas de Hitos
-            document.querySelectorAll('.milestone-slide').forEach((slide, i) => {
-                gsap.from(slide, {
-                    opacity: 0,
-                    y: 50,
-                    duration: 1,
-                    ease: "power3.out",
-                    scrollTrigger: {
-                        trigger: slide,
-                        start: "left 80%",
-                        end: "left 20%",
-                        toggleActions: "play none none reverse",
-                        containerAnimation: horizontalScroll
-                    }
-                });
-            });
-            
-            // Animación de Títulos de Facetas
-            document.querySelectorAll('.facet-title-slide h2').forEach((title, index) => {
-                gsap.from(title, {
-                    opacity: 0,
-                    scale: 0.8,
-                    duration: 1.5,
-                    ease: "power3.out",
-                    scrollTrigger: {
-                        trigger: title.closest('.facet-title-slide'),
-                        start: "left 70%",
-                        end: "left 30%",
-                        toggleActions: "play none none reverse",
-                        containerAnimation: horizontalScroll
-                    }
-                });
-            });
-            
-            // Animación de imágenes principales en diapositivas
+            // Asegurar que las imágenes se vean completas - sin transiciones
             document.querySelectorAll('.milestone-slide-main-image').forEach(img => {
-                img.style.transition = 'opacity 0.3s ease';
+                img.style.transition = 'none';
+                if (img.complete) {
+                    img.style.opacity = '1';
+                }
             });
             
-            // Ocultar Hero al hacer scroll
+            // Ocultar Hero al hacer scroll a la primera faceta
             const hero = document.getElementById('hero');
-            ScrollTrigger.create({
-                trigger: horizontalContainer,
-                start: "top top",
-                onEnter: () => {
+            if (hero && facetContainers.length > 0) {
+                ScrollTrigger.create({
+                    trigger: facetContainers[0],
+                    start: "top top",
+                    onEnter: () => {
                     gsap.to(hero, {
                         opacity: 0,
                         y: -100,
-                        duration: 1,
-                        ease: "power3.inOut"
+                        duration: 0.3,
+                        ease: "power1.out"
                     });
-                },
-                onLeaveBack: () => {
+                    },
+                    onLeaveBack: () => {
                     gsap.to(hero, {
                         opacity: 1,
                         y: 0,
-                        duration: 1,
-                        ease: "power3.inOut"
+                        duration: 0.3,
+                        ease: "power1.out"
                     });
-                }
-            });
-        } else {
-            // Si no hay facetas, ocultar elementos de progreso
-            document.getElementById('progressBar').style.display = 'none';
-            document.getElementById('progressDots').style.display = 'none';
+                    }
+                });
+            }
         }
         
         // Smooth scroll para enlaces
