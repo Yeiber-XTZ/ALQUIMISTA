@@ -1,0 +1,201 @@
+{% extends "staff/base.html" %}
+
+{% block title %}Configuración del Sitio - Panel de Staff{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <h1 class="text-4xl font-bold text-gray-900 mb-2">Configuración del Sitio</h1>
+    <p class="text-gray-600">Gestiona la información general, logo y redes sociales del sitio</p>
+</div>
+
+<div class="bg-white rounded-lg shadow-md p-8 max-w-4xl">
+    <form method="post" enctype="multipart/form-data" class="space-y-6">
+        {% csrf_token %}
+        
+        <!-- Información Básica -->
+        <div class="border-b border-gray-200 pb-6">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">Información Básica</h2>
+            
+            <div class="space-y-4">
+                <div>
+                    <label for="nombre_sitio" class="block text-gray-700 font-semibold mb-2">Nombre del Sitio *</label>
+                    <input type="text" 
+                           id="nombre_sitio" 
+                           name="nombre_sitio" 
+                           value="{{ settings.nombre_sitio }}"
+                           required
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
+                </div>
+                
+                <div>
+                    <label for="descripcion_general" class="block text-gray-700 font-semibold mb-2">Descripción General</label>
+                    <textarea id="descripcion_general" 
+                              name="descripcion_general" 
+                              rows="4"
+                              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">{{ settings.descripcion_general }}</textarea>
+                    <p class="text-sm text-gray-500 mt-1">Esta descripción se usa en meta tags para SEO</p>
+                </div>
+                
+                <div>
+                    <label for="logo" class="block text-gray-700 font-semibold mb-2">Logo del Sitio</label>
+                    {% if settings.logo %}
+                    <div class="mb-4">
+                        <img src="{{ settings.logo.url }}" alt="Logo actual" class="max-w-xs rounded-lg border border-gray-300">
+                        <p class="text-sm text-gray-500 mt-2">Logo actual</p>
+                    </div>
+                    {% endif %}
+                    <input type="file" 
+                           id="logo" 
+                           name="logo" 
+                           accept="image/*"
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
+                    <p class="text-sm text-gray-500 mt-2">Recomendado: formato PNG con fondo transparente</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Hero Section -->
+        <div class="border-b border-gray-200 pb-6">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">Sección Hero (Portada)</h2>
+            
+            <div class="space-y-4">
+                <div>
+                    <label for="imagen_hero" class="block text-gray-700 font-semibold mb-2">Imagen de Fondo Hero</label>
+                    {% if settings.imagen_hero %}
+                    <div class="mb-4">
+                        <img src="{{ settings.imagen_hero.url }}" alt="Imagen hero actual" class="max-w-md rounded-lg border border-gray-300">
+                        <p class="text-sm text-gray-500 mt-2">Imagen hero actual</p>
+                    </div>
+                    {% endif %}
+                    <input type="file" 
+                           id="imagen_hero" 
+                           name="imagen_hero" 
+                           accept="image/*"
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
+                    <p class="text-sm text-gray-500 mt-2">Recomendado: 1920x1080px</p>
+                </div>
+                
+                <div>
+                    <label for="texto_hero" class="block text-gray-700 font-semibold mb-2">Texto Hero Principal</label>
+                    <input type="text" 
+                           id="texto_hero" 
+                           name="texto_hero" 
+                           value="{{ settings.texto_hero|default:'ALQUIMISTA' }}"
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
+                    <p class="text-sm text-gray-500 mt-2">Texto grande que aparece en el hero</p>
+                </div>
+                
+                <div>
+                    <label for="subtitulo_hero" class="block text-gray-700 font-semibold mb-2">Subtítulo Hero</label>
+                    <input type="text" 
+                           id="subtitulo_hero" 
+                           name="subtitulo_hero" 
+                           value="{{ settings.subtitulo_hero|default:'Scroll to explore' }}"
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
+                    <p class="text-sm text-gray-500 mt-2">Texto pequeño debajo del texto principal</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Información de Contacto -->
+        <div class="border-b border-gray-200 pb-6">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">Información de Contacto</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label for="email_contacto" class="block text-gray-700 font-semibold mb-2">Email de Contacto</label>
+                    <input type="email" 
+                           id="email_contacto" 
+                           name="email_contacto" 
+                           value="{{ settings.email_contacto }}"
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
+                </div>
+                
+                <div>
+                    <label for="telefono" class="block text-gray-700 font-semibold mb-2">Teléfono</label>
+                    <input type="text" 
+                           id="telefono" 
+                           name="telefono" 
+                           value="{{ settings.telefono }}"
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
+                </div>
+            </div>
+            
+            <div class="mt-4">
+                <label for="direccion" class="block text-gray-700 font-semibold mb-2">Dirección</label>
+                <textarea id="direccion" 
+                          name="direccion" 
+                          rows="3"
+                          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">{{ settings.direccion }}</textarea>
+            </div>
+        </div>
+        
+        <!-- Redes Sociales -->
+        <div>
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">Redes Sociales</h2>
+            
+            <div class="space-y-4">
+                <div>
+                    <label for="facebook_url" class="block text-gray-700 font-semibold mb-2">Facebook URL</label>
+                    <input type="url" 
+                           id="facebook_url" 
+                           name="facebook_url" 
+                           value="{{ settings.facebook_url }}"
+                           placeholder="https://facebook.com/..."
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
+                </div>
+                
+                <div>
+                    <label for="instagram_url" class="block text-gray-700 font-semibold mb-2">Instagram URL</label>
+                    <input type="url" 
+                           id="instagram_url" 
+                           name="instagram_url" 
+                           value="{{ settings.instagram_url }}"
+                           placeholder="https://instagram.com/..."
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
+                </div>
+                
+                <div>
+                    <label for="twitter_url" class="block text-gray-700 font-semibold mb-2">Twitter/X URL</label>
+                    <input type="url" 
+                           id="twitter_url" 
+                           name="twitter_url" 
+                           value="{{ settings.twitter_url }}"
+                           placeholder="https://twitter.com/..."
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
+                </div>
+                
+                <div>
+                    <label for="linkedin_url" class="block text-gray-700 font-semibold mb-2">LinkedIn URL</label>
+                    <input type="url" 
+                           id="linkedin_url" 
+                           name="linkedin_url" 
+                           value="{{ settings.linkedin_url }}"
+                           placeholder="https://linkedin.com/..."
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
+                </div>
+                
+                <div>
+                    <label for="youtube_url" class="block text-gray-700 font-semibold mb-2">YouTube URL</label>
+                    <input type="url" 
+                           id="youtube_url" 
+                           name="youtube_url" 
+                           value="{{ settings.youtube_url }}"
+                           placeholder="https://youtube.com/..."
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
+                </div>
+            </div>
+        </div>
+        
+        <div class="flex gap-4 pt-4 border-t border-gray-200">
+            <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg transition">
+                Guardar Configuración
+            </button>
+            <a href="{% url 'core:staff_dashboard' %}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-3 px-6 rounded-lg transition">
+                Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+

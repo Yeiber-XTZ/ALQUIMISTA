@@ -1,0 +1,95 @@
+{% extends "staff/base.html" %}
+
+{% block title %}Hitos - Panel de Staff{% endblock %}
+
+{% block content %}
+<div class="mb-8 flex items-center justify-between">
+    <div>
+        <h1 class="text-4xl font-bold text-gray-900 mb-2">Hitos</h1>
+        <p class="text-gray-600">
+            {% if facet %}
+            Hitos de: <strong>{{ facet.titulo }}</strong>
+            {% else %}
+            Todos los hitos del sitio
+            {% endif %}
+        </p>
+    </div>
+    <div class="flex gap-3">
+        {% if facet %}
+        <a href="{% url 'core:staff_milestone_create_for_facet' facet.id %}" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg transition">
+            + Nuevo Hito
+        </a>
+        <a href="{% url 'core:staff_milestones_list' %}" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition">
+            Ver Todos
+        </a>
+        {% else %}
+        <a href="{% url 'core:staff_milestone_create' %}" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg transition">
+            + Nuevo Hito
+        </a>
+        <a href="{% url 'core:staff_facets_list' %}" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition">
+            Ver Facetas
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+{% if milestones %}
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for milestone in milestones %}
+    <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 hover:shadow-lg transition">
+        {% if milestone.imagen %}
+        <div class="h-48 overflow-hidden">
+            <img src="{{ milestone.imagen.url }}" alt="{{ milestone.titulo }}" class="w-full h-full object-cover">
+        </div>
+        {% else %}
+        <div class="h-48 bg-gray-200 flex items-center justify-center">
+            <span class="text-gray-400">Sin imagen</span>
+        </div>
+        {% endif %}
+        <div class="p-6">
+            <div class="flex items-start justify-between mb-2">
+                <div class="flex-1">
+                    <h3 class="text-xl font-bold text-gray-900">{{ milestone.titulo }}</h3>
+                    <p class="text-sm text-gray-500 mt-1">{{ milestone.faceta.titulo }}</p>
+                </div>
+                <span class="px-2 py-1 text-xs rounded {% if milestone.activo %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+                    {% if milestone.activo %}Activo{% else %}Inactivo{% endif %}
+                </span>
+            </div>
+            {% if milestone.año %}
+            <p class="text-red-600 font-semibold mb-2">{{ milestone.año }}</p>
+            {% endif %}
+            {% if milestone.descripcion %}
+            <p class="text-gray-600 text-sm mb-4 line-clamp-2">{{ milestone.descripcion }}</p>
+            {% endif %}
+            <div class="text-sm text-gray-500 mb-4">
+                Orden: {{ milestone.orden }}
+            </div>
+            <div class="flex gap-2">
+                <a href="{% url 'core:staff_milestone_edit' milestone.id %}" class="flex-1 text-center bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded transition text-sm">
+                    Editar
+                </a>
+                <a href="{% url 'core:staff_milestone_delete' milestone.id %}" class="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded transition text-sm">
+                    Eliminar
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="bg-white rounded-lg shadow-md p-12 text-center">
+    <p class="text-gray-500 text-lg mb-4">
+        {% if facet %}
+        No hay hitos en esta faceta aún.
+        {% else %}
+        No hay hitos creados aún.
+        {% endif %}
+    </p>
+    <a href="{% if facet %}{% url 'core:staff_milestone_create_for_facet' facet.id %}{% else %}{% url 'core:staff_milestone_create' %}{% endif %}" class="inline-block bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg transition">
+        Crear Primer Hito
+    </a>
+</div>
+{% endif %}
+{% endblock %}
+

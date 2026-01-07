@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Panel de Staff - ALQUIMISTA{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --color-primary: #B8212A;
+            --color-secondary: #000000;
+            --color-accent: #FFFFFF;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-black text-white flex flex-col">
+            <!-- Logo -->
+            <div class="p-6 border-b border-red-900">
+                <h1 class="text-2xl font-bold text-white">ALQUIMISTA</h1>
+                <p class="text-sm text-gray-400 mt-1">Panel de Staff</p>
+            </div>
+            
+            <!-- Navigation -->
+            <nav class="flex-1 p-4 space-y-2">
+                <a href="{% url 'core:staff_dashboard' %}" 
+                   class="block px-4 py-3 rounded-lg hover:bg-red-900 transition {% if request.resolver_match.url_name == 'staff_dashboard' %}bg-red-900{% endif %}">
+                    Dashboard
+                </a>
+                {% if request.user.is_superuser %}
+                <a href="/admin/" 
+                   class="block px-4 py-3 rounded-lg hover:bg-red-900 transition">
+                    Django Admin
+                </a>
+                {% endif %}
+                <a href="{% url 'core:staff_site_settings' %}" 
+                   class="block px-4 py-3 rounded-lg hover:bg-red-900 transition {% if 'site_settings' in request.resolver_match.url_name %}bg-red-900{% endif %}">
+                    Configuración
+                </a>
+                <a href="{% url 'core:staff_facets_list' %}" 
+                   class="block px-4 py-3 rounded-lg hover:bg-red-900 transition {% if 'faceta' in request.resolver_match.url_name %}bg-red-900{% endif %}">
+                    Facetas
+                </a>
+                <a href="{% url 'core:staff_milestones_list' %}" 
+                   class="block px-4 py-3 rounded-lg hover:bg-red-900 transition {% if 'milestone' in request.resolver_match.url_name %}bg-red-900{% endif %}">
+                    Hitos
+                </a>
+                <a href="{% url 'core:staff_messages_list' %}" 
+                   class="block px-4 py-3 rounded-lg hover:bg-red-900 transition {% if 'message' in request.resolver_match.url_name %}bg-red-900{% endif %}">
+                    Mensajes
+                    {% if unread_count %}
+                    <span class="ml-2 bg-red-600 text-white text-xs px-2 py-1 rounded-full">{{ unread_count }}</span>
+                    {% endif %}
+                </a>
+            </nav>
+            
+            <!-- User Info -->
+            <div class="p-4 border-t border-red-900">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-semibold">{{ user.get_full_name|default:user.username }}</p>
+                        <p class="text-xs text-gray-400">{{ user.email }}</p>
+                    </div>
+                    <a href="{% url 'admin:logout' %}" 
+                       class="text-red-400 hover:text-red-300 text-sm">
+                        Salir
+                    </a>
+                </div>
+                <a href="{% url 'core:index' %}" 
+                   class="block mt-4 text-center text-sm text-gray-400 hover:text-white transition">
+                    Ver Sitio Público →
+                </a>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto">
+            <div class="p-8">
+                <!-- Messages -->
+                {% if messages %}
+                <div class="mb-6 space-y-2">
+                    {% for message in messages %}
+                    <div class="p-4 rounded-lg {% if message.tags == 'error' %}bg-red-100 text-red-800{% elif message.tags == 'success' %}bg-green-100 text-green-800{% else %}bg-blue-100 text-blue-800{% endif %}">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                <!-- Page Content -->
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+</body>
+</html>
+

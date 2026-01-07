@@ -1,0 +1,106 @@
+{% extends "staff/base.html" %}
+
+{% block title %}Dashboard - Panel de Staff{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <h1 class="text-4xl font-bold text-gray-900 mb-2">Dashboard</h1>
+    <p class="text-gray-600">Resumen general del sistema</p>
+</div>
+
+<!-- Estadísticas -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+    <!-- Facetas -->
+    <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-red-600">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-gray-600 text-sm font-medium">Total Facetas</p>
+                <p class="text-3xl font-bold text-gray-900">{{ stats.total_facetas }}</p>
+                <p class="text-sm text-green-600 mt-1">{{ stats.facetas_activas }} activas</p>
+            </div>
+            <div class="text-red-600 text-4xl">📋</div>
+        </div>
+    </div>
+
+    <!-- Hitos -->
+    <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-600">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-gray-600 text-sm font-medium">Total Hitos</p>
+                <p class="text-3xl font-bold text-gray-900">{{ stats.total_hitos }}</p>
+                <p class="text-sm text-green-600 mt-1">{{ stats.hitos_activos }} activos</p>
+            </div>
+            <div class="text-blue-600 text-4xl">⭐</div>
+        </div>
+    </div>
+
+    <!-- Mensajes -->
+    <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-yellow-600">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-gray-600 text-sm font-medium">Mensajes</p>
+                <p class="text-3xl font-bold text-gray-900">{{ stats.total_mensajes }}</p>
+                <p class="text-sm text-red-600 mt-1">{{ stats.mensajes_no_leidos }} no leídos</p>
+            </div>
+            <div class="text-yellow-600 text-4xl">✉️</div>
+        </div>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Últimas Facetas -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-bold text-gray-900">Últimas Facetas</h2>
+            <a href="{% url 'core:staff_facets_list' %}" class="text-red-600 hover:text-red-700 text-sm font-medium">Ver todas →</a>
+        </div>
+        {% if ultimas_facetas %}
+        <div class="space-y-3">
+            {% for facet in ultimas_facetas %}
+            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div class="flex-1">
+                    <p class="font-semibold text-gray-900">{{ facet.titulo }}</p>
+                    <p class="text-sm text-gray-500">{{ facet.fecha_creacion|date:"d/m/Y H:i" }}</p>
+                </div>
+                <span class="px-2 py-1 text-xs rounded {% if facet.activo %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+                    {% if facet.activo %}Activa{% else %}Inactiva{% endif %}
+                </span>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-gray-500 text-center py-4">No hay facetas creadas aún.</p>
+        {% endif %}
+    </div>
+
+    <!-- Últimos Mensajes -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-bold text-gray-900">Últimos Mensajes</h2>
+            <a href="{% url 'core:staff_messages_list' %}" class="text-red-600 hover:text-red-700 text-sm font-medium">Ver todos →</a>
+        </div>
+        {% if ultimos_mensajes %}
+        <div class="space-y-3">
+            {% for msg in ultimos_mensajes %}
+            <a href="{% url 'core:staff_message_detail' msg.pk %}" class="block p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+                <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                        <p class="font-semibold text-gray-900">{{ msg.nombre }}</p>
+                        <p class="text-sm text-gray-600">{{ msg.email }}</p>
+                        <p class="text-sm text-gray-500 mt-1 line-clamp-2">{{ msg.mensaje|truncatewords:15 }}</p>
+                    </div>
+                    {% if not msg.leido %}
+                    <span class="ml-2 bg-red-600 text-white text-xs px-2 py-1 rounded-full">Nuevo</span>
+                    {% endif %}
+                </div>
+                <p class="text-xs text-gray-400 mt-2">{{ msg.fecha_creacion|date:"d/m/Y H:i" }}</p>
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-gray-500 text-center py-4">No hay mensajes recibidos aún.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+

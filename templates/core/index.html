@@ -1,0 +1,1716 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if site_settings %}{{ site_settings.nombre_sitio }}{% else %}ALQUIMISTA NELSON{% endif %}</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollToPlugin.min.js"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800;900&family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-primary: #FFFFFF;
+            --color-secondary: #000000;
+            --color-tertiary: #B8212A;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #000000;
+            color: #FFFFFF;
+            cursor: none;
+        }
+        
+        /* Menú Hamburguesa Overlay */
+        .hamburger {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 9999px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            cursor: pointer;
+            z-index: 3000;
+            transition: transform 0.2s ease;
+        }
+        .hamburger:hover { transform: scale(1.05); }
+        .hamburger-lines {
+            position: relative;
+            width: 22px;
+            height: 2px;
+            background: #FFFFFF;
+        }
+        .hamburger-lines::before,
+        .hamburger-lines::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            width: 22px;
+            height: 2px;
+            background: #FFFFFF;
+            transition: all 0.3s ease;
+        }
+        .hamburger-lines::before { top: -7px; }
+        .hamburger-lines::after { top: 7px; }
+        .hamburger.active .hamburger-lines { background: transparent; }
+        .hamburger.active .hamburger-lines::before {
+            top: 0; transform: rotate(45deg); background: var(--color-tertiary);
+        }
+        .hamburger.active .hamburger-lines::after {
+            top: 0; transform: rotate(-45deg); background: var(--color-tertiary);
+        }
+        .menu-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2500;
+        }
+        .menu-overlay.open { display: flex; }
+        .menu-content {
+            text-align: center;
+            color: #FFFFFF;
+        }
+        .menu-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(2rem, 6vw, 5rem);
+            letter-spacing: 0.2em;
+            margin-bottom: 2rem;
+        }
+        .menu-links {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+        .menu-link {
+            font-size: clamp(1.25rem, 2vw, 1.5rem);
+            font-weight: 800;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: #FFFFFF;
+            text-decoration: none;
+            transition: color 0.2s ease, transform 0.2s ease;
+        }
+        .menu-link:hover { color: var(--color-tertiary); transform: translateY(-2px); }
+        
+        /* Hero Section - Imagen en Primer Plano */
+        .hero-section {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-image-container {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+        }
+        
+        .hero-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+        
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                to bottom,
+                rgba(0, 0, 0, 0.3) 0%,
+                rgba(0, 0, 0, 0.1) 50%,
+                rgba(0, 0, 0, 0.7) 100%
+            );
+            z-index: 2;
+        }
+        
+        .hero-logo-fixed {
+            position: absolute;
+            top: 24px;
+            left: 24px;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            padding: 0.75rem 1.25rem;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .hero-logo-fixed:hover {
+            background: rgba(0, 0, 0, 0.7);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        }
+        
+        .hero-logo-fixed img {
+            height: 60px;
+            width: auto;
+            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.8)) brightness(1.1);
+            transition: transform 0.3s ease;
+            object-fit: contain;
+        }
+        
+        .hero-logo-fixed:hover img {
+            transform: scale(1.08);
+            filter: drop-shadow(0 6px 16px rgba(184, 33, 42, 0.4)) brightness(1.2);
+        }
+        
+        .hero-logo-text {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 900;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: #FFFFFF;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
+        }
+        
+        .hero-scroll-indicator {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            animation: bounce 2s infinite;
+        }
+        
+        .hero-scroll-indicator span {
+            font-size: 0.75rem;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .hero-scroll-arrow {
+            width: 24px;
+            height: 24px;
+            border-right: 2px solid rgba(255, 255, 255, 0.7);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.7);
+            transform: rotate(45deg);
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
+            40% { transform: translateX(-50%) translateY(-10px); }
+            60% { transform: translateX(-50%) translateY(-5px); }
+        }
+        
+        /* Gallery Wrapper - Contenedor Horizontal */
+        .gallery-wrapper {
+            display: flex;
+            width: calc(100vw * {{ total_diapositivas|default:1 }});
+            position: relative;
+            background: #000000;
+        }
+        
+        /* Diapositiva de Hito - Estilo Presentación */
+        .milestone-slide {
+            min-width: 100vw;
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #000000;
+        }
+        
+        /* Layout tipo LeBron: Imagen Izquierda + Panel Texto Derecho */
+        .milestone-slide-layout {
+            display: grid;
+            grid-template-columns: 60% 40%;
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+        
+        .milestone-slide-image-section {
+            position: relative;
+            overflow: hidden;
+            height: 100vh;
+            width: 100%;
+        }
+        
+        .milestone-slide-image-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        .milestone-slide-main-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            filter: brightness(0.9) contrast(1.1);
+            display: block;
+        }
+        
+        /* Galería de imágenes adicionales dentro del hito */
+        .milestone-slide-gallery {
+            position: absolute;
+            bottom: 2rem;
+            left: 2rem;
+            display: flex;
+            gap: 1rem;
+            z-index: 10;
+        }
+        
+        .milestone-slide-gallery-item {
+            width: 120px;
+            height: 80px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .milestone-slide-gallery-item:hover {
+            transform: scale(1.1);
+            border-color: #FFFFFF;
+            z-index: 11;
+        }
+        
+        .milestone-slide-gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .milestone-slide-text-section {
+            background: #000000;
+            padding: 4rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            height: 100vh;
+            position: relative;
+            overflow-y: auto;
+        }
+        
+        .milestone-slide-year {
+            font-size: 4rem;
+            font-weight: 900;
+            font-family: 'Space Grotesk', sans-serif;
+            letter-spacing: 0.1em;
+            color: #FFFFFF;
+            margin-bottom: 1rem;
+            line-height: 1;
+        }
+        
+        .milestone-slide-title {
+            font-size: clamp(2rem, 4vw, 4rem);
+            font-weight: 900;
+            font-family: 'Space Grotesk', sans-serif;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: #FFFFFF;
+            margin-bottom: 2rem;
+            line-height: 1.1;
+        }
+        
+        .milestone-slide-description {
+            font-size: clamp(1rem, 1.5vw, 1.25rem);
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.9);
+            max-width: 500px;
+        }
+        
+        /* Layout Alternativo: Texto Centrado (para hitos sin imagen principal) */
+        .milestone-slide-centered {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem;
+            text-align: center;
+            height: 100vh;
+        }
+        
+        /* Título de Faceta (aparece antes de los hitos) */
+        .facet-title-slide {
+            flex: 0 0 100vw;
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #000000;
+        }
+        
+        .facet-title-slide h2 {
+            font-size: clamp(4rem, 12vw, 15rem);
+            font-weight: 900;
+            font-family: 'Space Grotesk', sans-serif;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #FFFFFF;
+            text-align: center;
+            line-height: 0.9;
+            text-shadow: 0 0 60px rgba(184, 33, 42, 0.25);
+        }
+        
+        .facet-section {
+            min-width: 100vw;
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #000000;
+        }
+        
+        /* Efecto Parallax en Imágenes de Fondo */
+        .facet-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 120%;
+            object-fit: cover;
+            will-change: transform;
+            opacity: 0.25;
+            filter: brightness(0.4) contrast(1.2) saturate(1.1);
+        }
+        
+        /* Máscara Shredded para Imágenes */
+        .shredded-mask {
+            clip-path: polygon(
+                0% 0%, 
+                100% 5%, 
+                95% 100%, 
+                0% 95%
+            );
+            position: relative;
+            border: 3px solid rgba(255, 255, 255, 0.12);
+        }
+        
+        /* Grilla Irregular para Hitos */
+        .milestone-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 2rem;
+            width: 100%;
+            max-width: 1400px;
+            padding: 0 4rem;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .milestone-item {
+            position: relative;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: transform;
+            background: rgba(255, 255, 255, 0.04);
+            padding: 1.5rem;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Posiciones irregulares para los hitos */
+        .milestone-item:nth-child(1) { grid-column: 1 / 5; grid-row: 1; }
+        .milestone-item:nth-child(2) { grid-column: 6 / 10; grid-row: 2; margin-top: 3rem; }
+        .milestone-item:nth-child(3) { grid-column: 2 / 6; grid-row: 3; margin-top: 2rem; }
+        .milestone-item:nth-child(4) { grid-column: 7 / 12; grid-row: 1; }
+        .milestone-item:nth-child(5) { grid-column: 1 / 4; grid-row: 4; margin-top: 4rem; }
+        .milestone-item:nth-child(6) { grid-column: 5 / 9; grid-row: 2; margin-top: 1rem; }
+        .milestone-item:nth-child(7) { grid-column: 10 / 13; grid-row: 3; margin-top: 3rem; }
+        .milestone-item:nth-child(8) { grid-column: 3 / 7; grid-row: 5; margin-top: 2rem; }
+        
+        /* Micro-interacciones Hover */
+        .milestone-item:hover {
+            transform: translateY(-20px) scale(1.02);
+            z-index: 20;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+            border-color: var(--color-tertiary);
+        }
+        
+        .milestone-item:hover .milestone-image {
+            transform: scale(1.1);
+            filter: grayscale(0%) contrast(1.15);
+        }
+        
+        .milestone-item:hover .milestone-title {
+            color: var(--color-tertiary);
+        }
+        
+        .milestone-image {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 4/3;
+            object-fit: cover;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .milestone-title {
+            font-size: clamp(1.5rem, 3vw, 3rem);
+            font-weight: 800;
+            font-family: 'Space Grotesk', sans-serif;
+            letter-spacing: 0.05em;
+            margin-top: 1rem;
+            transition: all 0.4s ease;
+            text-transform: uppercase;
+            color: #FFFFFF;
+        }
+        
+        .milestone-year {
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            color: #FFFFFF;
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Primera Faceta - Estilo LeBron (KING'S DOMAIN) */
+        .facet-section.first-facet {
+            flex-direction: column;
+            align-items: stretch;
+            justify-content: flex-start;
+            padding: 0;
+        }
+        
+        .first-facet-header {
+            width: 100%;
+            background: #000000;
+            padding: 4rem 4rem 3rem;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .first-facet-header-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(3rem, 8vw, 8rem);
+            font-weight: 900;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: #FFFFFF;
+            line-height: 1;
+        }
+        
+        .first-facet-panels {
+            display: flex;
+            width: 100%;
+            height: calc(100vh - 220px);
+            overflow: hidden;
+        }
+        
+        .first-facet-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem 2rem;
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+        }
+        
+        .first-facet-panel:nth-child(1) { background: #FFFFFF; }
+        .first-facet-panel:nth-child(2) { background: #1a4d2e; }
+        .first-facet-panel:nth-child(3) { background: #000000; }
+        .first-facet-panel:nth-child(4) { background: #000000; }
+        .first-facet-panel:nth-child(5) { background: #0066cc; }
+        .first-facet-panel:nth-child(6) { background: #B8212A; }
+        .first-facet-panel:nth-child(7) { background: #2d2d2d; }
+        .first-facet-panel:nth-child(8) { background: #1a1a1a; }
+        
+        .first-facet-panel:hover {
+            flex: 1.2;
+            z-index: 10;
+        }
+        
+        .first-facet-panel-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .first-facet-panel img {
+            max-width: 200px;
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+            filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.3));
+        }
+        
+        .first-facet-panel-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(1.5rem, 3vw, 2.5rem);
+            font-weight: 800;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin: 0;
+        }
+        
+        .first-facet-panel:nth-child(1) .first-facet-panel-title,
+        .first-facet-panel:nth-child(1) .first-facet-panel-text,
+        .first-facet-panel:nth-child(1) .first-facet-panel-year {
+            color: #000000;
+        }
+        
+        .first-facet-panel:nth-child(2) .first-facet-panel-title,
+        .first-facet-panel:nth-child(2) .first-facet-panel-text,
+        .first-facet-panel:nth-child(2) .first-facet-panel-year {
+            color: #FFFFFF;
+        }
+        
+        .first-facet-panel:nth-child(3) .first-facet-panel-title,
+        .first-facet-panel:nth-child(3) .first-facet-panel-text,
+        .first-facet-panel:nth-child(3) .first-facet-panel-year {
+            color: #FFFFFF;
+        }
+        
+        .first-facet-panel:nth-child(4) .first-facet-panel-title,
+        .first-facet-panel:nth-child(4) .first-facet-panel-text,
+        .first-facet-panel:nth-child(4) .first-facet-panel-year {
+            color: #FFFFFF;
+        }
+        
+        .first-facet-panel:nth-child(5) .first-facet-panel-title,
+        .first-facet-panel:nth-child(5) .first-facet-panel-text,
+        .first-facet-panel:nth-child(5) .first-facet-panel-year {
+            color: #FFFFFF;
+        }
+        
+        .first-facet-panel-text {
+            font-size: clamp(0.9rem, 1.5vw, 1.2rem);
+            line-height: 1.6;
+            opacity: 0.9;
+        }
+        
+        .first-facet-panel-year {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            opacity: 0.8;
+        }
+        
+        /* Título de Faceta Normal (no primera) - Impactante */
+        .facet-title {
+            position: absolute;
+            top: 15%;
+            left: 5%;
+            font-size: clamp(4rem, 12vw, 15rem);
+            font-weight: 900;
+            font-family: 'Space Grotesk', sans-serif;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            line-height: 0.9;
+            z-index: 5;
+            color: #FFFFFF;
+            text-shadow: 0 0 60px rgba(184, 33, 42, 0.25);
+        }
+        
+        /* Timeline de Progreso */
+        .progress-timeline {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--color-tertiary), #FFFFFF);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .progress-dots {
+            position: fixed;
+            right: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .progress-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.18);
+            border: 2px solid rgba(255, 255, 255, 0.35);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .progress-dot.active {
+            background: var(--color-tertiary);
+            border-color: #FFFFFF;
+            transform: scale(1.5);
+            box-shadow: 0 0 20px rgba(184, 33, 42, 0.5);
+        }
+        
+        /* (Sección de contacto eliminada de la portada) */
+
+        /* Cursor y Partículas */
+        .custom-cursor {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--color-primary);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 4000;
+            transition: transform 0.2s ease, width 0.2s ease, height 0.2s ease, border-color 0.2s ease;
+            mix-blend-mode: difference;
+        }
+        .custom-cursor-dot {
+            width: 4px;
+            height: 4px;
+            background: var(--color-primary);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 4001;
+            transition: transform 0.06s ease;
+            mix-blend-mode: difference;
+        }
+        .custom-cursor.hover {
+            width: 56px;
+            height: 56px;
+            border-color: var(--color-tertiary);
+            background: rgba(184, 33, 42, 0.12);
+        }
+        .particles-container {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 2; overflow: hidden;
+        }
+        .particle {
+            position: absolute;
+            width: 2px; height: 2px; border-radius: 50%;
+            background: var(--color-primary); opacity: 0.28;
+            animation: float 20s infinite ease-in-out;
+        }
+        @keyframes float {
+            0%,100% { transform: translate(0,0) scale(1); opacity: 0.28; }
+            50% { transform: translate(120px,-120px) scale(1.4); opacity: 0.55; }
+        }
+        .scan-line {
+            position: fixed; top: 0; left: 0; width: 100%; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--color-tertiary), transparent);
+            z-index: 3500; pointer-events: none; animation: scan 3s infinite;
+            opacity: 0.6;
+        }
+        @keyframes scan {
+            0% { top: 0; opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { top: 100vh; opacity: 0.6; }
+        }
+
+        /* Botón flotante Staff/Admin */
+        .admin-fab {
+            position: fixed; right: 20px; bottom: 20px;
+            width: 54px; height: 54px; border-radius: 9999px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+            display: flex; align-items: center; justify-content: center;
+            color: #FFF; z-index: 3200; cursor: pointer;
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
+        .admin-fab:hover { transform: translateY(-2px); background: rgba(255,255,255,0.12); }
+        .admin-fab-menu {
+            position: fixed; right: 20px; bottom: 80px; z-index: 3200;
+            display: none; flex-direction: column; gap: 10px;
+        }
+        .admin-fab-menu.open { display: flex; }
+        .admin-fab-link {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+            color: #FFF; text-decoration: none; font-weight: 800; letter-spacing: .15em;
+            text-transform: uppercase; font-size: 12px;
+            padding: 10px 14px; border-radius: 9999px; transition: transform .2s ease, background .2s ease;
+        }
+        .admin-fab-link:hover { transform: translateY(-2px); background: rgba(184,33,42,0.25); }
+        
+        /* Efectos Avanzados */
+        .glitch-effect {
+            position: relative;
+        }
+        
+        .hologram-effect {
+            background: linear-gradient(
+                90deg,
+                #000000 0%,
+                var(--color-tertiary) 50%,
+                #000000 100%
+            );
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: hologramShift 3s infinite linear;
+        }
+        
+        @keyframes hologramShift {
+            to {
+                background-position: 200% center;
+            }
+        }
+        
+        .text-reveal span {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: revealText 0.6s forwards;
+        }
+        
+        @keyframes revealText {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .distortion-effect {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .distortion-effect::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.3),
+                transparent
+            );
+            transition: left 0.5s ease;
+            z-index: 2;
+        }
+        
+        .distortion-effect:hover::before {
+            left: 100%;
+        }
+        
+        .glow-on-hover {
+            position: relative;
+        }
+        
+        .glow-on-hover::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: radial-gradient(
+                circle,
+                rgba(184, 33, 42, 0.3) 0%,
+                transparent 70%
+            );
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease, height 0.6s ease;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .glow-on-hover:hover::after {
+            width: 300px;
+            height: 300px;
+        }
+        
+        /* Footer Innovador */
+        .main-footer {
+            background: linear-gradient(180deg, #0a0a0a 0%, #000000 100%);
+            color: #FFFFFF;
+            padding: 0;
+            position: relative;
+            z-index: 100;
+            overflow: hidden;
+        }
+        
+        .footer-wave {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 100'%3E%3Cpath fill='%23000' d='M0,50 C360,100 720,0 1080,50 C1260,75 1380,25 1440,50 L1440,0 L0,0 Z'/%3E%3C/svg%3E") no-repeat center;
+            background-size: cover;
+            opacity: 0.5;
+        }
+        
+        .footer-glow {
+            position: absolute;
+            top: -200px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            height: 400px;
+            background: radial-gradient(ellipse, rgba(184, 33, 42, 0.15) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        
+        .footer-inner {
+            position: relative;
+            z-index: 2;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 6rem 2rem 4rem;
+        }
+        
+        .footer-top {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 4rem;
+        }
+        
+        .footer-brand {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .footer-brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .footer-brand-logo img {
+            height: 60px;
+            width: auto;
+            filter: drop-shadow(0 4px 12px rgba(184, 33, 42, 0.3));
+        }
+        
+        .footer-brand-name {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 900;
+            letter-spacing: 0.1em;
+        }
+        
+        .footer-brand-desc {
+            color: rgba(255, 255, 255, 0.6);
+            line-height: 1.8;
+            max-width: 400px;
+        }
+        
+        .footer-social {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .footer-social-btn {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #FFFFFF;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .footer-social-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, #B8212A, #ff4757);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .footer-social-btn:hover::before {
+            opacity: 1;
+        }
+        
+        .footer-social-btn:hover {
+            transform: translateY(-4px) scale(1.1);
+            border-color: transparent;
+            box-shadow: 0 10px 30px rgba(184, 33, 42, 0.4);
+        }
+        
+        .footer-social-btn svg {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .footer-column h4 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+            color: #FFFFFF;
+        }
+        
+        .footer-column ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .footer-column li {
+            margin-bottom: 0.75rem;
+        }
+        
+        .footer-column a {
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .footer-column a::before {
+            content: '';
+            width: 0;
+            height: 1px;
+            background: #B8212A;
+            transition: width 0.3s ease;
+        }
+        
+        .footer-column a:hover {
+            color: #FFFFFF;
+            transform: translateX(8px);
+        }
+        
+        .footer-column a:hover::before {
+            width: 20px;
+        }
+        
+        .footer-newsletter {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+        
+        .footer-newsletter h4 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+        
+        .footer-newsletter p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        
+        .footer-newsletter-form {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .footer-newsletter-input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            color: #FFFFFF;
+            font-size: 0.9rem;
+        }
+        
+        .footer-newsletter-input:focus {
+            outline: none;
+            border-color: #B8212A;
+        }
+        
+        .footer-newsletter-btn {
+            background: linear-gradient(135deg, #B8212A, #ff4757);
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            color: #FFFFFF;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .footer-newsletter-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(184, 33, 42, 0.4);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            /* Hamburguesa ya es responsive por defecto */
+            
+            .milestone-slide-layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .milestone-slide-image-section {
+                height: 50vh;
+            }
+            
+            .milestone-slide-text-section {
+                height: 50vh;
+                padding: 2rem;
+            }
+            
+            .milestone-slide-gallery {
+                bottom: 1rem;
+                left: 1rem;
+            }
+            
+            .milestone-slide-gallery-item {
+                width: 80px;
+                height: 60px;
+            }
+            
+            .facet-title-slide h2 {
+                font-size: 3rem;
+            }
+            
+            .progress-dots {
+                display: none;
+            }
+            
+            .hero-logo-fixed {
+                top: 16px;
+                left: 16px;
+            }
+            
+            .hero-logo-fixed img {
+                height: 40px;
+            }
+            
+            .hero-logo-text {
+                font-size: 1rem;
+            }
+            
+            .footer-top {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            .first-facet-panels {
+                flex-direction: column;
+                height: auto;
+            }
+            
+            .first-facet-panel {
+                min-height: 300px;
+            }
+            
+            .first-facet-header {
+                padding: 3rem 2rem 2rem;
+            }
+        }
+        
+    </style>
+</head>
+<body>
+    <!-- Cursor y Partículas -->
+    <div class="custom-cursor" id="customCursor"></div>
+    <div class="custom-cursor-dot" id="customCursorDot"></div>
+    <div class="particles-container" id="particlesContainer"></div>
+    <div class="scan-line"></div>
+
+    <!-- Botón Hamburguesa -->
+    <button id="hamburgerBtn" class="hamburger" aria-label="Menú">
+        <div class="hamburger-lines"></div>
+    </button>
+    <!-- Overlay de Menú -->
+    <div id="menuOverlay" class="menu-overlay">
+        <div class="menu-content">
+            <div class="menu-title">
+                {% if site_settings and site_settings.logo %}
+                <img src="{{ site_settings.logo.url }}" alt="Logo" style="height:64px; width:auto; display:block; margin:0 auto 1rem auto;">
+                {% endif %}
+                {% if site_settings %}{{ site_settings.nombre_sitio }}{% else %}ALQUIMISTA{% endif %}
+            </div>
+            <div class="menu-links" id="menuLinks">
+                <a href="#" class="menu-link" data-action="home">Inicio</a>
+                <a href="{% url 'core:contact' %}" class="menu-link">Contacto</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hero Section - Imagen en Primer Plano -->
+    <section class="hero-section" id="hero">
+        <!-- Logo en Esquina Superior Izquierda -->
+        <div class="hero-logo-fixed">
+            {% if site_settings and site_settings.logo %}
+            <img src="{{ site_settings.logo.url }}" alt="Logo">
+            {% endif %}
+            <span class="hero-logo-text">{% if site_settings %}{{ site_settings.nombre_sitio }}{% else %}ALQUIMISTA{% endif %}</span>
+        </div>
+        
+        <!-- Imagen Hero en Primer Plano -->
+        <div class="hero-image-container">
+            {% if site_settings and site_settings.imagen_hero %}
+            <img src="{{ site_settings.imagen_hero.url }}" alt="Hero" class="hero-image">
+            {% else %}
+            <div style="width:100%; height:100%; background: linear-gradient(135deg, #1a1a1a 0%, #000 100%);"></div>
+            {% endif %}
+            <div class="hero-overlay"></div>
+        </div>
+        
+        <!-- Indicador de Scroll -->
+        <div class="hero-scroll-indicator">
+            <span>Scroll</span>
+            <div class="hero-scroll-arrow"></div>
+        </div>
+    </section>
+
+    <!-- Timeline de Progreso -->
+    <div class="progress-timeline">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <!-- Dots de Progreso -->
+    <div class="progress-dots" id="progressDots"></div>
+
+    <!-- Contenedor Principal - Horizontal Scroll -->
+    <div id="horizontal-scroll-container" class="relative">
+        <div class="gallery-wrapper" id="galleryWrapper">
+            {% for facet in facets %}
+            <!-- Título de la Faceta (Diapositiva de Presentación) -->
+            <section class="facet-title-slide" data-facet="{{ facet.slug }}" data-type="facet-title">
+                {% if facet.imagen_hero %}
+                <img src="{{ facet.imagen_hero.url }}" 
+                     alt="{{ facet.titulo }}" 
+                     class="facet-bg"
+                     data-speed="0.5">
+                {% endif %}
+                <h2 class="hologram-effect">{{ facet.titulo }}</h2>
+            </section>
+            
+            <!-- Cada Hito es una Diapositiva Completa -->
+            {% if facet.hitos_activos %}
+                {% for milestone in facet.hitos_activos %}
+                <section class="milestone-slide" 
+                         data-facet="{{ facet.slug }}" 
+                         data-milestone="{{ milestone.id }}"
+                         data-type="milestone">
+                    
+                    {% if milestone.imagen or milestone.imagenes_activas %}
+                    <!-- Layout: Imagen Izquierda + Panel Texto Derecho -->
+                    <div class="milestone-slide-layout">
+                        <!-- Sección de Imagen (Izquierda) -->
+                        <div class="milestone-slide-image-section">
+                            <div class="milestone-slide-image-container">
+                                {% if milestone.imagen %}
+                                <img src="{{ milestone.imagen.url }}" 
+                                     alt="{{ milestone.titulo }}" 
+                                     class="milestone-slide-main-image">
+                                {% elif milestone.imagenes_activas %}
+                                <img src="{{ milestone.imagenes_activas.0.imagen.url }}" 
+                                     alt="{{ milestone.titulo }}" 
+                                     class="milestone-slide-main-image">
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Galería de Imágenes Adicionales (si hay más de una) -->
+                            {% if milestone.imagenes_activas|length > 1 %}
+                            <div class="milestone-slide-gallery">
+                                {% for img in milestone.imagenes_activas|slice:"1:6" %}
+                                <div class="milestone-slide-gallery-item" onclick="changeMainImage(this, '{{ img.imagen.url }}')">
+                                    <img src="{{ img.imagen.url }}" alt="Imagen {{ forloop.counter }}">
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Sección de Texto (Derecha) -->
+                        <div class="milestone-slide-text-section">
+                            {% if milestone.año %}
+                            <div class="milestone-slide-year">{{ milestone.año }}</div>
+                            {% endif %}
+                            <h3 class="milestone-slide-title">{{ milestone.titulo }}</h3>
+                            {% if milestone.descripcion %}
+                            <div class="milestone-slide-description">
+                                {{ milestone.descripcion|linebreaks }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% else %}
+                    <!-- Layout Alternativo: Texto Centrado (sin imagen) -->
+                    <div class="milestone-slide-centered">
+                        {% if milestone.año %}
+                        <div class="milestone-slide-year">{{ milestone.año }}</div>
+                        {% endif %}
+                        <h3 class="milestone-slide-title">{{ milestone.titulo }}</h3>
+                        {% if milestone.descripcion %}
+                        <div class="milestone-slide-description" style="max-width: 800px;">
+                            {{ milestone.descripcion|linebreaks }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </section>
+                {% endfor %}
+            {% endif %}
+            {% empty %}
+            <!-- Estado Vacío -->
+            <section class="facet-title-slide">
+                <h2>ALQUIMISTA</h2>
+                <p class="text-xl text-gray-400" style="margin-top: 2rem;">No hay contenido disponible</p>
+            </section>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Footer Innovador (sin derechos reservados) -->
+    <footer class="main-footer">
+        <div class="footer-glow"></div>
+        <div class="footer-wave"></div>
+        
+        <div class="footer-inner">
+            <div class="footer-top">
+                <!-- Brand -->
+                <div class="footer-brand">
+                    <div class="footer-brand-logo">
+                        {% if site_settings and site_settings.logo %}
+                        <img src="{{ site_settings.logo.url }}" alt="Logo">
+                        {% endif %}
+                        <span class="footer-brand-name">{% if site_settings %}{{ site_settings.nombre_sitio }}{% else %}ALQUIMISTA{% endif %}</span>
+                    </div>
+                    <p class="footer-brand-desc">
+                        {% if site_settings and site_settings.descripcion_general %}
+                        {{ site_settings.descripcion_general }}
+                        {% else %}
+                        Explorando las diferentes facetas de la creatividad, el talento y la innovación.
+                        {% endif %}
+                    </p>
+                    <div class="footer-social">
+                        {% if site_settings.facebook_url %}
+                        <a href="{{ site_settings.facebook_url }}" target="_blank" class="footer-social-btn" title="Facebook">
+                            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                        </a>
+                        {% endif %}
+                        {% if site_settings.instagram_url %}
+                        <a href="{{ site_settings.instagram_url }}" target="_blank" class="footer-social-btn" title="Instagram">
+                            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                        </a>
+                        {% endif %}
+                        {% if site_settings.twitter_url %}
+                        <a href="{{ site_settings.twitter_url }}" target="_blank" class="footer-social-btn" title="Twitter">
+                            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/></svg>
+                        </a>
+                        {% endif %}
+                        {% if site_settings.linkedin_url %}
+                        <a href="{{ site_settings.linkedin_url }}" target="_blank" class="footer-social-btn" title="LinkedIn">
+                            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                        </a>
+                        {% endif %}
+                        {% if site_settings.youtube_url %}
+                        <a href="{{ site_settings.youtube_url }}" target="_blank" class="footer-social-btn" title="YouTube">
+                            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Navegación -->
+                <div class="footer-column">
+                    <h4>Navegación</h4>
+                    <ul>
+                        <li><a href="{% url 'core:index' %}">Inicio</a></li>
+                        <li><a href="{% url 'core:contact' %}">Contacto</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Contacto -->
+                {% if site_settings %}
+                <div class="footer-column">
+                    <h4>Contacto</h4>
+                    <ul>
+                        {% if site_settings.email_contacto %}
+                        <li><a href="mailto:{{ site_settings.email_contacto }}">{{ site_settings.email_contacto }}</a></li>
+                        {% endif %}
+                        {% if site_settings.telefono %}
+                        <li><a href="tel:{{ site_settings.telefono }}">{{ site_settings.telefono }}</a></li>
+                        {% endif %}
+                        {% if site_settings.direccion %}
+                        <li><span style="color: rgba(255,255,255,0.6);">{{ site_settings.direccion }}</span></li>
+                        {% endif %}
+                    </ul>
+                </div>
+                {% endif %}
+                
+                <!-- Newsletter -->
+                <div class="footer-newsletter">
+                    <h4>Mantente Conectado</h4>
+                    <p>Recibe las últimas novedades y actualizaciones.</p>
+                    <form class="footer-newsletter-form" action="{% url 'core:contact' %}" method="get">
+                        <input type="email" placeholder="Tu email" class="footer-newsletter-input">
+                        <button type="submit" class="footer-newsletter-btn">→</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Script GSAP - Horizontal Scroll Experience -->
+    <script>
+        gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+
+        // Menú Hamburguesa Overlay
+        const hamburgerBtn = document.getElementById('hamburgerBtn');
+        const menuOverlay = document.getElementById('menuOverlay');
+        const menuLinks = document.getElementById('menuLinks');
+        hamburgerBtn.addEventListener('click', () => {
+            hamburgerBtn.classList.toggle('active');
+            menuOverlay.classList.toggle('open');
+        });
+        menuOverlay.addEventListener('click', (e) => {
+            if (e.target === menuOverlay) {
+                hamburgerBtn.classList.remove('active');
+                menuOverlay.classList.remove('open');
+            }
+        });
+
+        // Función para cambiar imagen principal
+        function changeMainImage(thumbElement, imageUrl) {
+            const slide = thumbElement.closest('.milestone-slide');
+            const mainImage = slide.querySelector('.milestone-slide-main-image');
+            if (mainImage) {
+                mainImage.src = imageUrl;
+                // Efecto fade
+                mainImage.style.opacity = '0';
+                setTimeout(() => {
+                    mainImage.style.opacity = '1';
+                }, 200);
+            }
+        }
+        
+        const totalDiapositivas = {{ total_diapositivas|default:1 }};
+        
+        if (totalDiapositivas > 1) {
+            const galleryWrapper = document.getElementById('galleryWrapper');
+            const horizontalContainer = document.getElementById('horizontal-scroll-container');
+            const progressBar = document.getElementById('progressBar');
+            const progressDots = document.getElementById('progressDots');
+            // Calcular ancho total basado en el número de diapositivas
+            const totalWidth = totalDiapositivas * window.innerWidth;
+            
+            // Crear dots de progreso para cada diapositiva
+            const slides = document.querySelectorAll('.facet-title-slide, .milestone-slide');
+            slides.forEach((slide, i) => {
+                const dot = document.createElement('div');
+                dot.className = 'progress-dot';
+                dot.dataset.index = i;
+                dot.addEventListener('click', () => {
+                    const scrollAmount = i * window.innerWidth;
+                    window.scrollTo({
+                        top: scrollAmount,
+                        behavior: 'smooth'
+                    });
+                });
+                progressDots.appendChild(dot);
+            });
+            
+            // Links dinámicos del menú para cada faceta
+            const facetTitles = document.querySelectorAll('.facet-title-slide');
+            facetTitles.forEach((facetSlide, i) => {
+                const facetTitle = facetSlide.querySelector('h2');
+                if (facetTitle) {
+                    const slideIndex = Array.from(slides).indexOf(facetSlide);
+                    const a = document.createElement('a');
+                    a.href = '#';
+                    a.className = 'menu-link';
+                    a.textContent = facetTitle.textContent.trim();
+                    a.dataset.index = slideIndex;
+                    a.addEventListener('click', (ev) => {
+                        ev.preventDefault();
+                        const scrollAmount = slideIndex * window.innerWidth;
+                        window.scrollTo({ top: scrollAmount, behavior: 'smooth' });
+                        hamburgerBtn.classList.remove('active');
+                        menuOverlay.classList.remove('open');
+                    });
+                    menuLinks.appendChild(a);
+                }
+            });
+            
+            // Scroll Horizontal con Pinning
+            const horizontalScroll = gsap.to(galleryWrapper, {
+                x: () => -(totalWidth - window.innerWidth),
+                ease: "none",
+                scrollTrigger: {
+                    trigger: horizontalContainer,
+                    pin: true,
+                    scrub: 0.5,
+                    start: "top top",
+                    end: () => `+=${totalWidth - window.innerWidth}`,
+                    invalidateOnRefresh: true,
+                    anticipatePin: 1,
+                    onUpdate: (self) => {
+                        // Actualizar barra de progreso
+                        const progress = self.progress;
+                        progressBar.style.width = (progress * 100) + '%';
+                        
+                        // Actualizar dots activos
+                        const currentIndex = Math.round(progress * (totalDiapositivas - 1));
+                        document.querySelectorAll('.progress-dot').forEach((dot, i) => {
+                            if (i === currentIndex) {
+                                dot.classList.add('active');
+                            } else {
+                                dot.classList.remove('active');
+                            }
+                        });
+                    }
+                }
+            });
+            
+            // Efecto Parallax en Imágenes de Fondo de Facetas
+            document.querySelectorAll('.facet-bg').forEach((bg, index) => {
+                gsap.to(bg, {
+                    y: "30%",
+                    ease: "none",
+                    scrollTrigger: {
+                        trigger: bg.closest('.facet-title-slide'),
+                        start: "left left",
+                        end: "right left",
+                        scrub: true,
+                        containerAnimation: horizontalScroll
+                    }
+                });
+            });
+            
+            // Animaciones de Entrada para Diapositivas de Hitos
+            document.querySelectorAll('.milestone-slide').forEach((slide, i) => {
+                gsap.from(slide, {
+                    opacity: 0,
+                    y: 50,
+                    duration: 1,
+                    ease: "power3.out",
+                    scrollTrigger: {
+                        trigger: slide,
+                        start: "left 80%",
+                        end: "left 20%",
+                        toggleActions: "play none none reverse",
+                        containerAnimation: horizontalScroll
+                    }
+                });
+            });
+            
+            // Animación de Títulos de Facetas
+            document.querySelectorAll('.facet-title-slide h2').forEach((title, index) => {
+                gsap.from(title, {
+                    opacity: 0,
+                    scale: 0.8,
+                    duration: 1.5,
+                    ease: "power3.out",
+                    scrollTrigger: {
+                        trigger: title.closest('.facet-title-slide'),
+                        start: "left 70%",
+                        end: "left 30%",
+                        toggleActions: "play none none reverse",
+                        containerAnimation: horizontalScroll
+                    }
+                });
+            });
+            
+            // Animación de imágenes principales en diapositivas
+            document.querySelectorAll('.milestone-slide-main-image').forEach(img => {
+                img.style.transition = 'opacity 0.3s ease';
+            });
+            
+            // Ocultar Hero al hacer scroll
+            const hero = document.getElementById('hero');
+            ScrollTrigger.create({
+                trigger: horizontalContainer,
+                start: "top top",
+                onEnter: () => {
+                    gsap.to(hero, {
+                        opacity: 0,
+                        y: -100,
+                        duration: 1,
+                        ease: "power3.inOut"
+                    });
+                },
+                onLeaveBack: () => {
+                    gsap.to(hero, {
+                        opacity: 1,
+                        y: 0,
+                        duration: 1,
+                        ease: "power3.inOut"
+                    });
+                }
+            });
+        } else {
+            // Si no hay facetas, ocultar elementos de progreso
+            document.getElementById('progressBar').style.display = 'none';
+            document.getElementById('progressDots').style.display = 'none';
+        }
+        
+        // Smooth scroll para enlaces
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // Efectos de Distorsión en Imágenes
+        const distortionImages = document.querySelectorAll('.distortion-effect img');
+        distortionImages.forEach(img => {
+            img.addEventListener('mousemove', (e) => {
+                const rect = img.getBoundingClientRect();
+                const x = ((e.clientX - rect.left) / rect.width) * 100;
+                const y = ((e.clientY - rect.top) / rect.height) * 100;
+                
+                const rotateX = (y - 50) * 0.1;
+                const rotateY = (50 - x) * 0.1;
+                
+                img.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.1)`;
+            });
+            
+            img.addEventListener('mouseleave', () => {
+                img.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
+            });
+        });
+
+        // Cursor personalizado
+        const cursor = document.getElementById('customCursor');
+        const cursorDot = document.getElementById('customCursorDot');
+        let mouseX = 0, mouseY = 0, cx = 0, cy = 0;
+        document.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; });
+        function animateCursor() {
+            cx += (mouseX - cx) * 0.12; cy += (mouseY - cy) * 0.12;
+            if (cursor) { cursor.style.left = cx + 'px'; cursor.style.top = cy + 'px'; }
+            if (cursorDot) { cursorDot.style.left = mouseX + 'px'; cursorDot.style.top = mouseY + 'px'; }
+            requestAnimationFrame(animateCursor);
+        }
+        animateCursor();
+        document.querySelectorAll('a, button, .milestone-slide, .milestone-slide-gallery-item').forEach(el => {
+            el.addEventListener('mouseenter', () => cursor && cursor.classList.add('hover'));
+            el.addEventListener('mouseleave', () => cursor && cursor.classList.remove('hover'));
+        });
+
+        // Partículas
+        const particlesContainer = document.getElementById('particlesContainer');
+        if (particlesContainer) {
+            const count = 60;
+            for (let i = 0; i < count; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                p.style.left = Math.random() * 100 + '%';
+                p.style.top = Math.random() * 100 + '%';
+                p.style.animationDelay = (Math.random() * 20) + 's';
+                p.style.animationDuration = (15 + Math.random() * 12) + 's';
+                particlesContainer.appendChild(p);
+            }
+            window.addEventListener('scroll', () => {
+                const scrolled = window.pageYOffset;
+                const particles = document.querySelectorAll('.particle');
+                particles.forEach((particle, i) => {
+                    const speed = 0.2 + (i % 4) * 0.15;
+                    particle.style.transform = `translateY(${scrolled * speed}px)`;
+                });
+            });
+        }
+
+        // Botón flotante Staff/Admin (solo si el usuario tiene permisos)
+        {% if request.user.is_authenticated and request.user.is_staff %}
+        const fab = document.createElement('button');
+        fab.className = 'admin-fab';
+        fab.innerHTML = '⚙';
+        const fabMenu = document.createElement('div');
+        fabMenu.className = 'admin-fab-menu';
+        const linkStaff = document.createElement('a');
+        linkStaff.className = 'admin-fab-link';
+        linkStaff.href = '{% url "core:staff_dashboard" %}';
+        linkStaff.textContent = 'Panel Staff';
+        fabMenu.appendChild(linkStaff);
+        {% if request.user.is_superuser %}
+        const linkAdmin = document.createElement('a');
+        linkAdmin.className = 'admin-fab-link';
+        linkAdmin.href = '/admin/';
+        linkAdmin.textContent = 'Django Admin';
+        fabMenu.appendChild(linkAdmin);
+        {% endif %}
+        document.body.appendChild(fab);
+        document.body.appendChild(fabMenu);
+        fab.addEventListener('click', () => { fabMenu.classList.toggle('open'); });
+        document.addEventListener('click', (e) => {
+            if (!fab.contains(e.target) && !fabMenu.contains(e.target)) fabMenu.classList.remove('open');
+        });
+        {% endif %}
+    </script>
+</body>
+</html>

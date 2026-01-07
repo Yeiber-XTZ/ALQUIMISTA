@@ -1,0 +1,37 @@
+{% extends "staff/base.html" %}
+
+{% block title %}Eliminar Mensaje - Panel de Staff{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <h1 class="text-4xl font-bold text-gray-900 mb-2">Eliminar Mensaje</h1>
+    <p class="text-gray-600">¿Estás seguro de que deseas eliminar este mensaje?</p>
+</div>
+
+<div class="bg-white rounded-lg shadow-md p-8 max-w-2xl">
+    <div class="mb-6">
+        <h2 class="text-2xl font-bold text-gray-900 mb-4">{{ message_obj.nombre }}</h2>
+        <p class="text-gray-600 mb-2"><strong>Email:</strong> {{ message_obj.email }}</p>
+        <p class="text-gray-600 mb-2"><strong>Fecha:</strong> {{ message_obj.fecha_creacion|date:"d/m/Y H:i" }}</p>
+        <div class="bg-gray-50 rounded-lg p-4 border border-gray-200 mt-4">
+            <p class="text-gray-700 line-clamp-3">{{ message_obj.mensaje }}</p>
+        </div>
+        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mt-4">
+            <p class="text-yellow-800 text-sm">
+                <strong>⚠️ Advertencia:</strong> Esta acción eliminará el mensaje permanentemente. Esta acción no se puede deshacer.
+            </p>
+        </div>
+    </div>
+
+    <form method="post" class="flex gap-4">
+        {% csrf_token %}
+        <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg transition">
+            Sí, Eliminar
+        </button>
+        <a href="{% url 'core:staff_messages_list' %}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-3 px-6 rounded-lg transition">
+            Cancelar
+        </a>
+    </form>
+</div>
+{% endblock %}
+

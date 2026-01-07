@@ -1,0 +1,67 @@
+{% extends "staff/base.html" %}
+
+{% block title %}Facetas - Panel de Staff{% endblock %}
+
+{% block content %}
+<div class="mb-8 flex items-center justify-between">
+    <div>
+        <h1 class="text-4xl font-bold text-gray-900 mb-2">Facetas</h1>
+        <p class="text-gray-600">Gestiona las secciones principales del sitio</p>
+    </div>
+    <a href="{% url 'core:staff_facet_create' %}" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg transition">
+        + Nueva Faceta
+    </a>
+</div>
+
+{% if facets %}
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for facet in facets %}
+    <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 hover:shadow-lg transition">
+        {% if facet.imagen_hero %}
+        <div class="h-48 overflow-hidden">
+            <img src="{{ facet.imagen_hero.url }}" alt="{{ facet.titulo }}" class="w-full h-full object-cover">
+        </div>
+        {% else %}
+        <div class="h-48 bg-gray-200 flex items-center justify-center">
+            <span class="text-gray-400">Sin imagen</span>
+        </div>
+        {% endif %}
+        <div class="p-6">
+            <div class="flex items-start justify-between mb-2">
+                <h3 class="text-xl font-bold text-gray-900">{{ facet.titulo }}</h3>
+                <span class="px-2 py-1 text-xs rounded {% if facet.activo %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+                    {% if facet.activo %}Activa{% else %}Inactiva{% endif %}
+                </span>
+            </div>
+            {% if facet.descripcion %}
+            <p class="text-gray-600 text-sm mb-4 line-clamp-2">{{ facet.descripcion }}</p>
+            {% endif %}
+            <div class="flex items-center justify-between text-sm text-gray-500 mb-4">
+                <span>Orden: {{ facet.orden }}</span>
+                <span>{{ facet.num_hitos }} hitos</span>
+            </div>
+            <div class="flex gap-2">
+                <a href="{% url 'core:staff_milestones_list_by_facet' facet.id %}" class="flex-1 text-center bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded transition text-sm">
+                    Ver Hitos
+                </a>
+                <a href="{% url 'core:staff_facet_edit' facet.id %}" class="flex-1 text-center bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded transition text-sm">
+                    Editar
+                </a>
+                <a href="{% url 'core:staff_facet_delete' facet.id %}" class="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded transition text-sm">
+                    Eliminar
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="bg-white rounded-lg shadow-md p-12 text-center">
+    <p class="text-gray-500 text-lg mb-4">No hay facetas creadas aún.</p>
+    <a href="{% url 'core:staff_facet_create' %}" class="inline-block bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg transition">
+        Crear Primera Faceta
+    </a>
+</div>
+{% endif %}
+{% endblock %}
+
