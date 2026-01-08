@@ -3,17 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO Meta Tags -->
     <title>{% if site_settings %}{{ site_settings.nombre_sitio }}{% else %}ALQUIMISTA NELSON{% endif %}</title>
+    <meta name="description" content="{% if site_settings and site_settings.descripcion_general %}{{ site_settings.descripcion_general|truncatewords:30 }}{% else %}Explorando las diferentes facetas de la creatividad, el talento y la innovación.{% endif %}">
+    <meta name="keywords" content="{% if site_settings %}ALQUIMISTA, creatividad, talento, innovación{% else %}ALQUIMISTA NELSON, portfolio, creatividad{% endif %}">
+    <meta name="author" content="{% if site_settings %}{{ site_settings.nombre_sitio }}{% else %}ALQUIMISTA{% endif %}">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="{{ request.build_absolute_uri }}">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta property="og:title" content="{% if site_settings %}{{ site_settings.nombre_sitio }}{% else %}ALQUIMISTA NELSON{% endif %}">
+    <meta property="og:description" content="{% if site_settings and site_settings.descripcion_general %}{{ site_settings.descripcion_general|truncatewords:30 }}{% else %}Explorando las diferentes facetas de la creatividad, el talento y la innovación.{% endif %}">
+    {% if site_settings and site_settings.logo %}
+    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ site_settings.logo.url }}">
+    {% endif %}
+    {% if site_settings and site_settings.imagen_hero %}
+    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ site_settings.imagen_hero.url }}">
+    {% endif %}
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="{{ request.build_absolute_uri }}">
+    <meta name="twitter:title" content="{% if site_settings %}{{ site_settings.nombre_sitio }}{% else %}ALQUIMISTA NELSON{% endif %}">
+    <meta name="twitter:description" content="{% if site_settings and site_settings.descripcion_general %}{{ site_settings.descripcion_general|truncatewords:30 }}{% else %}Explorando las diferentes facetas de la creatividad, el talento y la innovación.{% endif %}">
+    {% if site_settings and site_settings.logo %}
+    <meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{{ site_settings.logo.url }}">
+    {% endif %}
+    
+    <!-- Favicon -->
+    {% if site_settings and site_settings.logo %}
+    <link rel="icon" type="image/png" href="{{ site_settings.logo.url }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ site_settings.logo.url }}">
+    {% endif %}
+    
+    <!-- Preconnect for Performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    
+    <!-- Google Fonts with display=swap -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800;900&family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
     <!-- GSAP -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollToPlugin.min.js"></script>
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800;900&family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "{% if site_settings %}{{ site_settings.nombre_sitio }}{% else %}Organization{% endif %}",
+        "name": "{% if site_settings %}{{ site_settings.nombre_sitio }}{% else %}ALQUIMISTA NELSON{% endif %}",
+        "description": "{% if site_settings and site_settings.descripcion_general %}{{ site_settings.descripcion_general|truncatewords:50 }}{% else %}Explorando las diferentes facetas de la creatividad, el talento y la innovación.{% endif %}",
+        "url": "{{ request.build_absolute_uri }}",
+        {% if site_settings and site_settings.logo %}"logo": "{{ request.scheme }}://{{ request.get_host }}{{ site_settings.logo.url }}",{% endif %}
+        {% if site_settings and site_settings.email_contacto %}"email": "{{ site_settings.email_contacto }}",{% endif %}
+        {% if site_settings and site_settings.telefono %}"telephone": "{{ site_settings.telefono }}",{% endif %}
+        "sameAs": [
+            {% if site_settings.facebook_url %}"{{ site_settings.facebook_url }}"{% if site_settings.instagram_url or site_settings.twitter_url or site_settings.linkedin_url %},{% endif %}{% endif %}
+            {% if site_settings.instagram_url %}"{{ site_settings.instagram_url }}"{% if site_settings.twitter_url or site_settings.linkedin_url %},{% endif %}{% endif %}
+            {% if site_settings.twitter_url %}"{{ site_settings.twitter_url }}"{% if site_settings.linkedin_url %},{% endif %}{% endif %}
+            {% if site_settings.linkedin_url %}"{{ site_settings.linkedin_url }}"{% endif %}
+        ]
+    }
+    </script>
     <style>
         :root {
             --color-primary: #FFFFFF;
@@ -142,6 +203,29 @@
             box-sizing: border-box;
         }
         
+        /* Ocultar todas las scrollbars */
+        * {
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE y Edge */
+        }
+        
+        *::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+            width: 0;
+            height: 0;
+        }
+        
+        html {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        
+        html::-webkit-scrollbar {
+            display: none;
+            width: 0;
+            height: 0;
+        }
+        
         body {
             margin: 0;
             padding: 0;
@@ -150,6 +234,52 @@
             background: #000000;
             color: #FFFFFF;
             cursor: none;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        
+        body::-webkit-scrollbar {
+            display: none;
+            width: 0;
+            height: 0;
+        }
+        
+        /* Screen reader only */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+        
+        /* Focus visible for accessibility */
+        *:focus-visible {
+            outline: 2px solid var(--color-tertiary);
+            outline-offset: 2px;
+            border-radius: 4px;
+        }
+        
+        /* Skip to content link */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: var(--color-tertiary);
+            color: #FFFFFF;
+            padding: 8px 16px;
+            text-decoration: none;
+            z-index: 10000;
+            font-weight: 700;
+            border-radius: 0 0 8px 0;
+        }
+        
+        .skip-link:focus {
+            top: 0;
         }
         
         /* Menú Hamburguesa Overlay */
@@ -208,7 +338,7 @@
             justify-content: center;
             z-index: 2500;
             padding: 2rem;
-            overflow-y: auto;
+            overflow-y: hidden;
         }
         .menu-overlay.open { display: flex; }
         .menu-content {
@@ -558,7 +688,7 @@
             }
             
             .milestone-slide-title {
-                font-size: clamp(1.25rem, 4vw, 2rem) !important;
+                font-size: clamp(1rem, 3vw, 1.75rem) !important;
                 margin-bottom: 1rem !important;
             }
             
@@ -713,6 +843,19 @@
             overflow: hidden;
             height: 100vh;
             width: 100%;
+            background: #000000;
+            z-index: 1;
+        }
+        
+        .milestone-slide-image-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #000000;
+            z-index: 1;
         }
         
         /* Layout 3 y 6: Ajustar altura de imagen para layouts verticales */
@@ -730,6 +873,7 @@
             align-items: center;
             justify-content: center;
             overflow: hidden;
+            background: #000000;
         }
         
         /* Layout 4: Imagen centrada grande */
@@ -740,18 +884,69 @@
         .milestone-slide-main-image {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: contain;
             object-position: center;
             filter: brightness(0.9) contrast(1.1);
             display: block;
+            max-width: 100%;
+            max-height: 100%;
+        }
+        
+        .milestone-slide-main-video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            object-position: center;
+            display: block;
+            background: #000000;
+        }
+        
+        .milestone-slide-video-embed {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .milestone-slide-video-iframe {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
+            min-width: 100%;
+            min-height: 100%;
+        }
+        
+        /* Ajustes para videos en diferentes layouts */
+        .milestone-slide-layout.layout-2 .milestone-slide-main-video,
+        .milestone-slide-layout.layout-2 .milestone-slide-video-embed {
+            width: 80%;
+            height: 80%;
+            max-width: 600px;
+        }
+        
+        .milestone-slide-layout.layout-4 .milestone-slide-main-video,
+        .milestone-slide-layout.layout-4 .milestone-slide-video-embed {
+            width: 85%;
+            height: 85%;
+        }
+        
+        .milestone-slide-layout.layout-5 .milestone-slide-main-video,
+        .milestone-slide-layout.layout-5 .milestone-slide-video-embed {
+            width: 65%;
+            height: 75%;
+            max-width: 500px;
         }
         
         /* Layout 1: Imagen completa sin padding */
         .milestone-slide-layout.layout-1 .milestone-slide-main-image {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: contain;
             object-position: center;
+            padding: 2rem;
         }
         
         /* Layout 2: Imagen con espacio alrededor - más pequeña */
@@ -762,19 +957,21 @@
             justify-content: center;
         }
         .milestone-slide-layout.layout-2 .milestone-slide-main-image {
-            width: 80%;
-            height: 80%;
+            width: 85%;
+            height: 85%;
             max-width: 600px;
-            object-fit: cover;
+            object-fit: contain;
             object-position: center;
+            padding: 1rem;
         }
         
         /* Layout 3: Imagen grande abajo ocupando todo el espacio */
         .milestone-slide-layout.layout-3 .milestone-slide-main-image {
             width: 100%;
-            height: 100%;
-            object-fit: cover;
-            object-position: center;
+            height: 90%;
+            object-fit: contain;
+            object-position: center bottom;
+            padding: 2rem;
         }
         
         /* Layout 4: Imagen mediana con padding arriba y abajo */
@@ -787,8 +984,9 @@
         .milestone-slide-layout.layout-4 .milestone-slide-main-image {
             width: 85%;
             height: 85%;
-            object-fit: cover;
+            object-fit: contain;
             object-position: center;
+            padding: 1.5rem;
         }
         
         /* Layout 5: Imagen pequeña centrada a la derecha */
@@ -799,19 +997,69 @@
             justify-content: center;
         }
         .milestone-slide-layout.layout-5 .milestone-slide-main-image {
-            width: 65%;
-            height: 75%;
+            width: 70%;
+            height: 80%;
             max-width: 500px;
-            object-fit: cover;
+            object-fit: contain;
             object-position: center;
+            padding: 1rem;
         }
         
         /* Layout 6: Imagen muy grande que ocupa casi todo */
         .milestone-slide-layout.layout-6 .milestone-slide-main-image {
             width: 100%;
-            height: 100%;
-            object-fit: cover;
+            height: 95%;
+            object-fit: contain;
             object-position: center;
+            padding: 2rem;
+        }
+        
+        /* Tamaños de imagen según selección del staff */
+        /* Imagen Grande */
+        .milestone-slide-main-image.tamaño-grande {
+            width: 100% !important;
+            height: 100% !important;
+            max-width: none !important;
+            max-height: none !important;
+            padding: 1rem !important;
+        }
+        
+        .milestone-slide-layout.layout-2 .milestone-slide-main-image.tamaño-grande {
+            width: 95% !important;
+            height: 95% !important;
+            max-width: 800px !important;
+        }
+        
+        .milestone-slide-layout.layout-5 .milestone-slide-main-image.tamaño-grande {
+            width: 85% !important;
+            height: 90% !important;
+            max-width: 700px !important;
+        }
+        
+        /* Imagen Mediana (default) */
+        .milestone-slide-main-image.tamaño-mediana {
+            /* Usa los tamaños por defecto definidos arriba */
+        }
+        
+        /* Imagen Pequeña */
+        .milestone-slide-main-image.tamaño-pequeña {
+            width: 60% !important;
+            height: 65% !important;
+            max-width: 400px !important;
+            max-height: 500px !important;
+            padding: 2rem !important;
+        }
+        
+        .milestone-slide-layout.layout-2 .milestone-slide-main-image.tamaño-pequeña {
+            width: 60% !important;
+            height: 65% !important;
+            max-width: 400px !important;
+        }
+        
+        .milestone-slide-layout.layout-5 .milestone-slide-main-image.tamaño-pequeña {
+            width: 50% !important;
+            height: 60% !important;
+            max-width: 350px !important;
         }
         
         /* Galería de imágenes adicionales dentro del hito */
@@ -860,41 +1108,67 @@
         
         .milestone-slide-text-section {
             background: #000000;
-            padding: 4rem;
+            padding: 4rem 5rem;
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-start;
+            align-items: flex-start;
             height: 100vh;
             position: relative;
+            z-index: 20;
             overflow-y: auto;
+            overflow-x: hidden;
+            padding-top: 4rem;
         }
         
         /* Layout 3: Texto abajo más compacto */
         .milestone-slide-layout.layout-3 .milestone-slide-text-section {
             height: auto;
-            padding: 2rem 4rem;
+            min-height: 40vh;
+            max-height: 60vh;
+            padding: 3rem 4rem;
+            padding-top: 3rem;
+            z-index: 25;
+            overflow-y: auto;
+            overflow-x: hidden;
+            justify-content: flex-start;
         }
         
         /* Layout 4: Texto normal (no superpuesto) */
         .milestone-slide-layout.layout-4 .milestone-slide-text-section {
             position: relative;
             height: 100vh;
+            max-height: 100vh;
             background: #000000;
             padding: 4rem;
-            justify-content: center;
+            padding-top: 4rem;
+            justify-content: flex-start;
+            align-items: flex-start;
+            overflow-y: auto;
+            overflow-x: hidden;
         }
         
         /* Layout 6: Texto arriba más compacto */
         .milestone-slide-layout.layout-6 .milestone-slide-text-section {
             height: auto;
+            max-height: 50vh;
             padding: 3rem 4rem 2rem;
+            padding-top: 3rem;
             justify-content: flex-start;
+            align-items: flex-start;
+            overflow-y: auto;
+            overflow-x: hidden;
         }
         
         /* Layout 2 y 5: Texto a la izquierda */
         .milestone-slide-layout.layout-2 .milestone-slide-text-section,
         .milestone-slide-layout.layout-5 .milestone-slide-text-section {
             order: -1 !important;
+            justify-content: flex-start;
+            align-items: flex-start;
+            padding-top: 4rem;
+            overflow-y: auto;
+            overflow-x: hidden;
         }
         
         /* Layout 2 y 5: Imagen a la derecha */
@@ -910,20 +1184,35 @@
             font-weight: 900;
             font-family: 'Space Grotesk', sans-serif;
             letter-spacing: 0.1em;
-            color: #FFFFFF;
+            color: #FFFFFF !important;
             margin-bottom: 1rem;
             line-height: 1;
+            display: block !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            position: relative;
+            z-index: 21;
+            flex-shrink: 0;
+            margin-top: 0;
         }
         
         .milestone-slide-title {
-            font-size: clamp(2rem, 4vw, 4rem);
+            font-size: clamp(1.5rem, 3vw, 3rem);
             font-weight: 900;
             font-family: 'Space Grotesk', sans-serif;
             letter-spacing: 0.05em;
             text-transform: uppercase;
-            color: #FFFFFF;
+            color: #FFFFFF !important;
             margin-bottom: 2rem;
             line-height: 1.1;
+            display: block !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            width: 100%;
+            position: relative;
+            z-index: 21;
+            flex-shrink: 0;
+            margin-top: 0;
         }
         
         .milestone-slide-description {
@@ -931,6 +1220,10 @@
             line-height: 1.8;
             color: rgba(255, 255, 255, 0.9);
             max-width: 500px;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
+            overflow: visible;
         }
         
         /* Layout Alternativo: Texto Centrado (para hitos sin imagen principal) */
@@ -938,10 +1231,13 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             padding: 4rem;
+            padding-top: 4rem;
             text-align: center;
             height: 100vh;
+            overflow-y: auto;
+            overflow-x: hidden;
         }
         
         /* Título de Faceta - Layout tipo LeBron (Texto izquierda, Imagen derecha) */
@@ -972,7 +1268,7 @@
         
         .facet-title-slide h2 {
             font-family: 'Space Grotesk', sans-serif;
-            font-size: clamp(1.5rem, 4vw, 3.5rem);
+            font-size: clamp(2rem, 5.5vw, 5rem);
             font-weight: 700;
             letter-spacing: 0.1em;
             text-transform: uppercase;
@@ -981,13 +1277,42 @@
             margin-bottom: 1rem;
         }
         
-        .facet-title-slide .facet-title-small {
-            font-size: clamp(0.75rem, 1.5vw, 1rem);
-            font-weight: 400;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.7);
-            margin-bottom: 0.5rem;
+        .facet-title-decorative {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+        
+        .facet-title-icon {
+            font-size: clamp(1.5rem, 3vw, 2.5rem);
+            color: var(--color-tertiary);
+            margin-right: 1rem;
+            display: inline-block;
+            animation: pulse-glow 3s ease-in-out infinite;
+            filter: drop-shadow(0 0 10px rgba(184, 33, 42, 0.5));
+        }
+        
+        .facet-title-decorative::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, var(--color-tertiary) 0%, rgba(184, 33, 42, 0.3) 50%, transparent 100%);
+            margin-left: 1rem;
+            max-width: 200px;
+        }
+        
+        @keyframes pulse-glow {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+                filter: drop-shadow(0 0 10px rgba(184, 33, 42, 0.5));
+            }
+            50% {
+                opacity: 0.8;
+                transform: scale(1.1);
+                filter: drop-shadow(0 0 15px rgba(184, 33, 42, 0.8));
+            }
         }
         
         .facet-title-image-section {
@@ -1145,7 +1470,7 @@
         
         .first-facet-header-title {
             font-family: 'Space Grotesk', sans-serif;
-            font-size: clamp(2rem, 5vw, 4.5rem);
+            font-size: clamp(2.5rem, 6vw, 5.5rem);
             font-weight: 800;
             letter-spacing: 0.12em;
             text-transform: uppercase;
@@ -1673,6 +1998,8 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 12px;
             padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
         }
         
         .footer-newsletter h4 {
@@ -1681,49 +2008,51 @@
             font-weight: 700;
             letter-spacing: 0.2em;
             text-transform: uppercase;
-            margin-bottom: 1rem;
+            margin-bottom: 0.75rem;
+            color: #FFFFFF;
         }
         
         .footer-newsletter p {
             color: rgba(255, 255, 255, 0.6);
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             margin-bottom: 1rem;
+            line-height: 1.5;
         }
         
-        .footer-newsletter-form {
+        .footer-share-text {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+        
+        .footer-share-buttons {
             display: flex;
-            gap: 0.5rem;
+            gap: 0.75rem;
+            justify-content: flex-start;
+            flex-wrap: wrap;
+            margin-top: 0;
         }
         
-        .footer-newsletter-input {
-            flex: 1;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            padding: 0.75rem 1rem;
-            color: #FFFFFF;
-            font-size: 0.9rem;
+        .footer-share-btn {
+            width: 42px;
+            height: 42px;
+            min-width: 42px;
+            min-height: 42px;
+            position: relative;
         }
         
-        .footer-newsletter-input:focus {
-            outline: none;
-            border-color: #B8212A;
+        .footer-share-btn svg {
+            width: 18px;
+            height: 18px;
         }
         
-        .footer-newsletter-btn {
-            background: linear-gradient(135deg, #B8212A, #ff4757);
+        .footer-share-buttons button.footer-share-btn {
             border: none;
-            border-radius: 8px;
-            padding: 0.75rem 1.5rem;
-            color: #FFFFFF;
-            font-weight: 700;
+            background: inherit;
             cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .footer-newsletter-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(184, 33, 42, 0.4);
+            padding: 0;
+            font-family: inherit;
         }
         
         /* Responsive - Mobile y Tablet */
@@ -1734,7 +2063,7 @@
             }
             
             .facet-title-slide h2 {
-                font-size: clamp(1.5rem, 4vw, 3rem);
+                font-size: clamp(2rem, 5.5vw, 4.5rem);
             }
         }
         
@@ -1785,12 +2114,21 @@
                 grid-template-rows: 40% 60% !important;
             }
             
+            .facet-title-icon {
+                font-size: clamp(1.2rem, 4vw, 2rem) !important;
+                margin-right: 0.75rem !important;
+            }
+            
+            .facet-title-decorative::after {
+                max-width: 150px;
+            }
+            
             .facet-title-content {
                 padding: 2rem;
             }
             
             .facet-title-slide h2 {
-                font-size: clamp(1.5rem, 6vw, 2.5rem) !important;
+                font-size: clamp(2rem, 7vw, 3.5rem) !important;
             }
             
             .facet-title-image-section {
@@ -1836,7 +2174,7 @@
             }
             
             .milestone-slide-title {
-                font-size: clamp(1.5rem, 5vw, 2.5rem) !important;
+                font-size: clamp(1.25rem, 4vw, 2rem) !important;
             }
             
             .milestone-slide-description {
@@ -1887,7 +2225,7 @@
         </div>
         <div class="loading-logo-container">
             {% if site_settings and site_settings.logo %}
-            <img src="{{ site_settings.logo.url }}" alt="Loading" class="loading-logo">
+            <img src="{{ site_settings.logo.url }}" alt="{% if site_settings %}{{ site_settings.nombre_sitio }}{% else %}ALQUIMISTA{% endif %} - Loading" class="loading-logo" loading="eager" fetchpriority="high">
             {% endif %}
             <div class="loading-text">LOADING</div>
         </div>
@@ -1899,12 +2237,16 @@
     <div class="particles-container" id="particlesContainer"></div>
     <div class="scan-line"></div>
 
+    <!-- Skip to content -->
+    <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
+    
     <!-- Botón Hamburguesa -->
-    <button id="hamburgerBtn" class="hamburger" aria-label="Menú">
-        <div class="hamburger-lines"></div>
+    <button id="hamburgerBtn" class="hamburger" aria-label="Abrir menú de navegación" aria-expanded="false" aria-controls="menuOverlay" tabindex="0">
+        <div class="hamburger-lines" aria-hidden="true"></div>
+        <span class="sr-only">Menú</span>
     </button>
     <!-- Overlay de Menú -->
-    <div id="menuOverlay" class="menu-overlay">
+    <div id="menuOverlay" class="menu-overlay" role="dialog" aria-modal="true" aria-label="Menú de navegación">
         <div class="menu-content">
             <div class="menu-title">
                 {% if site_settings and site_settings.logo %}
@@ -1917,8 +2259,8 @@
                 <div class="menu-section">
                     <div class="menu-section-title">Navegación</div>
                     <div class="menu-section-links">
-                        <a href="#" class="menu-link" data-action="home">Inicio</a>
-                        <a href="{% url 'core:contact' %}" class="menu-link">Contacto</a>
+                        <a href="#" class="menu-link" data-action="home" aria-label="Ir al inicio">Inicio</a>
+                        <a href="{% url 'core:contact' %}" class="menu-link" aria-label="Ir a la página de contacto">Contacto</a>
                     </div>
                 </div>
                 
@@ -1927,7 +2269,7 @@
                     <div class="menu-section-title">Facetas</div>
                     <div class="menu-section-links">
                         {% for facet in facets %}
-                        <a href="#facet-{{ facet.slug }}" class="menu-link menu-facet-link" data-action="scroll-to-facet" data-facet="{{ facet.slug }}">{{ facet.titulo }}</a>
+                        <a href="#facet-{{ facet.slug }}" class="menu-link menu-facet-link" data-action="scroll-to-facet" data-facet="{{ facet.slug }}" aria-label="Ir a la faceta {{ facet.titulo }}">{{ facet.titulo }}</a>
                         {% empty %}
                         <p class="text-gray-500 text-sm px-4 py-2">No hay facetas disponibles</p>
                         {% endfor %}
@@ -1952,7 +2294,8 @@
     </div>
 
     <!-- Hero Section - Imagen en Primer Plano -->
-    <section class="hero-section" id="hero">
+    <main id="main-content">
+    <section class="hero-section" id="hero" role="banner">
         <!-- Logo en Esquina Superior Izquierda -->
         <div class="hero-logo-fixed">
             {% if site_settings and site_settings.logo %}
@@ -1964,7 +2307,7 @@
         <!-- Imagen Hero en Primer Plano -->
         <div class="hero-image-container">
             {% if site_settings and site_settings.imagen_hero %}
-            <img src="{{ site_settings.imagen_hero.url }}" alt="Hero" class="hero-image">
+            <img src="{{ site_settings.imagen_hero.url }}" alt="Hero Background" class="hero-image" loading="eager" fetchpriority="high">
             {% else %}
             <div style="width:100%; height:100%; background: linear-gradient(135deg, #1a1a1a 0%, #000 100%);"></div>
             {% endif %}
@@ -1995,7 +2338,9 @@
         <div class="facet-scroll-container" 
              id="facetContainer{{ forloop.counter0 }}"
              data-facet="{{ facet.slug }}"
-             data-total-slides="{{ facet.total_slides|default:1 }}">
+             data-total-slides="{{ facet.total_slides|default:1 }}"
+             role="region"
+             aria-label="Faceta: {{ facet.titulo }}">
             
             <div class="facet-gallery-wrapper" 
                  id="facetGallery{{ forloop.counter0 }}"
@@ -2005,7 +2350,9 @@
                 <section class="facet-title-slide" data-type="facet-title">
                     <!-- Sección de Texto (Izquierda) -->
                     <div class="facet-title-content">
-                        <div class="facet-title-small">THE</div>
+                        <div class="facet-title-decorative">
+                            <span class="facet-title-icon">✦</span>
+                        </div>
                         <h2>{{ facet.titulo }}</h2>
                     </div>
                     
@@ -2013,8 +2360,9 @@
                     <div class="facet-title-image-section">
                         {% if facet.imagen_hero %}
                         <img src="{{ facet.imagen_hero.url }}" 
-                             alt="{{ facet.titulo }}" 
-                             class="facet-bg">
+                             alt="{{ facet.titulo }} - Imagen de fondo" 
+                             class="facet-bg"
+                             loading="lazy">
                         {% else %}
                         <div style="width:100%; height:100%; background: linear-gradient(135deg, #1a1a1a 0%, #000 100%);"></div>
                         {% endif %}
@@ -2029,20 +2377,64 @@
                              data-type="milestone"
                              data-milestone-index="{{ forloop.counter0 }}">
                         
-                        {% if milestone.imagen or milestone.imagenes_activas %}
+                        {% if milestone.video_activo and milestone.video or milestone.video_activo and milestone.video_url or milestone.imagen or milestone.imagenes_activas %}
                         <!-- Layout Variable según posición del hito (6 layouts diferentes) -->
                         <div class="milestone-slide-layout">
-                            <!-- Sección de Imagen -->
+                            <!-- Sección de Imagen/Video -->
                             <div class="milestone-slide-image-section">
                                 <div class="milestone-slide-image-container">
-                                    {% if milestone.imagen %}
+                                    {% if milestone.video_activo and milestone.video %}
+                                    <!-- Video subido -->
+                                    <video class="milestone-slide-main-video" 
+                                           controls 
+                                           preload="metadata"
+                                           playsinline
+                                           aria-label="{% if milestone.año %}{{ milestone.año }} - {% endif %}{{ milestone.titulo }}">
+                                        <source src="{{ milestone.video.url }}" type="video/mp4">
+                                        <source src="{{ milestone.video.url }}" type="video/webm">
+                                        Tu navegador no soporta el elemento de video.
+                                    </video>
+                                    {% elif milestone.video_activo and milestone.video_url %}
+                                    <!-- Video externo (YouTube, Vimeo, etc.) -->
+                                    <div class="milestone-slide-video-embed">
+                                        {% if milestone.get_youtube_video_id %}
+                                        <iframe src="https://www.youtube.com/embed/{{ milestone.get_youtube_video_id }}?rel=0&modestbranding=1&autoplay=0" 
+                                                frameborder="0" 
+                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                                allowfullscreen
+                                                class="milestone-slide-video-iframe"
+                                                title="{% if milestone.año %}{{ milestone.año }} - {% endif %}{{ milestone.titulo }}"></iframe>
+                                        {% elif milestone.get_vimeo_video_id %}
+                                        <iframe src="https://player.vimeo.com/video/{{ milestone.get_vimeo_video_id }}?title=0&byline=0&portrait=0&autoplay=0" 
+                                                frameborder="0" 
+                                                allow="autoplay; fullscreen; picture-in-picture" 
+                                                allowfullscreen
+                                                class="milestone-slide-video-iframe"
+                                                title="{% if milestone.año %}{{ milestone.año }} - {% endif %}{{ milestone.titulo }}"></iframe>
+                                        {% else %}
+                                        <!-- Video genérico - usar URL directamente -->
+                                        <video class="milestone-slide-main-video" 
+                                               controls 
+                                               preload="metadata"
+                                               playsinline
+                                               aria-label="{% if milestone.año %}{{ milestone.año }} - {% endif %}{{ milestone.titulo }}">
+                                            <source src="{{ milestone.video_url }}" type="video/mp4">
+                                            Tu navegador no soporta el elemento de video.
+                                        </video>
+                                        {% endif %}
+                                    </div>
+                                    {% elif milestone.imagen %}
                                     <img src="{{ milestone.imagen.url }}" 
-                                         alt="{{ milestone.titulo }}" 
-                                         class="milestone-slide-main-image">
+                                         alt="{% if milestone.año %}{{ milestone.año }} - {% endif %}{{ milestone.titulo }}{% if milestone.descripcion %} - {{ milestone.descripcion|truncatewords:10 }}{% endif %}" 
+                                         class="milestone-slide-main-image tamaño-{{ milestone.tamaño_imagen|default:'mediana' }}"
+                                         loading="lazy"
+                                         decoding="async">
                                     {% elif milestone.imagenes_activas %}
                                     <img src="{{ milestone.imagenes_activas.0.imagen.url }}" 
-                                         alt="{{ milestone.titulo }}" 
-                                         class="milestone-slide-main-image">
+                                         alt="{% if milestone.año %}{{ milestone.año }} - {% endif %}{{ milestone.titulo }}{% if milestone.descripcion %} - {{ milestone.descripcion|truncatewords:10 }}{% endif %}" 
+                                         class="milestone-slide-main-image tamaño-{{ milestone.tamaño_imagen|default:'mediana' }}"
+                                         loading="lazy"
+                                         decoding="async">
                                     {% endif %}
                                 </div>
                                 
@@ -2051,7 +2443,7 @@
                                 <div class="milestone-slide-gallery">
                                     {% for img in milestone.imagenes_activas|slice:"1:6" %}
                                     <div class="milestone-slide-gallery-item" onclick="changeMainImage(this, '{{ img.imagen.url }}')">
-                                        <img src="{{ img.imagen.url }}" alt="Imagen {{ forloop.counter }}">
+                                        <img src="{{ img.imagen.url }}" alt="{% if milestone.titulo %}{{ milestone.titulo }} - {% endif %}Imagen {{ forloop.counter|add:1 }}" loading="lazy" decoding="async">
                                     </div>
                                     {% endfor %}
                                 </div>
@@ -2063,7 +2455,7 @@
                                 {% if milestone.año %}
                                 <div class="milestone-slide-year">{{ milestone.año }}</div>
                                 {% endif %}
-                                <h3 class="milestone-slide-title">{{ milestone.titulo }}</h3>
+                                <h3 class="milestone-slide-title">{% if milestone.titulo %}{{ milestone.titulo }}{% else %}Sin título{% endif %}</h3>
                                 {% if milestone.descripcion %}
                                 <div class="milestone-slide-description">
                                     {{ milestone.descripcion|linebreaks }}
@@ -2077,7 +2469,7 @@
                             {% if milestone.año %}
                             <div class="milestone-slide-year">{{ milestone.año }}</div>
                             {% endif %}
-                            <h3 class="milestone-slide-title">{{ milestone.titulo }}</h3>
+                            <h3 class="milestone-slide-title">{% if milestone.titulo %}{{ milestone.titulo }}{% else %}Sin título{% endif %}</h3>
                             {% if milestone.descripcion %}
                             <div class="milestone-slide-description" style="max-width: 800px;">
                                 {{ milestone.descripcion|linebreaks }}
@@ -2103,11 +2495,13 @@
         {% endfor %}
     </div>
 
+    </main>
+    
     {% include 'core/includes/footer.html' %}
 
     <!-- Script GSAP - Horizontal Scroll Experience -->
     <script>
-        // Ocultar pantalla de loading cuando la página esté completamente cargada
+        // Esperar a que GSAP esté cargado antes de inicializar
         window.addEventListener('load', function() {
             const loadingScreen = document.getElementById('loadingScreen');
             if (loadingScreen) {
@@ -2115,47 +2509,85 @@
                     loadingScreen.classList.add('hidden');
                 }, 500);
             }
+            
+            // Esperar un poco más para asegurar que GSAP está completamente cargado
+            setTimeout(function() {
+                initializeApp();
+            }, 100);
         });
         
-        gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
-
-        // Menú Hamburguesa Overlay
-        const hamburgerBtn = document.getElementById('hamburgerBtn');
-        const menuOverlay = document.getElementById('menuOverlay');
-        const menuLinks = document.getElementById('menuLinks');
-        hamburgerBtn.addEventListener('click', () => {
-            hamburgerBtn.classList.toggle('active');
-            menuOverlay.classList.toggle('open');
-        });
-        menuOverlay.addEventListener('click', (e) => {
-            if (e.target === menuOverlay) {
-                hamburgerBtn.classList.remove('active');
-                menuOverlay.classList.remove('open');
+        function initializeApp() {
+            // Verificar que GSAP esté disponible
+            if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
+                console.error('GSAP no está cargado. Reintentando...');
+                setTimeout(initializeApp, 100);
+                return;
             }
-        });
+            
+            gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
-        // Función para cambiar imagen principal
-        function changeMainImage(thumbElement, imageUrl) {
-            const slide = thumbElement.closest('.milestone-slide');
-            const mainImage = slide.querySelector('.milestone-slide-main-image');
-            if (mainImage) {
-                mainImage.src = imageUrl;
-                // Efecto fade
-                mainImage.style.opacity = '0';
-                setTimeout(() => {
-                    mainImage.style.opacity = '1';
-                }, 200);
+            // Menú Hamburguesa Overlay
+            const hamburgerBtn = document.getElementById('hamburgerBtn');
+            const menuOverlay = document.getElementById('menuOverlay');
+            const menuLinks = document.getElementById('menuLinks');
+            
+            if (hamburgerBtn && menuOverlay) {
+                hamburgerBtn.addEventListener('click', () => {
+                    const isOpen = menuOverlay.classList.contains('open');
+                    hamburgerBtn.classList.toggle('active');
+                    menuOverlay.classList.toggle('open');
+                    hamburgerBtn.setAttribute('aria-expanded', !isOpen);
+                    
+                    // Cerrar menú con Escape
+                    if (!isOpen) {
+                        document.addEventListener('keydown', handleMenuEscape);
+                    } else {
+                        document.removeEventListener('keydown', handleMenuEscape);
+                    }
+                });
+                
+                function handleMenuEscape(e) {
+                    if (e.key === 'Escape' && menuOverlay.classList.contains('open')) {
+                        hamburgerBtn.classList.remove('active');
+                        menuOverlay.classList.remove('open');
+                        hamburgerBtn.setAttribute('aria-expanded', 'false');
+                        hamburgerBtn.focus();
+                        document.removeEventListener('keydown', handleMenuEscape);
+                    }
+                }
+                
+                menuOverlay.addEventListener('click', (e) => {
+                    if (e.target === menuOverlay) {
+                        hamburgerBtn.classList.remove('active');
+                        menuOverlay.classList.remove('open');
+                        hamburgerBtn.setAttribute('aria-expanded', 'false');
+                        document.removeEventListener('keydown', handleMenuEscape);
+                    }
+                });
             }
-        }
-        
-        // Calcular y aplicar ancho de facet galleries
-        document.querySelectorAll('.facet-gallery-wrapper').forEach(function(wrapper) {
-            var totalSlides = parseInt(wrapper.getAttribute('data-total-slides') || '1');
-            wrapper.style.width = 'calc(100vw * ' + totalSlides + ')';
-        });
-        
-        // Asignar layouts variados a los milestones
-        function assignMilestoneLayouts() {
+
+            // Función para cambiar imagen principal
+            function changeMainImage(thumbElement, imageUrl) {
+                const slide = thumbElement.closest('.milestone-slide');
+                const mainImage = slide.querySelector('.milestone-slide-main-image');
+                if (mainImage) {
+                    mainImage.src = imageUrl;
+                    // Efecto fade
+                    mainImage.style.opacity = '0';
+                    setTimeout(() => {
+                        mainImage.style.opacity = '1';
+                    }, 200);
+                }
+            }
+            
+            // Calcular y aplicar ancho de facet galleries
+            document.querySelectorAll('.facet-gallery-wrapper').forEach(function(wrapper) {
+                var totalSlides = parseInt(wrapper.getAttribute('data-total-slides') || '1');
+                wrapper.style.width = 'calc(100vw * ' + totalSlides + ')';
+            });
+            
+            // Asignar layouts variados a los milestones
+            function assignMilestoneLayouts() {
             const facetContainers = document.querySelectorAll('.facet-scroll-container');
             console.log('Asignando layouts a milestones. Facetas encontradas:', facetContainers.length);
             
@@ -2213,21 +2645,38 @@
             });
         }
         
-        // Ejecutar assignMilestoneLayouts cuando el DOM esté listo
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', function() {
+            // Ejecutar assignMilestoneLayouts cuando el DOM esté listo
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', function() {
+                    setTimeout(assignMilestoneLayouts, 200);
+                });
+            } else {
                 setTimeout(assignMilestoneLayouts, 200);
-            });
-        } else {
-            setTimeout(assignMilestoneLayouts, 200);
-        }
+            }
+            
+            // Asegurar que todas las secciones de texto empiecen desde arriba
+            function resetTextSectionsScroll() {
+                document.querySelectorAll('.milestone-slide-text-section, .milestone-slide-centered').forEach(function(section) {
+                    if (section) {
+                        section.scrollTop = 0;
+                    }
+                });
+            }
+            
+            // Resetear scroll cuando se carga la página
+            resetTextSectionsScroll();
+            
+            // Resetear scroll cuando se cambia de slide (para GSAP)
+            if (typeof ScrollTrigger !== 'undefined') {
+                ScrollTrigger.addEventListener('refresh', resetTextSectionsScroll);
+            }
+            
+            // Inicializar scroll horizontal para cada faceta individualmente
+            const facetContainers = document.querySelectorAll('.facet-scroll-container');
         
-        // Inicializar scroll horizontal para cada faceta individualmente
-        const facetContainers = document.querySelectorAll('.facet-scroll-container');
-        
-        console.log('Contenedores de facetas encontrados:', facetContainers.length);
-        
-        if (facetContainers.length > 0) {
+            console.log('Contenedores de facetas encontrados:', facetContainers.length);
+            
+            if (facetContainers.length > 0) {
             // Configurar scroll horizontal para cada faceta individual
             facetContainers.forEach((facetContainer, facetIndex) => {
                 const galleryWrapper = facetContainer.querySelector('.facet-gallery-wrapper');
@@ -2258,21 +2707,21 @@
                             anticipatePin: 1,
                             onEnter: () => {
                                 // Activar barra de progreso cuando entramos a la faceta
-                                progressContainer.classList.add('active');
+                                if (progressContainer) progressContainer.classList.add('active');
                             },
                             onLeave: () => {
                                 // Desactivar barra de progreso cuando salimos de la faceta (scroll vertical a la siguiente)
-                                progressContainer.classList.remove('active');
-                                progressBar.style.width = '0%';
+                                if (progressContainer) progressContainer.classList.remove('active');
+                                if (progressBar) progressBar.style.width = '0%';
                             },
                             onLeaveBack: () => {
                                 // Desactivar barra de progreso cuando volvemos hacia atrás
-                                progressContainer.classList.remove('active');
-                                progressBar.style.width = '0%';
+                                if (progressContainer) progressContainer.classList.remove('active');
+                                if (progressBar) progressBar.style.width = '0%';
                             },
                             onUpdate: (self) => {
                                 // Actualizar barra de progreso según el progreso dentro de la faceta
-                                if (self.isActive) {
+                                if (self.isActive && progressBar) {
                                     const progress = self.progress;
                                     progressBar.style.width = (progress * 100) + '%';
                                 }
@@ -2286,149 +2735,237 @@
                 }
             });
             
-            // Asignar layouts variados a los milestones DESPUÉS de inicializar todo
-            assignMilestoneLayouts();
-            
-            // Asegurar que las imágenes se vean completas - sin transiciones
-            document.querySelectorAll('.milestone-slide-main-image').forEach(img => {
-                img.style.transition = 'none';
-                if (img.complete) {
-                    img.style.opacity = '1';
-                }
-            });
-            
-            // Ocultar Hero al hacer scroll a la primera faceta
-            const hero = document.getElementById('hero');
-            if (hero && facetContainers.length > 0) {
-                ScrollTrigger.create({
-                    trigger: facetContainers[0],
-                    start: "top top",
-                    onEnter: () => {
-                    gsap.to(hero, {
-                        opacity: 0,
-                        y: -100,
-                        duration: 0.3,
-                        ease: "power1.out"
-                    });
-                    },
-                    onLeaveBack: () => {
-                    gsap.to(hero, {
-                        opacity: 1,
-                        y: 0,
-                        duration: 0.3,
-                        ease: "power1.out"
-                    });
+                // Asignar layouts variados a los milestones DESPUÉS de inicializar todo
+                assignMilestoneLayouts();
+                
+                // Asegurar que las imágenes se vean completas - sin transiciones
+                document.querySelectorAll('.milestone-slide-main-image').forEach(img => {
+                    img.style.transition = 'none';
+                    if (img.complete) {
+                        img.style.opacity = '1';
                     }
                 });
-            }
-        }
-        
-        // Smooth scroll para enlaces y facetas
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
+                
+                // Ocultar Hero al hacer scroll a la primera faceta
+                const hero = document.getElementById('hero');
+                if (hero && facetContainers.length > 0) {
+                    ScrollTrigger.create({
+                        trigger: facetContainers[0],
+                        start: "top top",
+                        onEnter: () => {
+                            gsap.to(hero, {
+                                opacity: 0,
+                                y: -100,
+                                duration: 0.3,
+                                ease: "power1.out"
+                            });
+                        },
+                        onLeaveBack: () => {
+                            gsap.to(hero, {
+                                opacity: 1,
+                                y: 0,
+                                duration: 0.3,
+                                ease: "power1.out"
+                            });
+                        }
                     });
                 }
-            });
-        });
-        
-        // Scroll a facetas desde el menú
-        document.querySelectorAll('a[data-action="scroll-to-facet"]').forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                const facetSlug = this.dataset.facet;
-                const facetContainer = document.querySelector(`[data-facet="${facetSlug}"]`);
-                if (facetContainer) {
+            }
+            
+            // Manejar botón "Inicio"
+            document.querySelectorAll('a[data-action="home"]').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
                     // Cerrar el menú
                     const menuOverlay = document.getElementById('menuOverlay');
                     const hamburgerBtn = document.getElementById('hamburgerBtn');
                     if (menuOverlay) menuOverlay.classList.remove('open');
-                    if (hamburgerBtn) hamburgerBtn.classList.remove('active');
+                    if (hamburgerBtn) {
+                        hamburgerBtn.classList.remove('active');
+                        hamburgerBtn.setAttribute('aria-expanded', 'false');
+                    }
                     
-                    // Scroll suave a la faceta
-                    gsap.to(window, {
-                        duration: 1.5,
-                        scrollTo: {
-                            y: facetContainer,
-                            offsetY: 0
-                        },
-                        ease: "power2.inOut"
-                    });
-                }
-            });
-        });
-        
-        // Efectos de Distorsión en Imágenes
-        const distortionImages = document.querySelectorAll('.distortion-effect img');
-        distortionImages.forEach(img => {
-            img.addEventListener('mousemove', (e) => {
-                const rect = img.getBoundingClientRect();
-                const x = ((e.clientX - rect.left) / rect.width) * 100;
-                const y = ((e.clientY - rect.top) / rect.height) * 100;
-                
-                const rotateX = (y - 50) * 0.1;
-                const rotateY = (50 - x) * 0.1;
-                
-                img.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.1)`;
-            });
-            
-            img.addEventListener('mouseleave', () => {
-                img.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
-            });
-        });
-
-        // Cursor personalizado
-        const cursor = document.getElementById('customCursor');
-        const cursorDot = document.getElementById('customCursorDot');
-        let mouseX = 0, mouseY = 0, cx = 0, cy = 0;
-        document.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; });
-        function animateCursor() {
-            cx += (mouseX - cx) * 0.12; cy += (mouseY - cy) * 0.12;
-            if (cursor) { cursor.style.left = cx + 'px'; cursor.style.top = cy + 'px'; }
-            if (cursorDot) { cursorDot.style.left = mouseX + 'px'; cursorDot.style.top = mouseY + 'px'; }
-            requestAnimationFrame(animateCursor);
-        }
-        animateCursor();
-        document.querySelectorAll('a, button, .milestone-slide, .milestone-slide-gallery-item').forEach(el => {
-            el.addEventListener('mouseenter', () => cursor && cursor.classList.add('hover'));
-            el.addEventListener('mouseleave', () => cursor && cursor.classList.remove('hover'));
-        });
-
-        // Partículas
-        const particlesContainer = document.getElementById('particlesContainer');
-        if (particlesContainer) {
-            const count = 60;
-            for (let i = 0; i < count; i++) {
-                const p = document.createElement('div');
-                p.className = 'particle';
-                p.style.left = Math.random() * 100 + '%';
-                p.style.top = Math.random() * 100 + '%';
-                p.style.animationDelay = (Math.random() * 20) + 's';
-                p.style.animationDuration = (15 + Math.random() * 12) + 's';
-                particlesContainer.appendChild(p);
-            }
-            window.addEventListener('scroll', () => {
-                const scrolled = window.pageYOffset;
-                const particles = document.querySelectorAll('.particle');
-                particles.forEach((particle, i) => {
-                    const speed = 0.2 + (i % 4) * 0.15;
-                    particle.style.transform = `translateY(${scrolled * speed}px)`;
+                    // Scroll al inicio
+                    const hero = document.getElementById('hero');
+                    if (hero) {
+                        if (typeof gsap !== 'undefined' && gsap.to && ScrollToPlugin) {
+                            gsap.to(window, {
+                                duration: 1.5,
+                                scrollTo: {
+                                    y: 0,
+                                    offsetY: 0
+                                },
+                                ease: "power2.inOut"
+                            });
+                        } else {
+                            window.scrollTo({
+                                top: 0,
+                                behavior: 'smooth'
+                            });
+                        }
+                    }
                 });
             });
-        }
+            
+            // Smooth scroll para otros enlaces con hash (evitar conflictos con facetas)
+            document.querySelectorAll('a[href^="#"]:not([data-action])').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const href = this.getAttribute('href');
+                    if (href && href !== '#') {
+                        const target = document.querySelector(href);
+                        if (target) {
+                            if (typeof gsap !== 'undefined' && gsap.to && ScrollToPlugin) {
+                                gsap.to(window, {
+                                    duration: 1.5,
+                                    scrollTo: {
+                                        y: target,
+                                        offsetY: 0
+                                    },
+                                    ease: "power2.inOut"
+                                });
+                            } else {
+                                target.scrollIntoView({
+                                    behavior: 'smooth',
+                                    block: 'start'
+                                });
+                            }
+                        }
+                    }
+                });
+            });
+            
+            // Scroll a facetas desde el menú (prioridad sobre otros enlaces)
+            document.querySelectorAll('a[data-action="scroll-to-facet"]').forEach(link => {
+                // Remover cualquier listener previo para evitar duplicados
+                const newLink = link.cloneNode(true);
+                link.parentNode.replaceChild(newLink, link);
+                
+                newLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const facetSlug = this.dataset.facet;
+                    // Buscar el contenedor específico de la faceta (no el progress container)
+                    const facetContainer = document.querySelector(`.facet-scroll-container[data-facet="${facetSlug}"]`);
+                    console.log('Haciendo clic en faceta:', facetSlug, 'Contenedor encontrado:', facetContainer);
+                    
+                    if (facetContainer) {
+                        // Cerrar el menú
+                        const menuOverlay = document.getElementById('menuOverlay');
+                        const hamburgerBtn = document.getElementById('hamburgerBtn');
+                        if (menuOverlay) menuOverlay.classList.remove('open');
+                        if (hamburgerBtn) {
+                            hamburgerBtn.classList.remove('active');
+                            hamburgerBtn.setAttribute('aria-expanded', 'false');
+                        }
+                        
+                        // Scroll suave a la faceta usando GSAP si está disponible
+                        try {
+                            if (typeof gsap !== 'undefined' && gsap.to && typeof ScrollToPlugin !== 'undefined') {
+                                gsap.to(window, {
+                                    duration: 1.5,
+                                    scrollTo: {
+                                        y: facetContainer,
+                                        offsetY: 0
+                                    },
+                                    ease: "power2.inOut"
+                                });
+                            } else {
+                                throw new Error('GSAP no disponible');
+                            }
+                        } catch (error) {
+                            console.log('Usando scroll nativo como fallback:', error);
+                            // Fallback: scroll nativo suave
+                            facetContainer.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'start'
+                            });
+                        }
+                    } else {
+                        console.error('No se encontró el contenedor de la faceta:', facetSlug);
+                        // Intentar buscar por ID también
+                        const facetById = document.getElementById(`facet-${facetSlug}`);
+                        if (facetById) {
+                            console.log('Encontrado por ID:', facetById);
+                            facetById.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'start'
+                            });
+                        }
+                    }
+                });
+            });
+            
+            // Efectos de Distorsión en Imágenes
+            const distortionImages = document.querySelectorAll('.distortion-effect img');
+            distortionImages.forEach(img => {
+                img.addEventListener('mousemove', (e) => {
+                    const rect = img.getBoundingClientRect();
+                    const x = ((e.clientX - rect.left) / rect.width) * 100;
+                    const y = ((e.clientY - rect.top) / rect.height) * 100;
+                    
+                    const rotateX = (y - 50) * 0.1;
+                    const rotateY = (50 - x) * 0.1;
+                    
+                    img.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.1)`;
+                });
+                
+                img.addEventListener('mouseleave', () => {
+                    img.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
+                });
+            });
 
-        // Botón flotante Staff/Admin (solo si el usuario tiene permisos)
-        {% if request.user.is_authenticated and request.user.is_staff %}
-        var staffButtonConfig = {
-            isSuperuser: {% if request.user.is_superuser %}true{% else %}false{% endif %},
-            staffUrl: '{% url "core:staff_dashboard" %}'
-        };
+            // Cursor personalizado
+            const cursor = document.getElementById('customCursor');
+            const cursorDot = document.getElementById('customCursorDot');
+            let mouseX = 0, mouseY = 0, cx = 0, cy = 0;
+            document.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; });
+            function animateCursor() {
+                cx += (mouseX - cx) * 0.12; cy += (mouseY - cy) * 0.12;
+                if (cursor) { cursor.style.left = cx + 'px'; cursor.style.top = cy + 'px'; }
+                if (cursorDot) { cursorDot.style.left = mouseX + 'px'; cursorDot.style.top = mouseY + 'px'; }
+                requestAnimationFrame(animateCursor);
+            }
+            animateCursor();
+            document.querySelectorAll('a, button, .milestone-slide, .milestone-slide-gallery-item').forEach(el => {
+                el.addEventListener('mouseenter', () => cursor && cursor.classList.add('hover'));
+                el.addEventListener('mouseleave', () => cursor && cursor.classList.remove('hover'));
+            });
+
+            // Partículas
+            const particlesContainer = document.getElementById('particlesContainer');
+            if (particlesContainer) {
+                const count = 60;
+                for (let i = 0; i < count; i++) {
+                    const p = document.createElement('div');
+                    p.className = 'particle';
+                    p.style.left = Math.random() * 100 + '%';
+                    p.style.top = Math.random() * 100 + '%';
+                    p.style.animationDelay = (Math.random() * 20) + 's';
+                    p.style.animationDuration = (15 + Math.random() * 12) + 's';
+                    particlesContainer.appendChild(p);
+                }
+                window.addEventListener('scroll', () => {
+                    const scrolled = window.pageYOffset;
+                    const particles = document.querySelectorAll('.particle');
+                    particles.forEach((particle, i) => {
+                        const speed = 0.2 + (i % 4) * 0.15;
+                        particle.style.transform = `translateY(${scrolled * speed}px)`;
+                    });
+                });
+            }
+            }
+        
+        // Inicializar efectos inmediatamente (no dependen de GSAP)
         (function() {
+            // Botón flotante Staff/Admin (solo si el usuario tiene permisos)
+            {% if request.user.is_authenticated and request.user.is_staff %}
+            var staffButtonConfig = {
+                isSuperuser: {% if request.user.is_superuser %}true{% else %}false{% endif %},
+                staffUrl: '{% url "core:staff_dashboard" %}'
+            };
+            
+            (function() {
             var fab = document.createElement('button');
             fab.className = 'admin-fab';
             fab.innerHTML = '⚙';
@@ -2456,8 +2993,9 @@
                     fabMenu.classList.remove('open');
                 }
             });
+            })();
+            {% endif %}
         })();
-        {% endif %}
     </script>
 </body>
 </html>

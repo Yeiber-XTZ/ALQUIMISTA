@@ -33,7 +33,11 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-r+7dds)gsc7&xh3)5ku3^v-2j1
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'a065cb74ae4e.ngrok-free.app']
+
+# En desarrollo, permitir cualquier host si DEBUG está activo (útil para ngrok que cambia de dominio)
+if DEBUG:
+    ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -45,6 +49,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sitemaps',  # Para sitemap.xml
     'core',  # Nuestra app principal
 ]
 
@@ -148,3 +153,13 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Cache configuration (para rate limiting)
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+    }
+}
+
+# Note: Error handlers are defined in urls.py, not in settings.py

@@ -3,6 +3,8 @@ from django.contrib import messages
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Q, Prefetch
+from django.http import HttpResponse
+from django.urls import reverse
 from .models import Facet, Milestone, ContactMessage, SiteSettings, MilestoneImage, UserFacetPreference
 from .decorators import staff_required
 from .forms import CustomUserCreationForm, FacetSelectionForm, LoginForm, FacetManagementForm
@@ -79,22 +81,66 @@ def index(request):
 
 def contact(request):
     """
-    Página de contacto (GET) y procesamiento (POST).
+    Página de contacto (GET) y procesamiento (POST) con validación mejorada.
     """
+    site_settings = SiteSettings.load()
+    
     if request.method == 'POST':
-        nombre = request.POST.get('nombre')
-        email = request.POST.get('email')
-        mensaje = request.POST.get('mensaje')
-        if nombre and email and mensaje:
+        # Rate limiting básico - evitar spam (10 mensajes por hora por IP)
+        from django.core.cache import cache
+        from django.utils import timezone
+        from datetime import timedelta
+        
+        ip_address = request.META.get('REMOTE_ADDR', '')
+        cache_key = f'contact_rate_limit_{ip_address}'
+        message_count = cache.get(cache_key, 0)
+        
+        if message_count >= 10:
+            messages.error(request, 'Has enviado demasiados mensajes. Por favor intenta más tarde.')
+            return redirect('core:contact')
+        
+        # Validación y sanitización
+        nombre = request.POST.get('nombre', '').strip()
+        email = request.POST.get('email', '').strip()
+        mensaje = request.POST.get('mensaje', '').strip()
+        
+        # Validaciones básicas
+        if not nombre or len(nombre) < 2:
+            messages.error(request, 'El nombre debe tener al menos 2 caracteres.')
+            return redirect('core:contact')
+        
+        if len(nombre) > 200:
+            messages.error(request, 'El nombre es demasiado largo (máximo 200 caracteres).')
+            return redirect('core:contact')
+        
+        if not email or '@' not in email:
+            messages.error(request, 'Por favor ingresa un email válido.')
+            return redirect('core:contact')
+        
+        if len(email) > 254:
+            messages.error(request, 'El email es demasiado largo.')
+            return redirect('core:contact')
+        
+        if not mensaje or len(mensaje) < 10:
+            messages.error(request, 'El mensaje debe tener al menos 10 caracteres.')
+            return redirect('core:contact')
+        
+        if len(mensaje) > 5000:
+            messages.error(request, 'El mensaje es demasiado largo (máximo 5000 caracteres).')
+            return redirect('core:contact')
+        
+        # Crear mensaje
+        try:
             ContactMessage.objects.create(nombre=nombre, email=email, mensaje=mensaje)
-            messages.success(request, '¡Mensaje enviado correctamente!')
-            return redirect('core:contact')
-        else:
-            messages.error(request, 'Por favor completa todos los campos.')
-            return redirect('core:contact')
+            # Incrementar contador de rate limiting
+            cache.set(cache_key, message_count + 1, 3600)  # 1 hora
+            messages.success(request, '¡Mensaje enviado correctamente! Te responderemos pronto.')
+        except Exception as e:
+            messages.error(request, 'Hubo un error al enviar el mensaje. Por favor intenta nuevamente.')
+        
+        return redirect('core:contact')
+    
     # GET
-    from .models import SiteSettings
-    site_settings = SiteSettings.load() if hasattr(SiteSettings, 'load') else None
     return render(request, 'core/contact.html', {'site_settings': site_settings})
 
 
@@ -147,9 +193,6 @@ def staff_site_settings(request):
             settings.twitter_url = request.POST.get('twitter_url', '')
             settings.linkedin_url = request.POST.get('linkedin_url', '')
             settings.youtube_url = request.POST.get('youtube_url', '')
-            # Hero Section
-            settings.texto_hero = request.POST.get('texto_hero', 'ALQUIMISTA')
-            settings.subtitulo_hero = request.POST.get('subtitulo_hero', 'Scroll to explore')
             
             if 'logo' in request.FILES:
                 settings.logo = request.FILES['logo']
@@ -260,11 +303,18 @@ def staff_milestone_create(request, facet_id=None):
                 descripcion=request.POST.get('descripcion', ''),
                 año=int(request.POST.get('año')) if request.POST.get('año') else None,
                 orden=int(request.POST.get('orden', 0)),
-                activo=request.POST.get('activo') == 'on'
+                activo=request.POST.get('activo') == 'on',
+                video_activo=request.POST.get('video_activo') == 'on',
+                tamaño_imagen=request.POST.get('tamaño_imagen', 'mediana')
             )
             if 'imagen' in request.FILES:
                 milestone.imagen = request.FILES['imagen']
-                milestone.save()
+            if 'video' in request.FILES:
+                milestone.video = request.FILES['video']
+            video_url = request.POST.get('video_url', '').strip()
+            if video_url:
+                milestone.video_url = video_url
+            milestone.save()
             messages.success(request, f'Hito "{milestone.titulo}" creado exitosamente.')
             return redirect('core:staff_milestones_list_by_facet', facet_id=faceta_obj.id)
         except Exception as e:
@@ -290,8 +340,17 @@ def staff_milestone_edit(request, pk):
             milestone.año = int(request.POST.get('año')) if request.POST.get('año') else None
             milestone.orden = int(request.POST.get('orden', 0))
             milestone.activo = request.POST.get('activo') == 'on'
+            milestone.video_activo = request.POST.get('video_activo') == 'on'
+            milestone.tamaño_imagen = request.POST.get('tamaño_imagen', 'mediana')
             if 'imagen' in request.FILES:
                 milestone.imagen = request.FILES['imagen']
+            if 'video' in request.FILES:
+                milestone.video = request.FILES['video']
+            video_url = request.POST.get('video_url', '').strip()
+            if video_url:
+                milestone.video_url = video_url
+            elif 'video_url' in request.POST:
+                milestone.video_url = None
             milestone.save()
             messages.success(request, f'Hito "{milestone.titulo}" actualizado exitosamente.')
             return redirect('core:staff_milestones_list_by_facet', facet_id=milestone.faceta.id)
@@ -465,6 +524,17 @@ def user_logout(request):
 
 
 @login_required
+# Error handlers
+def handler404(request, exception):
+    """Custom 404 error handler."""
+    site_settings = SiteSettings.load()
+    return render(request, 'core/404.html', {'site_settings': site_settings}, status=404)
+
+def handler500(request):
+    """Custom 500 error handler."""
+    site_settings = SiteSettings.load()
+    return render(request, 'core/500.html', {'site_settings': site_settings}, status=500)
+
 def manage_facets(request):
     """Vista para gestionar las facetas seleccionadas por el usuario."""
     site_settings = SiteSettings.load()

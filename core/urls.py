@@ -1,12 +1,25 @@
 from django.urls import path
+from django.contrib.sitemaps.views import sitemap
 from . import views
+from .robots import robots_txt
+from .sitemaps import StaticViewSitemap, FacetSitemap
 
 app_name = 'core'
+
+# Sitemap configuration
+sitemaps = {
+    'static': StaticViewSitemap,
+    'facets': FacetSitemap,
+}
 
 urlpatterns = [
     # Público
     path('', views.index, name='index'),
     path('contact/', views.contact, name='contact'),
+    
+    # SEO
+    path('robots.txt', robots_txt, name='robots_txt'),
+    path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
     
     # Autenticación
     path('register/', views.register, name='register'),

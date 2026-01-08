@@ -43,9 +43,24 @@
             <label for="descripcion" class="block text-gray-700 font-semibold mb-2">Descripción</label>
             <textarea id="descripcion" 
                       name="descripcion" 
-                      rows="4"
+                      rows="6"
+                      maxlength="1000"
                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">{% if milestone %}{{ milestone.descripcion }}{% endif %}</textarea>
+            <p class="text-sm text-gray-500 mt-2">Máximo 1000 caracteres. Recomendado: 500 caracteres para mejor visualización.</p>
+            <p class="text-xs text-gray-400 mt-1" id="descripcion-counter">0 / 1000 caracteres</p>
         </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const descripcion = document.getElementById('descripcion');
+                const counter = document.getElementById('descripcion-counter');
+                if (descripcion && counter) {
+                    counter.textContent = (descripcion.value.length || 0) + ' / 1000 caracteres';
+                    descripcion.addEventListener('input', function() {
+                        counter.textContent = this.value.length + ' / 1000 caracteres';
+                    });
+                }
+            });
+        </script>
 
         <div class="grid grid-cols-2 gap-4">
             <div>
@@ -93,6 +108,65 @@
                    accept="image/*"
                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
             <p class="text-sm text-gray-500 mt-2">Recomendado: 1200x800px</p>
+            
+            <div class="mt-4">
+                <label for="tamaño_imagen" class="block text-gray-700 font-semibold mb-2">Tamaño de Imagen</label>
+                <select id="tamaño_imagen" 
+                        name="tamaño_imagen" 
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
+                    <option value="grande" {% if milestone and milestone.tamaño_imagen == 'grande' %}selected{% endif %}>Grande</option>
+                    <option value="mediana" {% if milestone and milestone.tamaño_imagen == 'mediana' or not milestone %}selected{% endif %}>Mediana</option>
+                    <option value="pequeña" {% if milestone and milestone.tamaño_imagen == 'pequeña' %}selected{% endif %}>Pequeña</option>
+                </select>
+                <p class="text-sm text-gray-500 mt-2">Selecciona el tamaño de visualización de la imagen principal</p>
+            </div>
+        </div>
+
+        <div class="border-t pt-6 mt-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Video (Opcional)</h3>
+            
+            <div class="mb-4">
+                <label for="video" class="block text-gray-700 font-semibold mb-2">Subir Video</label>
+                {% if milestone and milestone.video %}
+                <div class="mb-4">
+                    <video controls class="max-w-md rounded-lg border border-gray-300 mb-2" style="max-height: 300px;">
+                        <source src="{{ milestone.video.url }}" type="video/mp4">
+                        Tu navegador no soporta el elemento de video.
+                    </video>
+                    <p class="text-sm text-gray-500">Video actual</p>
+                </div>
+                {% endif %}
+                <input type="file" 
+                       id="video" 
+                       name="video" 
+                       accept="video/*"
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
+                <p class="text-sm text-gray-500 mt-2">Formatos soportados: MP4, WebM, MOV (máx. 100MB)</p>
+            </div>
+
+            <div class="mb-2">
+                <label for="video_url" class="block text-gray-700 font-semibold mb-2">O URL de Video Externo</label>
+                <input type="url" 
+                       id="video_url" 
+                       name="video_url" 
+                       value="{% if milestone and milestone.video_url %}{{ milestone.video_url }}{% endif %}"
+                       placeholder="https://www.youtube.com/watch?v=... o https://vimeo.com/..."
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
+                <p class="text-sm text-gray-500 mt-2">Soporta YouTube, Vimeo y otros servicios de video</p>
+                <p class="text-xs text-gray-400 mt-1">Nota: Si subes un video, la URL será ignorada. Si solo proporcionas URL, se usará el video externo.</p>
+            </div>
+            
+            <div class="flex items-center mt-4">
+                <label class="flex items-center cursor-pointer">
+                    <input type="checkbox" 
+                           id="video_activo"
+                           name="video_activo" 
+                           {% if milestone and milestone.video_activo or not milestone %}checked{% endif %}
+                           class="w-5 h-5 text-red-600 border-gray-300 rounded focus:ring-red-500">
+                    <span class="ml-2 text-gray-700 font-semibold">Video Activo (mostrar en el sitio)</span>
+                </label>
+            </div>
+            <p class="text-xs text-gray-400 mt-1 ml-7">Si está desmarcado, se mostrará la imagen en lugar del video, incluso si hay un video subido.</p>
         </div>
 
         <div class="flex gap-4 pt-4">

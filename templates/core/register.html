@@ -270,6 +270,56 @@
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(184, 33, 42, 0.4);
         }
+        
+        .footer-share-text {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+        
+        .footer-share-buttons {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: flex-start;
+            flex-wrap: wrap;
+            margin-top: 0;
+        }
+        
+        .footer-share-btn {
+            width: 42px;
+            height: 42px;
+            min-width: 42px;
+            min-height: 42px;
+            position: relative;
+        }
+        
+        .footer-share-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+        
+        .footer-share-buttons button.footer-share-btn {
+            border: none;
+            background: inherit;
+            cursor: pointer;
+            padding: 0;
+            font-family: inherit;
+        }
+        
+        .footer-newsletter {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .footer-newsletter h4 {
+            margin-bottom: 0.75rem;
+        }
+        
+        .footer-newsletter p {
+            font-size: 0.85rem;
+        }
+        
         @media (max-width: 768px) {
             .footer-inner {
                 padding: 3rem 1.5rem 2rem;

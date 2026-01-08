@@ -29,20 +29,6 @@ class SiteSettings(models.Model):
         verbose_name="Imagen Hero",
         help_text="Imagen de fondo para la sección hero (recomendado: 1920x1080px)"
     )
-    texto_hero = models.CharField(
-        max_length=200,
-        default="ALQUIMISTA",
-        blank=True,
-        verbose_name="Texto Hero Principal",
-        help_text="Texto grande que aparece en el hero"
-    )
-    subtitulo_hero = models.CharField(
-        max_length=200,
-        default="Scroll to explore",
-        blank=True,
-        verbose_name="Subtítulo Hero",
-        help_text="Texto pequeño debajo del texto principal"
-    )
     descripcion_general = models.TextField(
         blank=True,
         verbose_name="Descripción General",
@@ -193,8 +179,9 @@ class Milestone(models.Model):
     )
     descripcion = models.TextField(
         verbose_name="Descripción",
-        help_text="Descripción detallada del hito",
-        blank=True
+        help_text="Descripción detallada del hito (máximo recomendado: 500 caracteres para mejor visualización)",
+        blank=True,
+        max_length=1000
     )
     año = models.IntegerField(
         verbose_name="Año",
@@ -212,6 +199,36 @@ class Milestone(models.Model):
         help_text="Imagen del hito (recomendado: 1200x800px)",
         blank=True,
         null=True
+    )
+    TAMAÑO_IMAGEN_CHOICES = [
+        ('grande', 'Grande'),
+        ('mediana', 'Mediana'),
+        ('pequeña', 'Pequeña'),
+    ]
+    tamaño_imagen = models.CharField(
+        max_length=10,
+        choices=TAMAÑO_IMAGEN_CHOICES,
+        default='mediana',
+        verbose_name="Tamaño de Imagen",
+        help_text="Tamaño de visualización de la imagen principal"
+    )
+    video = models.FileField(
+        upload_to='hitos/videos/',
+        verbose_name="Video",
+        help_text="Video del hito (opcional, formatos: mp4, webm, mov)",
+        blank=True,
+        null=True
+    )
+    video_url = models.URLField(
+        verbose_name="URL de Video",
+        help_text="URL de video externo (YouTube, Vimeo, etc.) - Opcional",
+        blank=True,
+        null=True
+    )
+    video_activo = models.BooleanField(
+        default=True,
+        verbose_name="Video Activo",
+        help_text="Marcar para mostrar el video en el sitio público. Si está desmarcado, se mostrará la imagen en su lugar."
     )
     orden = models.IntegerField(
         default=0,
@@ -250,6 +267,37 @@ class Milestone(models.Model):
     def imagenes_activas(self):
         """Retorna todas las imágenes activas del hito, ordenadas por orden."""
         return self.imagenes.filter(activo=True).order_by('orden')
+    
+    def get_youtube_video_id(self):
+        """Extrae el ID del video de YouTube desde la URL."""
+        if not self.video_url or 'youtube.com' not in self.video_url and 'youtu.be' not in self.video_url:
+            return None
+        
+        import re
+        # Patrones para diferentes formatos de YouTube
+        patterns = [
+            r'(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})',
+            r'youtube\.com\/embed\/([a-zA-Z0-9_-]{11})',
+        ]
+        
+        for pattern in patterns:
+            match = re.search(pattern, self.video_url)
+            if match:
+                return match.group(1)
+        return None
+    
+    def get_vimeo_video_id(self):
+        """Extrae el ID del video de Vimeo desde la URL."""
+        if not self.video_url or 'vimeo.com' not in self.video_url:
+            return None
+        
+        import re
+        # Patrón para Vimeo
+        pattern = r'vimeo\.com\/(?:.*\/)?(\d+)'
+        match = re.search(pattern, self.video_url)
+        if match:
+            return match.group(1)
+        return None
 
 
 class MilestoneImage(models.Model):

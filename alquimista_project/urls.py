@@ -24,6 +24,10 @@ urlpatterns = [
     path('', include('core.urls')),
 ]
 
+# Error handlers (must be at the root level)
+handler404 = 'core.views.handler404'
+handler500 = 'core.views.handler500'
+
 # Servir archivos estáticos y multimedia en desarrollo
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS[0])
