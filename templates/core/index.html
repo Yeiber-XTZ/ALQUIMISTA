@@ -21,6 +21,121 @@
             --color-tertiary: #B8212A;
         }
         
+        /* Pantalla de Loading estilo LeBron James */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #000000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+            overflow: hidden;
+        }
+        
+        .loading-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        
+        .loading-logo-container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            z-index: 10;
+        }
+        
+        .loading-logo {
+            width: 120px;
+            height: 120px;
+            object-fit: contain;
+            filter: brightness(0) invert(1);
+            z-index: 10;
+            position: relative;
+        }
+        
+        .loading-text {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            font-size: 0.75rem;
+            font-weight: 400;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: #FFFFFF;
+            margin-top: 0.5rem;
+            z-index: 10;
+            position: relative;
+        }
+        
+        .loading-waves {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .loading-wave {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 50%;
+            opacity: 0.4;
+        }
+        
+        .loading-wave:nth-child(1) {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .loading-wave:nth-child(2) {
+            width: 400px;
+            height: 400px;
+        }
+        
+        .loading-wave:nth-child(3) {
+            width: 500px;
+            height: 500px;
+        }
+        
+        .loading-wave:nth-child(4) {
+            width: 600px;
+            height: 600px;
+        }
+        
+        .loading-wave:nth-child(5) {
+            width: 700px;
+            height: 700px;
+        }
+        
+        .loading-wave:nth-child(6) {
+            width: 800px;
+            height: 800px;
+        }
+        
+        .loading-wave:nth-child(7) {
+            width: 900px;
+            height: 900px;
+        }
+        
+        .loading-wave:nth-child(8) {
+            width: 1000px;
+            height: 1000px;
+        }
+        
         * {
             margin: 0;
             padding: 0;
@@ -85,40 +200,287 @@
         .menu-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.9);
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             display: none;
             align-items: center;
             justify-content: center;
             z-index: 2500;
+            padding: 2rem;
+            overflow-y: auto;
         }
         .menu-overlay.open { display: flex; }
         .menu-content {
             text-align: center;
             color: #FFFFFF;
+            width: 100%;
+            max-width: 1200px;
+            animation: fadeInUp 0.6s ease-out;
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         .menu-title {
             font-family: 'Space Grotesk', sans-serif;
-            font-size: clamp(2rem, 6vw, 5rem);
-            letter-spacing: 0.2em;
-            margin-bottom: 2rem;
+            font-size: clamp(1.1rem, 3vw, 2rem);
+            letter-spacing: 0.15em;
+            margin-bottom: 2.5rem;
+            position: relative;
+        }
+        .menu-title::after {
+            content: '';
+            position: absolute;
+            bottom: -1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--color-tertiary), transparent);
+        }
+        .menu-title img {
+            height: 36px !important;
+            width: auto !important;
+            display: block !important;
+            margin: 0 auto 0.5rem auto !important;
         }
         .menu-links {
             display: flex;
+            flex-direction: row;
+            gap: 3rem;
+            justify-content: center;
+            align-items: flex-start;
+            width: 100%;
+            flex-wrap: wrap;
+        }
+        .menu-section {
+            flex: 1;
+            min-width: 180px;
+            max-width: 250px;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.3s ease;
+        }
+        .menu-section:hover {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(184, 33, 42, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+        .menu-section-title {
+            font-size: clamp(0.65rem, 1.1vw, 0.75rem);
+            font-weight: 600;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 1.25rem;
+            text-align: left;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid rgba(184, 33, 42, 0.4);
+            position: relative;
+        }
+        .menu-section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 40px;
+            height: 1px;
+            background: var(--color-tertiary);
+        }
+        .menu-section-links {
+            display: flex;
             flex-direction: column;
-            gap: 1.25rem;
+            gap: 0.625rem;
         }
         .menu-link {
-            font-size: clamp(1.25rem, 2vw, 1.5rem);
-            font-weight: 800;
-            letter-spacing: 0.2em;
+            font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+            font-weight: 500;
+            letter-spacing: 0.1em;
             text-transform: uppercase;
             color: #FFFFFF;
             text-decoration: none;
-            transition: color 0.2s ease, transform 0.2s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            display: block;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
         }
-        .menu-link:hover { color: var(--color-tertiary); transform: translateY(-2px); }
+        .menu-link::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 3px;
+            height: 100%;
+            background: var(--color-tertiary);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+            transform-origin: bottom;
+        }
+        .menu-link:hover { 
+            color: var(--color-tertiary); 
+            background: rgba(184, 33, 42, 0.15);
+            transform: translateX(6px);
+            padding-left: 1.25rem;
+        }
+        .menu-link:hover::before {
+            transform: scaleY(1);
+            transform-origin: top;
+        }
+        .menu-facet-link {
+            font-size: clamp(0.8rem, 1.3vw, 0.95rem);
+            font-weight: 400;
+            letter-spacing: 0.08em;
+            color: rgba(255, 255, 255, 0.85);
+            padding: 0.625rem 1rem;
+            position: relative;
+        }
+        .menu-facet-link::before {
+            background: rgba(184, 33, 42, 0.8);
+        }
+        .menu-facet-link:hover {
+            color: #FFFFFF;
+            background: rgba(184, 33, 42, 0.25);
+            transform: translateX(8px);
+        }
+        
+        /* Media query para desktop - layout horizontal */
+        @media (min-width: 769px) {
+            .menu-title {
+                font-size: clamp(1rem, 2.5vw, 1.75rem) !important;
+                margin-bottom: 2.5rem !important;
+            }
+            .menu-title img {
+                height: 32px !important;
+            }
+            .menu-links {
+                flex-direction: row !important;
+                gap: 2rem !important;
+                justify-content: center !important;
+                flex-wrap: nowrap !important;
+            }
+            .menu-section {
+                flex: 1 !important;
+                min-width: 180px !important;
+                max-width: 240px !important;
+                margin-bottom: 0 !important;
+                padding: 1.25rem !important;
+            }
+            .menu-section:hover {
+                transform: translateY(-4px) !important;
+            }
+            .menu-link {
+                font-size: clamp(0.85rem, 1.3vw, 1rem) !important;
+                padding: 0.65rem 0.875rem !important;
+            }
+            .menu-facet-link {
+                font-size: clamp(0.75rem, 1.2vw, 0.9rem) !important;
+                padding: 0.55rem 0.875rem !important;
+            }
+            .menu-section-title {
+                font-size: clamp(0.6rem, 1vw, 0.7rem) !important;
+                margin-bottom: 1rem !important;
+                padding-bottom: 0.625rem !important;
+            }
+        }
+        
+        /* Responsive para móvil */
+        @media (max-width: 768px) {
+            .menu-overlay {
+                padding: 1rem;
+            }
+            .menu-content {
+                padding: 1rem 0;
+                max-width: 100%;
+            }
+            .menu-title {
+                margin-bottom: 1.5rem;
+                font-size: clamp(1rem, 3.5vw, 1.35rem);
+            }
+            .menu-title img {
+                height: 28px !important;
+                margin-bottom: 0.5rem !important;
+            }
+            .menu-links {
+                flex-direction: column !important;
+                gap: 1.75rem;
+                align-items: stretch !important;
+            }
+            .menu-section {
+                width: 100%;
+                max-width: 100%;
+                min-width: auto;
+                margin-bottom: 0;
+            }
+            .menu-section-title {
+                font-size: 0.65rem;
+                padding: 0.35rem 0 0.35rem 0.875rem;
+                margin-bottom: 0.875rem;
+            }
+            .menu-link {
+                font-size: 0.9rem;
+                padding: 0.7rem 0.875rem;
+            }
+            .menu-link:hover {
+                transform: translateX(6px);
+            }
+            .menu-facet-link {
+                font-size: 0.85rem;
+                padding: 0.625rem 0.875rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .menu-overlay {
+                padding: 0.75rem;
+            }
+            .menu-content {
+                padding: 0.75rem 0;
+            }
+            .menu-title {
+                margin-bottom: 1.25rem;
+                font-size: clamp(1rem, 5vw, 1.35rem);
+            }
+            .menu-title img {
+                height: 28px !important;
+                margin-bottom: 0.5rem !important;
+            }
+            .menu-links {
+                flex-direction: column !important;
+                gap: 1.5rem;
+                align-items: stretch !important;
+            }
+            .menu-section {
+                width: 100%;
+                max-width: 100%;
+                min-width: auto;
+            }
+            .menu-section-title {
+                font-size: 0.6rem;
+                padding: 0.3rem 0 0.3rem 0.75rem;
+                margin-bottom: 0.75rem;
+            }
+            .menu-link {
+                font-size: 0.85rem;
+                padding: 0.625rem 0.75rem;
+            }
+            .menu-facet-link {
+                font-size: 0.8rem;
+                padding: 0.55rem 0.75rem;
+            }
+        }
         
         /* Hero Section - Imagen en Primer Plano */
         .hero-section {
@@ -160,8 +522,8 @@
             z-index: 100;
             display: flex;
             align-items: center;
-            gap: 1.25rem;
-            padding: 0.75rem 1.25rem;
+            gap: 0.875rem;
+            padding: 0.5rem 1rem;
             background: rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
@@ -170,18 +532,48 @@
             transition: all 0.3s ease;
         }
         
+        .hero-logo-fixed img {
+            height: 42px;
+            width: auto;
+        }
+        
         .hero-logo-fixed:hover {
             background: rgba(0, 0, 0, 0.7);
             transform: translateY(-2px);
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
         }
         
-        .hero-logo-fixed img {
-            height: 60px;
-            width: auto;
-            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.8)) brightness(1.1);
-            transition: transform 0.3s ease;
-            object-fit: contain;
+        @media (max-width: 480px) {
+            /* Mobile pequeño */
+            .milestone-slide-text-section {
+                padding: 1.5rem !important;
+            }
+            
+            .facet-title-content {
+                padding: 1.5rem;
+            }
+            
+            .milestone-slide-year {
+                font-size: 2rem !important;
+            }
+            
+            .milestone-slide-title {
+                font-size: clamp(1.25rem, 4vw, 2rem) !important;
+                margin-bottom: 1rem !important;
+            }
+            
+            .hero-logo-fixed {
+                top: 10px;
+                left: 10px;
+            }
+            
+            .hero-logo-fixed img {
+                height: 35px;
+            }
+            
+            .hero-logo-text {
+                font-size: 0.8rem;
+            }
         }
         
         .hero-logo-fixed:hover img {
@@ -191,9 +583,9 @@
         
         .hero-logo-text {
             font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.3rem;
-            font-weight: 900;
-            letter-spacing: 0.2em;
+            font-size: clamp(0.95rem, 1.2vw, 1.1rem);
+            font-weight: 700;
+            letter-spacing: 0.15em;
             text-transform: uppercase;
             color: #FFFFFF;
             text-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
@@ -266,12 +658,54 @@
         }
         
         /* Layout tipo LeBron: Imagen Izquierda + Panel Texto Derecho */
+        /* Layouts Variados para Milestones */
         .milestone-slide-layout {
             display: grid;
-            grid-template-columns: 60% 40%;
+            grid-template-columns: 65% 35%; /* Layout por defecto (Layout 1) */
             width: 100%;
             height: 100%;
             position: relative;
+        }
+        
+        /* Layout 1: Imagen Grande Izquierda 65% - Texto Derecha 35% */
+        .milestone-slide-layout.layout-1 {
+            grid-template-columns: 65% 35% !important;
+            grid-template-rows: 1fr !important;
+        }
+        
+        /* Layout 2: Texto Izquierda 45% - Imagen Mediana Derecha 55% */
+        .milestone-slide-layout.layout-2 {
+            grid-template-columns: 45% 55% !important;
+            grid-template-rows: 1fr !important;
+        }
+        
+        /* Layout 3: Imagen Pequeña Centrada 40% - Texto 60% (imagen no ocupa todo el ancho) */
+        .milestone-slide-layout.layout-3 {
+            grid-template-columns: 1fr !important;
+            grid-template-rows: 60% 40% !important;
+        }
+        
+        /* Layout 4: Texto Izquierda 50% - Imagen Grande Derecha 50% */
+        .milestone-slide-layout.layout-4 {
+            grid-template-columns: 50% 50% !important;
+            grid-template-rows: 1fr !important;
+        }
+        
+        /* Layout 4: Imagen con margen superior para dar más espacio al texto */
+        .milestone-slide-layout.layout-4 .milestone-slide-image-container {
+            padding-top: 2rem;
+        }
+        
+        /* Layout 5: Texto Izquierda 55% - Imagen Pequeña Derecha 45% */
+        .milestone-slide-layout.layout-5 {
+            grid-template-columns: 55% 45% !important;
+            grid-template-rows: 1fr !important;
+        }
+        
+        /* Layout 6: Imagen Mediana Izquierda 55% - Texto Derecha 45% */
+        .milestone-slide-layout.layout-6 {
+            grid-template-columns: 55% 45% !important;
+            grid-template-rows: 1fr !important;
         }
         
         .milestone-slide-image-section {
@@ -281,6 +715,13 @@
             width: 100%;
         }
         
+        /* Layout 3 y 6: Ajustar altura de imagen para layouts verticales */
+        .milestone-slide-layout.layout-3 .milestone-slide-image-section,
+        .milestone-slide-layout.layout-6 .milestone-slide-image-section {
+            height: auto;
+        }
+        
+        /* Imágenes de diferentes tamaños según layout */
         .milestone-slide-image-container {
             position: relative;
             width: 100%;
@@ -289,6 +730,11 @@
             align-items: center;
             justify-content: center;
             overflow: hidden;
+        }
+        
+        /* Layout 4: Imagen centrada grande */
+        .milestone-slide-layout.layout-4 .milestone-slide-image-container {
+            height: 100vh;
         }
         
         .milestone-slide-main-image {
@@ -300,6 +746,74 @@
             display: block;
         }
         
+        /* Layout 1: Imagen completa sin padding */
+        .milestone-slide-layout.layout-1 .milestone-slide-main-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+        
+        /* Layout 2: Imagen con espacio alrededor - más pequeña */
+        .milestone-slide-layout.layout-2 .milestone-slide-image-container {
+            padding: 5rem 4rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .milestone-slide-layout.layout-2 .milestone-slide-main-image {
+            width: 80%;
+            height: 80%;
+            max-width: 600px;
+            object-fit: cover;
+            object-position: center;
+        }
+        
+        /* Layout 3: Imagen grande abajo ocupando todo el espacio */
+        .milestone-slide-layout.layout-3 .milestone-slide-main-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+        
+        /* Layout 4: Imagen mediana con padding arriba y abajo */
+        .milestone-slide-layout.layout-4 .milestone-slide-image-container {
+            padding: 3rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .milestone-slide-layout.layout-4 .milestone-slide-main-image {
+            width: 85%;
+            height: 85%;
+            object-fit: cover;
+            object-position: center;
+        }
+        
+        /* Layout 5: Imagen pequeña centrada a la derecha */
+        .milestone-slide-layout.layout-5 .milestone-slide-image-container {
+            padding: 6rem 4rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .milestone-slide-layout.layout-5 .milestone-slide-main-image {
+            width: 65%;
+            height: 75%;
+            max-width: 500px;
+            object-fit: cover;
+            object-position: center;
+        }
+        
+        /* Layout 6: Imagen muy grande que ocupa casi todo */
+        .milestone-slide-layout.layout-6 .milestone-slide-main-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+        
         /* Galería de imágenes adicionales dentro del hito */
         .milestone-slide-gallery {
             position: absolute;
@@ -308,6 +822,18 @@
             display: flex;
             gap: 1rem;
             z-index: 10;
+        }
+        
+        /* Layout 4: Galería centrada */
+        .milestone-slide-layout.layout-4 .milestone-slide-gallery {
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        /* Layout 6: Galería arriba */
+        .milestone-slide-layout.layout-6 .milestone-slide-gallery {
+            top: 2rem;
+            bottom: auto;
         }
         
         .milestone-slide-gallery-item {
@@ -342,6 +868,42 @@
             position: relative;
             overflow-y: auto;
         }
+        
+        /* Layout 3: Texto abajo más compacto */
+        .milestone-slide-layout.layout-3 .milestone-slide-text-section {
+            height: auto;
+            padding: 2rem 4rem;
+        }
+        
+        /* Layout 4: Texto normal (no superpuesto) */
+        .milestone-slide-layout.layout-4 .milestone-slide-text-section {
+            position: relative;
+            height: 100vh;
+            background: #000000;
+            padding: 4rem;
+            justify-content: center;
+        }
+        
+        /* Layout 6: Texto arriba más compacto */
+        .milestone-slide-layout.layout-6 .milestone-slide-text-section {
+            height: auto;
+            padding: 3rem 4rem 2rem;
+            justify-content: flex-start;
+        }
+        
+        /* Layout 2 y 5: Texto a la izquierda */
+        .milestone-slide-layout.layout-2 .milestone-slide-text-section,
+        .milestone-slide-layout.layout-5 .milestone-slide-text-section {
+            order: -1 !important;
+        }
+        
+        /* Layout 2 y 5: Imagen a la derecha */
+        .milestone-slide-layout.layout-2 .milestone-slide-image-section,
+        .milestone-slide-layout.layout-5 .milestone-slide-image-section {
+            order: 1 !important;
+        }
+        
+        /* Asegurar que los layouts se vean diferentes - colores de fondo temporales para debug */
         
         .milestone-slide-year {
             font-size: 4rem;
@@ -576,19 +1138,19 @@
         .first-facet-header {
             width: 100%;
             background: #000000;
-            padding: 4rem 4rem 3rem;
+            padding: 3rem 4rem 2.5rem;
             text-align: center;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .first-facet-header-title {
             font-family: 'Space Grotesk', sans-serif;
-            font-size: clamp(3rem, 8vw, 8rem);
-            font-weight: 900;
-            letter-spacing: 0.15em;
+            font-size: clamp(2rem, 5vw, 4.5rem);
+            font-weight: 800;
+            letter-spacing: 0.12em;
             text-transform: uppercase;
             color: #FFFFFF;
-            line-height: 1;
+            line-height: 1.1;
         }
         
         .first-facet-panels {
@@ -1164,35 +1726,75 @@
             box-shadow: 0 8px 20px rgba(184, 33, 42, 0.4);
         }
         
-        /* Responsive */
-        @media (max-width: 768px) {
-            /* Hamburguesa ya es responsive por defecto */
+        /* Responsive - Mobile y Tablet */
+        @media (max-width: 1024px) {
+            /* Tablet: Ajustes generales */
+            .milestone-slide-text-section {
+                padding: 3rem;
+            }
             
-            .milestone-slide-layout {
-                grid-template-columns: 1fr;
+            .facet-title-slide h2 {
+                font-size: clamp(1.5rem, 4vw, 3rem);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            /* Mobile: Layouts verticales y ajustes */
+            
+            /* Todos los layouts se convierten en vertical en móvil */
+            .milestone-slide-layout.layout-1,
+            .milestone-slide-layout.layout-2,
+            .milestone-slide-layout.layout-3,
+            .milestone-slide-layout.layout-4,
+            .milestone-slide-layout.layout-5,
+            .milestone-slide-layout.layout-6 {
+                grid-template-columns: 1fr !important;
+                grid-template-rows: 50vh 50vh !important;
             }
             
             .milestone-slide-image-section {
-                height: 50vh;
+                height: 50vh !important;
             }
             
             .milestone-slide-text-section {
-                height: 50vh;
-                padding: 2rem;
+                height: auto !important;
+                min-height: 50vh;
+                padding: 2rem !important;
+            }
+            
+            .milestone-slide-layout.layout-4 .milestone-slide-text-section {
+                position: relative !important;
+                background: #000000 !important;
+                padding: 2rem !important;
             }
             
             .milestone-slide-gallery {
                 bottom: 1rem;
                 left: 1rem;
+                flex-wrap: wrap;
+                max-width: calc(100% - 2rem);
             }
             
             .milestone-slide-gallery-item {
-                width: 80px;
-                height: 60px;
+                width: 60px;
+                height: 45px;
+            }
+            
+            .facet-title-slide {
+                grid-template-columns: 1fr !important;
+                grid-template-rows: 40% 60% !important;
+            }
+            
+            .facet-title-content {
+                padding: 2rem;
             }
             
             .facet-title-slide h2 {
-                font-size: 3rem;
+                font-size: clamp(1.5rem, 6vw, 2.5rem) !important;
+            }
+            
+            .facet-title-image-section {
+                height: 60vh !important;
             }
             
             .facet-progress-container {
@@ -1200,26 +1802,58 @@
             }
             
             .facet-progress-label {
-                bottom: -20px;
-                font-size: 0.6rem;
+                bottom: -18px;
+                font-size: 0.65rem;
             }
             
             .hero-logo-fixed {
-                top: 16px;
-                left: 16px;
+                top: 12px;
+                left: 12px;
             }
             
             .hero-logo-fixed img {
-                height: 40px;
+                height: 36px;
             }
             
             .hero-logo-text {
-                font-size: 1rem;
+                font-size: 0.85rem;
+            }
+            
+            .first-facet-header-title {
+                font-size: clamp(1.75rem, 6vw, 3.5rem) !important;
+            }
+            
+            .first-facet-header {
+                padding: 2.5rem 2rem 2rem !important;
+            }
+            
+            .hero-scroll-indicator {
+                bottom: 20px;
+            }
+            
+            .milestone-slide-year {
+                font-size: 2.5rem !important;
+            }
+            
+            .milestone-slide-title {
+                font-size: clamp(1.5rem, 5vw, 2.5rem) !important;
+            }
+            
+            .milestone-slide-description {
+                font-size: clamp(0.9rem, 2vw, 1.1rem) !important;
+            }
+            
+            .footer-inner {
+                padding: 3rem 1.5rem 2rem;
             }
             
             .footer-top {
-                grid-template-columns: 1fr;
+                grid-template-columns: 1fr !important;
                 gap: 2rem;
+            }
+            
+            .footer-column {
+                width: 100%;
             }
             
             .first-facet-panels {
@@ -1239,6 +1873,26 @@
     </style>
 </head>
 <body>
+    <!-- Pantalla de Loading -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-waves">
+            <div class="loading-wave"></div>
+            <div class="loading-wave"></div>
+            <div class="loading-wave"></div>
+            <div class="loading-wave"></div>
+            <div class="loading-wave"></div>
+            <div class="loading-wave"></div>
+            <div class="loading-wave"></div>
+            <div class="loading-wave"></div>
+        </div>
+        <div class="loading-logo-container">
+            {% if site_settings and site_settings.logo %}
+            <img src="{{ site_settings.logo.url }}" alt="Loading" class="loading-logo">
+            {% endif %}
+            <div class="loading-text">LOADING</div>
+        </div>
+    </div>
+    
     <!-- Cursor y Partículas -->
     <div class="custom-cursor" id="customCursor"></div>
     <div class="custom-cursor-dot" id="customCursorDot"></div>
@@ -1254,13 +1908,45 @@
         <div class="menu-content">
             <div class="menu-title">
                 {% if site_settings and site_settings.logo %}
-                <img src="{{ site_settings.logo.url }}" alt="Logo" style="height:64px; width:auto; display:block; margin:0 auto 1rem auto;">
+                <img src="{{ site_settings.logo.url }}" alt="Logo">
                 {% endif %}
                 {% if site_settings %}{{ site_settings.nombre_sitio }}{% else %}ALQUIMISTA{% endif %}
             </div>
             <div class="menu-links" id="menuLinks">
-                <a href="#" class="menu-link" data-action="home">Inicio</a>
-                <a href="{% url 'core:contact' %}" class="menu-link">Contacto</a>
+                <!-- Navegación Principal -->
+                <div class="menu-section">
+                    <div class="menu-section-title">Navegación</div>
+                    <div class="menu-section-links">
+                        <a href="#" class="menu-link" data-action="home">Inicio</a>
+                        <a href="{% url 'core:contact' %}" class="menu-link">Contacto</a>
+                    </div>
+                </div>
+                
+                <!-- Facetas -->
+                <div class="menu-section">
+                    <div class="menu-section-title">Facetas</div>
+                    <div class="menu-section-links">
+                        {% for facet in facets %}
+                        <a href="#facet-{{ facet.slug }}" class="menu-link menu-facet-link" data-action="scroll-to-facet" data-facet="{{ facet.slug }}">{{ facet.titulo }}</a>
+                        {% empty %}
+                        <p class="text-gray-500 text-sm px-4 py-2">No hay facetas disponibles</p>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <!-- Cuenta -->
+                <div class="menu-section">
+                    <div class="menu-section-title">Cuenta</div>
+                    <div class="menu-section-links">
+                        {% if user.is_authenticated %}
+                        <a href="{% url 'core:manage_facets' %}" class="menu-link">Mis Facetas</a>
+                        <a href="{% url 'core:logout' %}" class="menu-link">Cerrar Sesión</a>
+                        {% else %}
+                        <a href="{% url 'core:login' %}" class="menu-link">Iniciar Sesión</a>
+                        <a href="{% url 'core:register' %}" class="menu-link">Registrarse</a>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -1313,7 +1999,7 @@
             
             <div class="facet-gallery-wrapper" 
                  id="facetGallery{{ forloop.counter0 }}"
-                 style="width: calc(100vw * {{ facet.total_slides|default:1 }});">
+                 data-total-slides="{{ facet.total_slides|default:1 }}">
                 
                 <!-- Título de la Faceta (Layout tipo LeBron) -->
                 <section class="facet-title-slide" data-type="facet-title">
@@ -1340,12 +2026,13 @@
                     {% for milestone in facet.hitos_activos %}
                     <section class="milestone-slide" 
                              data-milestone="{{ milestone.id }}"
-                             data-type="milestone">
+                             data-type="milestone"
+                             data-milestone-index="{{ forloop.counter0 }}">
                         
                         {% if milestone.imagen or milestone.imagenes_activas %}
-                        <!-- Layout: Imagen Izquierda + Panel Texto Derecho -->
+                        <!-- Layout Variable según posición del hito (6 layouts diferentes) -->
                         <div class="milestone-slide-layout">
-                            <!-- Sección de Imagen (Izquierda) -->
+                            <!-- Sección de Imagen -->
                             <div class="milestone-slide-image-section">
                                 <div class="milestone-slide-image-container">
                                     {% if milestone.imagen %}
@@ -1371,7 +2058,7 @@
                                 {% endif %}
                             </div>
                             
-                            <!-- Sección de Texto (Derecha) -->
+                            <!-- Sección de Texto -->
                             <div class="milestone-slide-text-section">
                                 {% if milestone.año %}
                                 <div class="milestone-slide-year">{{ milestone.año }}</div>
@@ -1416,99 +2103,20 @@
         {% endfor %}
     </div>
 
-    <!-- Footer Innovador (sin derechos reservados) -->
-    <footer class="main-footer">
-        <div class="footer-glow"></div>
-        <div class="footer-wave"></div>
-        
-        <div class="footer-inner">
-            <div class="footer-top">
-                <!-- Brand -->
-                <div class="footer-brand">
-                    <div class="footer-brand-logo">
-                        {% if site_settings and site_settings.logo %}
-                        <img src="{{ site_settings.logo.url }}" alt="Logo">
-                        {% endif %}
-                        <span class="footer-brand-name">{% if site_settings %}{{ site_settings.nombre_sitio }}{% else %}ALQUIMISTA{% endif %}</span>
-                    </div>
-                    <p class="footer-brand-desc">
-                        {% if site_settings and site_settings.descripcion_general %}
-                        {{ site_settings.descripcion_general }}
-                        {% else %}
-                        Explorando las diferentes facetas de la creatividad, el talento y la innovación.
-                        {% endif %}
-                    </p>
-                    <div class="footer-social">
-                        {% if site_settings.facebook_url %}
-                        <a href="{{ site_settings.facebook_url }}" target="_blank" class="footer-social-btn" title="Facebook">
-                            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-                        </a>
-                        {% endif %}
-                        {% if site_settings.instagram_url %}
-                        <a href="{{ site_settings.instagram_url }}" target="_blank" class="footer-social-btn" title="Instagram">
-                            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-                        </a>
-                        {% endif %}
-                        {% if site_settings.twitter_url %}
-                        <a href="{{ site_settings.twitter_url }}" target="_blank" class="footer-social-btn" title="Twitter">
-                            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/></svg>
-                        </a>
-                        {% endif %}
-                        {% if site_settings.linkedin_url %}
-                        <a href="{{ site_settings.linkedin_url }}" target="_blank" class="footer-social-btn" title="LinkedIn">
-                            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-                        </a>
-                        {% endif %}
-                        {% if site_settings.youtube_url %}
-                        <a href="{{ site_settings.youtube_url }}" target="_blank" class="footer-social-btn" title="YouTube">
-                            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-                        </a>
-                        {% endif %}
-                    </div>
-                </div>
-                
-                <!-- Navegación -->
-                <div class="footer-column">
-                    <h4>Navegación</h4>
-                    <ul>
-                        <li><a href="{% url 'core:index' %}">Inicio</a></li>
-                        <li><a href="{% url 'core:contact' %}">Contacto</a></li>
-                    </ul>
-                </div>
-                
-                <!-- Contacto -->
-                {% if site_settings %}
-                <div class="footer-column">
-                    <h4>Contacto</h4>
-                    <ul>
-                        {% if site_settings.email_contacto %}
-                        <li><a href="mailto:{{ site_settings.email_contacto }}">{{ site_settings.email_contacto }}</a></li>
-                        {% endif %}
-                        {% if site_settings.telefono %}
-                        <li><a href="tel:{{ site_settings.telefono }}">{{ site_settings.telefono }}</a></li>
-                        {% endif %}
-                        {% if site_settings.direccion %}
-                        <li><span style="color: rgba(255,255,255,0.6);">{{ site_settings.direccion }}</span></li>
-                        {% endif %}
-                    </ul>
-                </div>
-                {% endif %}
-                
-                <!-- Newsletter -->
-                <div class="footer-newsletter">
-                    <h4>Mantente Conectado</h4>
-                    <p>Recibe las últimas novedades y actualizaciones.</p>
-                    <form class="footer-newsletter-form" action="{% url 'core:contact' %}" method="get">
-                        <input type="email" placeholder="Tu email" class="footer-newsletter-input">
-                        <button type="submit" class="footer-newsletter-btn">→</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </footer>
+    {% include 'core/includes/footer.html' %}
 
     <!-- Script GSAP - Horizontal Scroll Experience -->
     <script>
+        // Ocultar pantalla de loading cuando la página esté completamente cargada
+        window.addEventListener('load', function() {
+            const loadingScreen = document.getElementById('loadingScreen');
+            if (loadingScreen) {
+                setTimeout(function() {
+                    loadingScreen.classList.add('hidden');
+                }, 500);
+            }
+        });
+        
         gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
         // Menú Hamburguesa Overlay
@@ -1540,34 +2148,86 @@
             }
         }
         
+        // Calcular y aplicar ancho de facet galleries
+        document.querySelectorAll('.facet-gallery-wrapper').forEach(function(wrapper) {
+            var totalSlides = parseInt(wrapper.getAttribute('data-total-slides') || '1');
+            wrapper.style.width = 'calc(100vw * ' + totalSlides + ')';
+        });
+        
+        // Asignar layouts variados a los milestones
+        function assignMilestoneLayouts() {
+            const facetContainers = document.querySelectorAll('.facet-scroll-container');
+            console.log('Asignando layouts a milestones. Facetas encontradas:', facetContainers.length);
+            
+            facetContainers.forEach((facetContainer, facetIdx) => {
+                const milestones = facetContainer.querySelectorAll('.milestone-slide[data-milestone-index]');
+                console.log(`Faceta ${facetIdx}: ${milestones.length} milestones encontrados`);
+                
+                milestones.forEach((milestone, index) => {
+                    const layoutIndex = (index % 6) + 1; // Ciclo de 1 a 6
+                    const layoutDiv = milestone.querySelector('.milestone-slide-layout');
+                    if (layoutDiv) {
+                        // Remover cualquier layout previo
+                        layoutDiv.classList.remove('layout-1', 'layout-2', 'layout-3', 'layout-4', 'layout-5', 'layout-6');
+                        // Agregar el nuevo layout
+                        layoutDiv.classList.add(`layout-${layoutIndex}`);
+                        
+                        // Obtener elementos de imagen y texto
+                        const imageSection = layoutDiv.querySelector('.milestone-slide-image-section');
+                        const textSection = layoutDiv.querySelector('.milestone-slide-text-section');
+                        
+                        // Cambiar el orden real de los elementos en el DOM según el layout
+                        if (imageSection && textSection) {
+                            // Layout 1, 3, 6: Imagen primero (izquierda), Texto después (derecha)
+                            // Layout 2, 4, 5: Texto primero (izquierda), Imagen después (derecha)
+                            
+                            // Obtener el orden actual
+                            const currentOrder = Array.from(layoutDiv.children).map(child => {
+                                return child === imageSection ? 'image' : (child === textSection ? 'text' : 'other');
+                            });
+                            const imagePos = currentOrder.indexOf('image');
+                            const textPos = currentOrder.indexOf('text');
+                            
+                            if (layoutIndex === 2 || layoutIndex === 4 || layoutIndex === 5) {
+                                // Texto a la izquierda, imagen a la derecha - texto debe estar primero
+                                if (textPos > imagePos) {
+                                    layoutDiv.removeChild(textSection);
+                                    layoutDiv.insertBefore(textSection, imageSection);
+                                    console.log(`Layout ${layoutIndex}: Texto movido a la izquierda`);
+                                }
+                            } else {
+                                // Imagen a la izquierda, texto a la derecha - imagen debe estar primero
+                                if (imagePos > textPos) {
+                                    layoutDiv.removeChild(imageSection);
+                                    layoutDiv.insertBefore(imageSection, textSection);
+                                    console.log(`Layout ${layoutIndex}: Imagen movida a la izquierda`);
+                                }
+                            }
+                        }
+                        
+                        console.log(`Milestone ${index}: Layout ${layoutIndex} asignado`);
+                    } else {
+                        console.warn(`No se encontró .milestone-slide-layout en milestone ${index}`);
+                    }
+                });
+            });
+        }
+        
+        // Ejecutar assignMilestoneLayouts cuando el DOM esté listo
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(assignMilestoneLayouts, 200);
+            });
+        } else {
+            setTimeout(assignMilestoneLayouts, 200);
+        }
+        
         // Inicializar scroll horizontal para cada faceta individualmente
         const facetContainers = document.querySelectorAll('.facet-scroll-container');
         
         console.log('Contenedores de facetas encontrados:', facetContainers.length);
         
         if (facetContainers.length > 0) {
-            // Links dinámicos del menú para cada faceta
-            facetContainers.forEach((facetContainer, facetIndex) => {
-                const facetTitleSlide = facetContainer.querySelector('.facet-title-slide');
-                if (facetTitleSlide) {
-                    const facetTitle = facetTitleSlide.querySelector('h2');
-                    if (facetTitle) {
-                        const a = document.createElement('a');
-                        a.href = '#';
-                        a.className = 'menu-link';
-                        a.textContent = facetTitle.textContent.trim();
-                        a.dataset.facet = facetIndex;
-                        a.addEventListener('click', (ev) => {
-                            ev.preventDefault();
-                            facetContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                            hamburgerBtn.classList.remove('active');
-                            menuOverlay.classList.remove('open');
-                        });
-                        menuLinks.appendChild(a);
-                    }
-                }
-            });
-            
             // Configurar scroll horizontal para cada faceta individual
             facetContainers.forEach((facetContainer, facetIndex) => {
                 const galleryWrapper = facetContainer.querySelector('.facet-gallery-wrapper');
@@ -1626,6 +2286,9 @@
                 }
             });
             
+            // Asignar layouts variados a los milestones DESPUÉS de inicializar todo
+            assignMilestoneLayouts();
+            
             // Asegurar que las imágenes se vean completas - sin transiciones
             document.querySelectorAll('.milestone-slide-main-image').forEach(img => {
                 img.style.transition = 'none';
@@ -1660,7 +2323,7 @@
             }
         }
         
-        // Smooth scroll para enlaces
+        // Smooth scroll para enlaces y facetas
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -1669,6 +2332,32 @@
                     target.scrollIntoView({
                         behavior: 'smooth',
                         block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // Scroll a facetas desde el menú
+        document.querySelectorAll('a[data-action="scroll-to-facet"]').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const facetSlug = this.dataset.facet;
+                const facetContainer = document.querySelector(`[data-facet="${facetSlug}"]`);
+                if (facetContainer) {
+                    // Cerrar el menú
+                    const menuOverlay = document.getElementById('menuOverlay');
+                    const hamburgerBtn = document.getElementById('hamburgerBtn');
+                    if (menuOverlay) menuOverlay.classList.remove('open');
+                    if (hamburgerBtn) hamburgerBtn.classList.remove('active');
+                    
+                    // Scroll suave a la faceta
+                    gsap.to(window, {
+                        duration: 1.5,
+                        scrollTo: {
+                            y: facetContainer,
+                            offsetY: 0
+                        },
+                        ease: "power2.inOut"
                     });
                 }
             });
@@ -1735,29 +2424,39 @@
 
         // Botón flotante Staff/Admin (solo si el usuario tiene permisos)
         {% if request.user.is_authenticated and request.user.is_staff %}
-        const fab = document.createElement('button');
-        fab.className = 'admin-fab';
-        fab.innerHTML = '⚙';
-        const fabMenu = document.createElement('div');
-        fabMenu.className = 'admin-fab-menu';
-        const linkStaff = document.createElement('a');
-        linkStaff.className = 'admin-fab-link';
-        linkStaff.href = '{% url "core:staff_dashboard" %}';
-        linkStaff.textContent = 'Panel Staff';
-        fabMenu.appendChild(linkStaff);
-        {% if request.user.is_superuser %}
-        const linkAdmin = document.createElement('a');
-        linkAdmin.className = 'admin-fab-link';
-        linkAdmin.href = '/admin/';
-        linkAdmin.textContent = 'Django Admin';
-        fabMenu.appendChild(linkAdmin);
-        {% endif %}
-        document.body.appendChild(fab);
-        document.body.appendChild(fabMenu);
-        fab.addEventListener('click', () => { fabMenu.classList.toggle('open'); });
-        document.addEventListener('click', (e) => {
-            if (!fab.contains(e.target) && !fabMenu.contains(e.target)) fabMenu.classList.remove('open');
-        });
+        var staffButtonConfig = {
+            isSuperuser: {% if request.user.is_superuser %}true{% else %}false{% endif %},
+            staffUrl: '{% url "core:staff_dashboard" %}'
+        };
+        (function() {
+            var fab = document.createElement('button');
+            fab.className = 'admin-fab';
+            fab.innerHTML = '⚙';
+            var fabMenu = document.createElement('div');
+            fabMenu.className = 'admin-fab-menu';
+            var linkStaff = document.createElement('a');
+            linkStaff.className = 'admin-fab-link';
+            linkStaff.href = staffButtonConfig.staffUrl;
+            linkStaff.textContent = 'Panel Staff';
+            fabMenu.appendChild(linkStaff);
+            
+            if (staffButtonConfig.isSuperuser) {
+                var linkAdmin = document.createElement('a');
+                linkAdmin.className = 'admin-fab-link';
+                linkAdmin.href = '/admin/';
+                linkAdmin.textContent = 'Django Admin';
+                fabMenu.appendChild(linkAdmin);
+            }
+            
+            document.body.appendChild(fab);
+            document.body.appendChild(fabMenu);
+            fab.addEventListener('click', function() { fabMenu.classList.toggle('open'); });
+            document.addEventListener('click', function(e) {
+                if (!fab.contains(e.target) && !fabMenu.contains(e.target)) {
+                    fabMenu.classList.remove('open');
+                }
+            });
+        })();
         {% endif %}
     </script>
 </body>

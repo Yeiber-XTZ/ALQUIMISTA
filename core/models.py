@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.text import slugify
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.contrib.auth.models import User
 
 
 class SiteSettings(models.Model):
@@ -322,6 +323,18 @@ class ContactMessage(models.Model):
         verbose_name="Leído",
         help_text="Marcar cuando el mensaje haya sido leído"
     )
+    respuesta = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name="Respuesta",
+        help_text="Respuesta al mensaje del contacto"
+    )
+    fecha_respuesta = models.DateTimeField(
+        blank=True,
+        null=True,
+        verbose_name="Fecha de Respuesta",
+        help_text="Fecha en que se envió la respuesta"
+    )
 
     class Meta:
         verbose_name = "Mensaje de Contacto"
@@ -333,3 +346,44 @@ class ContactMessage(models.Model):
 
     def __str__(self):
         return f"Mensaje de {self.nombre} - {self.fecha_creacion.strftime('%d/%m/%Y %H:%M')}"
+
+
+class UserFacetPreference(models.Model):
+    """
+    Relación entre Usuario y Faceta con prioridad.
+    Permite a los usuarios seleccionar qué facetas quieren ver y en qué orden.
+    """
+    usuario = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='facet_preferences',
+        verbose_name="Usuario"
+    )
+    faceta = models.ForeignKey(
+        Facet,
+        on_delete=models.CASCADE,
+        related_name='user_preferences',
+        verbose_name="Faceta"
+    )
+    prioridad = models.IntegerField(
+        default=0,
+        verbose_name="Prioridad",
+        help_text="Orden de prioridad (menor número = mayor prioridad)",
+        validators=[MinValueValidator(0)]
+    )
+    fecha_seleccion = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name="Fecha de selección"
+    )
+
+    class Meta:
+        verbose_name = "Preferencia de Faceta"
+        verbose_name_plural = "Preferencias de Facetas"
+        unique_together = ['usuario', 'faceta']
+        ordering = ['usuario', 'prioridad', 'faceta__orden']
+        indexes = [
+            models.Index(fields=['usuario', 'prioridad']),
+        ]
+
+    def __str__(self):
+        return f"{self.usuario.username} - {self.faceta.titulo} (Prioridad: {self.prioridad})"

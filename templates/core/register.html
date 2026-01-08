@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - {% if site_settings %}{{ site_settings.nombre_sitio }}{% else %}ALQUIMISTA NELSON{% endif %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800;900&family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #000000;
+            color: #FFFFFF;
+        }
+        .form-container {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .errorlist {
+            color: #B8212A;
+            list-style: none;
+            padding: 0;
+            margin: 0.5rem 0;
+        }
+        .errorlist li {
+            margin: 0.25rem 0;
+        }
+        .password-wrapper {
+            position: relative;
+        }
+        .password-wrapper input {
+            padding-right: 3rem;
+        }
+        .password-toggle {
+            position: absolute;
+            right: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            z-index: 10;
+        }
+        /* Estilos para campos de formulario */
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="number"],
+        textarea {
+            background: rgba(255, 255, 255, 0.05) !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            color: #FFFFFF !important;
+        }
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="password"]:focus,
+        input[type="number"]:focus,
+        textarea:focus {
+            background: rgba(255, 255, 255, 0.08) !important;
+            border-color: #B8212A !important;
+            outline: none;
+        }
+        input[type="text"]::placeholder,
+        input[type="email"]::placeholder,
+        input[type="password"]::placeholder,
+        input[type="number"]::placeholder {
+            color: rgba(255, 255, 255, 0.5) !important;
+        }
+        input[type="text"]:disabled,
+        input[type="number"]:disabled {
+            background: rgba(255, 255, 255, 0.02) !important;
+            border-color: rgba(255, 255, 255, 0.1) !important;
+            color: rgba(255, 255, 255, 0.4) !important;
+        }
+        /* Footer Innovador */
+        .main-footer {
+            background: linear-gradient(180deg, #0a0a0a 0%, #000000 100%);
+            color: #FFFFFF;
+            padding: 0;
+            position: relative;
+            z-index: 100;
+            overflow: hidden;
+        }
+        .footer-wave {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 100'%3E%3Cpath fill='%23000' d='M0,50 C360,100 720,0 1080,50 C1260,75 1380,25 1440,50 L1440,0 L0,0 Z'/%3E%3C/svg%3E") no-repeat center;
+            background-size: cover;
+            opacity: 0.5;
+        }
+        .footer-glow {
+            position: absolute;
+            top: -200px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            height: 400px;
+            background: radial-gradient(ellipse, rgba(184, 33, 42, 0.15) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .footer-inner {
+            position: relative;
+            z-index: 2;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 6rem 2rem 4rem;
+        }
+        .footer-top {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 4rem;
+        }
+        .footer-brand {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        .footer-brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .footer-brand-logo img {
+            height: 60px;
+            width: auto;
+            filter: drop-shadow(0 4px 12px rgba(184, 33, 42, 0.3));
+        }
+        .footer-brand-name {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 900;
+            letter-spacing: 0.1em;
+        }
+        .footer-brand-desc {
+            color: rgba(255, 255, 255, 0.6);
+            line-height: 1.8;
+            max-width: 400px;
+        }
+        .footer-social {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .footer-social-btn {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #FFFFFF;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .footer-social-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, #B8212A, #ff4757);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .footer-social-btn:hover::before {
+            opacity: 1;
+        }
+        .footer-social-btn:hover {
+            transform: translateY(-4px) scale(1.1);
+            border-color: transparent;
+            box-shadow: 0 10px 30px rgba(184, 33, 42, 0.4);
+        }
+        .footer-social-btn svg {
+            position: relative;
+            z-index: 1;
+        }
+        .footer-column h4 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+            color: #FFFFFF;
+        }
+        .footer-column ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .footer-column li {
+            margin-bottom: 0.75rem;
+        }
+        .footer-column a {
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .footer-column a::before {
+            content: '';
+            width: 0;
+            height: 1px;
+            background: #B8212A;
+            transition: width 0.3s ease;
+        }
+        .footer-column a:hover {
+            color: #FFFFFF;
+            transform: translateX(8px);
+        }
+        .footer-column a:hover::before {
+            width: 20px;
+        }
+        .footer-newsletter {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+        .footer-newsletter h4 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+        .footer-newsletter p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        .footer-newsletter-form {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .footer-newsletter-input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            color: #FFFFFF;
+            font-size: 0.9rem;
+        }
+        .footer-newsletter-input:focus {
+            outline: none;
+            border-color: #B8212A;
+        }
+        .footer-newsletter-btn {
+            background: linear-gradient(135deg, #B8212A, #ff4757);
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            color: #FFFFFF;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .footer-newsletter-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(184, 33, 42, 0.4);
+        }
+        @media (max-width: 768px) {
+            .footer-inner {
+                padding: 3rem 1.5rem 2rem;
+            }
+            .footer-top {
+                grid-template-columns: 1fr !important;
+                gap: 2rem;
+            }
+            .footer-column {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+<div class="flex-grow flex items-center justify-center p-4">
+    <div class="w-full max-w-4xl">
+        <div class="text-center mb-8">
+            {% if site_settings and site_settings.logo %}
+            <img src="{{ site_settings.logo.url }}" alt="Logo" class="h-20 mx-auto mb-4">
+            {% endif %}
+            <h1 class="text-4xl font-bold mb-2">Crear Cuenta</h1>
+            <p class="text-gray-400">Selecciona las facetas que te interesan</p>
+        </div>
+
+        <form method="post" class="form-container rounded-2xl p-8 space-y-6">
+            {% csrf_token %}
+            
+            <!-- Errores generales -->
+            {% if user_form.non_field_errors %}
+            <div class="bg-red-900/30 border border-red-500 rounded-lg p-4">
+                {{ user_form.non_field_errors }}
+            </div>
+            {% endif %}
+
+            <!-- Información de Usuario -->
+            <div class="grid md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium mb-2">Nombre de Usuario</label>
+                    {{ user_form.username }}
+                    {% if user_form.username.errors %}
+                    <ul class="errorlist">{{ user_form.username.errors }}</ul>
+                    {% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">Correo Electrónico</label>
+                    {{ user_form.email }}
+                    {% if user_form.email.errors %}
+                    <ul class="errorlist">{{ user_form.email.errors }}</ul>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium mb-2">Contraseña</label>
+                    <div class="password-wrapper">
+                        {{ user_form.password1 }}
+                        <button type="button" 
+                                onclick="togglePassword('id_password1', 'toggle1')" 
+                                class="password-toggle text-gray-400 hover:text-white">
+                            <span id="toggle1">👁️</span>
+                        </button>
+                    </div>
+                    {% if user_form.password1.errors %}
+                    <ul class="errorlist">{{ user_form.password1.errors }}</ul>
+                    {% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">Confirmar Contraseña</label>
+                    <div class="password-wrapper">
+                        {{ user_form.password2 }}
+                        <button type="button" 
+                                onclick="togglePassword('id_password2', 'toggle2')" 
+                                class="password-toggle text-gray-400 hover:text-white">
+                            <span id="toggle2">👁️</span>
+                        </button>
+                    </div>
+                    {% if user_form.password2.errors %}
+                    <ul class="errorlist">{{ user_form.password2.errors }}</ul>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Selección de Facetas -->
+            <div class="border-t border-gray-700 pt-6 mt-6">
+                <h2 class="text-2xl font-bold mb-2">Selecciona tus Facetas de Interés</h2>
+                <p class="text-gray-400 text-sm mb-6">Marca las facetas que quieres ver y establece su prioridad (0 = mayor prioridad)</p>
+                
+                <div class="space-y-3">
+                    {% for facet in facet_form.facets %}
+                    <div class="flex items-start gap-4 p-4 bg-gradient-to-r from-gray-900/50 to-gray-800/30 rounded-xl border border-gray-700/50 hover:border-gray-600 transition-all">
+                        <div class="flex-1">
+                            <label class="flex items-center gap-3 cursor-pointer group">
+                                <input type="checkbox" 
+                                       name="facet_{{ facet.id }}" 
+                                       id="facet_{{ facet.id }}"
+                                       class="facet-checkbox w-5 h-5 text-red-600 bg-gray-800 border-gray-600 rounded focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-900"
+                                       onchange="togglePriority({{ facet.id }})">
+                                <span class="text-lg font-semibold group-hover:text-red-400 transition-colors">{{ facet.titulo }}</span>
+                            </label>
+                            {% if facet.descripcion %}
+                            <p class="text-sm text-gray-400 mt-2 ml-8 leading-relaxed">{{ facet.descripcion|truncatewords:25 }}</p>
+                            {% endif %}
+                        </div>
+                        <div class="w-32 flex-shrink-0">
+                            <label for="priority_{{ facet.id }}" class="block text-sm font-medium mb-1 text-gray-300">Prioridad</label>
+                            <input type="number" 
+                                   name="priority_{{ facet.id }}" 
+                                   id="priority_{{ facet.id }}"
+                                   value="0" 
+                                   min="0"
+                                   disabled
+                                   class="priority-input w-full px-3 py-2 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 disabled:opacity-50 disabled:cursor-not-allowed">
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="flex gap-4 pt-4">
+                <button type="submit" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-4 px-6 rounded-lg transition">
+                    Crear Cuenta
+                </button>
+                <a href="{% url 'core:index' %}" class="px-6 py-4 border border-gray-600 hover:border-gray-400 rounded-lg transition">
+                    Cancelar
+                </a>
+            </div>
+
+            <div class="text-center mt-6">
+                <p class="text-gray-400">
+                    ¿Ya tienes cuenta? 
+                    <a href="{% url 'core:login' %}" class="text-red-500 hover:text-red-400">Inicia sesión</a>
+                </p>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function togglePriority(facetId) {
+            const checkbox = document.getElementById('facet_' + facetId);
+            const priorityInput = document.getElementById('priority_' + facetId);
+            if (checkbox && priorityInput) {
+                priorityInput.disabled = !checkbox.checked;
+                if (!checkbox.checked) {
+                    priorityInput.value = '0';
+                }
+            }
+        }
+        
+        function togglePassword(inputId, toggleId) {
+            const input = document.getElementById(inputId);
+            const toggle = document.getElementById(toggleId);
+            if (input && toggle) {
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    toggle.textContent = '🙈';
+                } else {
+                    input.type = 'password';
+                    toggle.textContent = '👁️';
+                }
+            }
+        }
+        
+        // Inicializar todos los checkboxes al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.facet-checkbox').forEach(checkbox => {
+                const facetId = checkbox.id.replace('facet_', '');
+                const priorityInput = document.getElementById('priority_' + facetId);
+                if (priorityInput) {
+                    priorityInput.disabled = !checkbox.checked;
+                }
+            });
+        });
+    </script>
+</div>
+{% include 'core/includes/footer.html' %}
+</body>
+</html>
