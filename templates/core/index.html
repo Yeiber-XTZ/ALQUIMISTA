@@ -617,7 +617,7 @@
         #intro-pin {
             position: relative;
             width: 100vw;
-            height: 300vh; /* Altura para el scroll del pin */
+            height: 700vh; /* Altura para el scroll del pin - mucho más lento */
             background: #000000;
             margin: 0;
             padding: 0;
@@ -2848,7 +2848,7 @@
                     scrollTrigger: {
                         trigger: introPin,
                         start: 'top top',
-                        end: '+=200vh', // 2 pantallas de scroll
+                        end: '+=600vh', // 6 pantallas de scroll - mucho más lento para sentir el zoom
                         scrub: 1, // Vinculado directamente al scroll (suave)
                         pin: true, // Pin del contenedor durante la animación
                         pinSpacing: false, // Eliminar espacios
@@ -2861,15 +2861,15 @@
                 introTimeline.to(heroCurtain, {
                     yPercent: -100,
                     ease: 'none',
-                    duration: 0.4 // 40% del scroll total
+                    duration: 0.15 // 15% del scroll total - rápido para revelar el video
                 }, 0);
                 
                 // Paso B: Zoom del video de scale(0.7) a scale(1) - de 70% a 100%
                 introTimeline.to(introVideo, {
                     scale: 1, // De 0.7 a 1.0 (100%)
                     ease: 'none',
-                    duration: 0.6 // 60% del scroll total (después del paso A)
-                }, 0.4); // Empieza cuando la cortina está a mitad de camino
+                    duration: 0.85 // 85% del scroll total - zoom extremadamente lento y gradual
+                }, 0.15); // Empieza después de que la cortina se haya ido
                 
                 // Eliminar espacios cuando termina el pin
                 ScrollTrigger.create({
@@ -2881,27 +2881,11 @@
                         introPin.style.marginBottom = '0';
                         introPin.style.paddingBottom = '0';
                         
-                        // Eliminar pin spacers creados por GSAP
-                        const pinSpacers = document.querySelectorAll('[data-pin-spacer]');
-                        pinSpacers.forEach(spacer => {
-                            if (spacer.contains(introPin) || 
-                                spacer.nextElementSibling === introPin ||
-                                spacer.previousElementSibling === introPin) {
-                                spacer.style.display = 'none';
-                                spacer.style.height = '0';
-                                spacer.style.margin = '0';
-                                spacer.style.padding = '0';
-                                spacer.style.visibility = 'hidden';
-                            }
-                        });
-                        
                         // Asegurar que las facetas estén justo después sin espacio
                         const facetsContainer = document.getElementById('facets-vertical-container');
                         if (facetsContainer) {
                             facetsContainer.style.marginTop = '0';
                             facetsContainer.style.paddingTop = '0';
-                            facetsContainer.style.position = 'relative';
-                            facetsContainer.style.top = '0';
                         }
                     }
                 });
@@ -2934,6 +2918,77 @@
             
             // Controles de Mute/Unmute para todos los videos
             function setupVideoControls() {
+                // Control para el video de intro (introVideo)
+                const introVideo = document.getElementById('introVideo');
+                const introVideoMuteBtn = document.getElementById('introVideoMuteBtn');
+                const introVideoMuteIcon = document.getElementById('introVideoMuteIcon');
+                
+                if (introVideo && introVideoMuteBtn && introVideoMuteIcon) {
+                    // Función para actualizar el estado del botón
+                    const updateIntroMuteButton = () => {
+                        introVideoMuteIcon.textContent = introVideo.muted ? '🔇' : '🔊';
+                        introVideoMuteBtn.classList.toggle('muted', introVideo.muted);
+                        introVideoMuteBtn.setAttribute('aria-label', introVideo.muted ? 'Unmute video' : 'Mute video');
+                        introVideoMuteBtn.setAttribute('title', introVideo.muted ? 'Click para escuchar' : 'Click para silenciar');
+                    };
+                    
+                    // Event listener para toggle mute/unmute
+                    introVideoMuteBtn.addEventListener('click', async (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        try {
+                            // Si está muteado, desmutear y reproducir
+                            if (introVideo.muted) {
+                                introVideo.muted = false;
+                                
+                                // Asegurar que el video esté reproduciéndose
+                                if (introVideo.paused) {
+                                    await introVideo.play();
+                                }
+                                
+                                // Establecer volumen al máximo
+                                introVideo.volume = 1.0;
+                            } else {
+                                // Si tiene sonido, mutear
+                                introVideo.muted = true;
+                            }
+                            
+                            updateIntroMuteButton();
+                        } catch (error) {
+                            console.error('Error al cambiar el estado del audio del video intro:', error);
+                            // Si falla, al menos cambiar el estado visual
+                            introVideo.muted = !introVideo.muted;
+                            updateIntroMuteButton();
+                        }
+                    });
+                    
+                    // Permitir interacción del usuario para desmutear
+                    introVideo.addEventListener('click', async () => {
+                        if (introVideo.muted) {
+                            try {
+                                introVideo.muted = false;
+                                introVideo.volume = 1.0;
+                                if (introVideo.paused) {
+                                    await introVideo.play();
+                                }
+                                updateIntroMuteButton();
+                            } catch (error) {
+                                console.log('Interacción requerida para audio:', error);
+                            }
+                        }
+                    });
+                    
+                    // Actualizar estado inicial
+                    updateIntroMuteButton();
+                    
+                    // Sincronizar con cambios externos al estado muted
+                    introVideo.addEventListener('volumechange', updateIntroMuteButton);
+                    introVideo.addEventListener('play', () => {
+                        updateIntroMuteButton();
+                    });
+                }
+                
                 // Control para el video del hero (transición inicial)
                 const heroVideo = document.getElementById('heroVideoElement');
                 const heroMuteBtn = document.getElementById('heroVideoMuteBtn');
