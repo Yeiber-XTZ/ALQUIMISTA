@@ -613,6 +613,99 @@
         }
         
         /* Hero Section - Imagen en Primer Plano */
+        /* Sección Intro - Efecto Curtain Reveal & Video Zoom */
+        #intro-pin {
+            position: relative;
+            width: 100vw;
+            height: 300vh; /* Altura para el scroll del pin */
+            background: #000000;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        .sticky-wrapper {
+            position: sticky;
+            top: 0;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        /* Capa 2: Video Reveal (Fondo) - Empieza al 70% */
+        .video-reveal {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+        }
+        
+        .video-reveal video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            transform: scale(0.7); /* Empieza al 70% - visible con bordes negros */
+            transform-origin: center center;
+            will-change: transform;
+        }
+        
+        /* Capa 1: Hero Curtain (Superior) - Se desliza hacia arriba (Imagen del Hero) */
+        .hero-curtain {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            background: #000000;
+            z-index: 2; /* Encima del video */
+            overflow: hidden;
+        }
+        
+        .hero-curtain .hero-image-container {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+        }
+        
+        .hero-curtain .hero-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+        
+        .hero-curtain .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                to bottom,
+                rgba(0, 0, 0, 0.3) 0%,
+                rgba(0, 0, 0, 0.1) 50%,
+                rgba(0, 0, 0, 0.7) 100%
+            );
+            z-index: 2;
+        }
+        
+        .hero-curtain .hero-logo-fixed {
+            position: absolute;
+            top: 24px;
+            left: 24px;
+            z-index: 10;
+        }
+        
+        .hero-curtain .hero-scroll-indicator {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+        }
+        
         .hero-section {
             width: 100vw;
             height: 100vh;
@@ -645,30 +738,7 @@
             z-index: 2;
         }
         
-        /* Hero Video Section - Detrás de la imagen */
-        .hero-video-section {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            z-index: 0; /* Detrás de la imagen del hero */
-        }
         
-        .hero-video-container {
-            position: absolute;
-            inset: 0;
-            z-index: 1;
-        }
-        
-        .hero-video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            object-position: center;
-            transform: scale(1.2); /* Zoom inicial para ocupar toda la pantalla */
-        }
         
         /* Controles de video - Estilo LeBron James */
         .video-controls {
@@ -915,7 +985,29 @@
             position: relative;
             background: #000000;
             overflow: hidden;
+            margin: 0;
+            padding: 0;
         }
+        
+        /* Eliminar espacio entre video sticky y facetas */
+        /* Eliminar espacio entre intro-pin y facetas */
+        #facets-vertical-container {
+            margin: 0;
+            padding: 0;
+        }
+        
+        #intro-pin + #facets-vertical-container,
+        #intro-pin ~ #facets-vertical-container {
+            margin-top: 0 !important;
+            padding-top: 0 !important;
+        }
+        
+        /* Eliminar espacios de pin spacers */
+        [data-pin-spacer] {
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        
         
         /* Gallery Wrapper - Contenedor Horizontal por Faceta */
         .facet-gallery-wrapper {
@@ -2491,50 +2583,53 @@
 
     <!-- Hero Section - Video detrás, Imagen en Primer Plano -->
     <main id="main-content">
-    <section class="hero-section" id="hero" role="banner">
-        <!-- Hero Video Section (Detrás de la imagen) -->
-        {% if site_settings and site_settings.video_hero %}
-        <div class="hero-video-section" id="heroVideo">
-            <div class="hero-video-container">
-                <video class="hero-video" id="heroVideoElement" autoplay muted loop playsinline preload="auto">
+    <!-- Sección Intro - Efecto Curtain Reveal & Video Zoom (Estilo LeBron James) -->
+    <section id="intro-pin">
+        <div class="sticky-wrapper">
+            <!-- Capa 2 (Fondo): Video Reveal - Empieza al 70% y hace zoom a 100% -->
+            {% if site_settings and site_settings.video_hero %}
+            <div class="video-reveal">
+                <video id="introVideo" autoplay muted loop playsinline preload="auto">
                     <source src="{{ site_settings.video_hero.url }}" type="video/mp4">
                     <source src="{{ site_settings.video_hero.url }}" type="video/webm">
                     Tu navegador no soporta el elemento de video.
                 </video>
-                <div class="hero-video-overlay"></div>
                 <div class="video-controls">
-                    <button class="video-mute-btn" id="heroVideoMuteBtn" aria-label="Mute/Unmute video" title="Mute/Unmute">
-                        <span id="heroVideoMuteIcon">🔊</span>
+                    <button class="video-mute-btn" id="introVideoMuteBtn" aria-label="Mute/Unmute video" title="Mute/Unmute">
+                        <span id="introVideoMuteIcon">🔊</span>
                     </button>
                 </div>
             </div>
-        </div>
-        {% endif %}
-        
-        <!-- Logo en Esquina Superior Izquierda -->
-        <div class="hero-logo-fixed">
-            {% if site_settings and site_settings.logo %}
-            <img src="{{ site_settings.logo.url }}" alt="Logo">
             {% endif %}
-            <span class="hero-logo-text">{% if site_settings %}{{ site_settings.nombre_sitio }}{% else %}ALQUIMISTA{% endif %}</span>
-        </div>
-        
-        <!-- Imagen Hero en Primer Plano -->
-        <div class="hero-image-container">
-            {% if site_settings and site_settings.imagen_hero %}
-            <img src="{{ site_settings.imagen_hero.url }}" alt="Hero Background" class="hero-image" loading="eager" fetchpriority="high">
-            {% else %}
-            <div style="width:100%; height:100%; background: linear-gradient(135deg, #1a1a1a 0%, #000 100%);"></div>
-            {% endif %}
-            <div class="hero-overlay"></div>
-        </div>
-        
-        <!-- Indicador de Scroll -->
-        <div class="hero-scroll-indicator">
-            <span>Scroll</span>
-            <div class="hero-scroll-arrow"></div>
+            
+            <!-- Capa 1 (Superior): Hero Curtain - Se desliza hacia arriba (Imagen del Hero) -->
+            <div class="hero-curtain">
+                <div class="hero-logo-fixed">
+                    {% if site_settings and site_settings.logo %}
+                    <img src="{{ site_settings.logo.url }}" alt="Logo">
+                    {% endif %}
+                    <span class="hero-logo-text">{% if site_settings %}{{ site_settings.nombre_sitio }}{% else %}ALQUIMISTA{% endif %}</span>
+                </div>
+                
+                <!-- Imagen Hero en Primer Plano -->
+                <div class="hero-image-container">
+                    {% if site_settings and site_settings.imagen_hero %}
+                    <img src="{{ site_settings.imagen_hero.url }}" alt="Hero Background" class="hero-image" loading="eager" fetchpriority="high">
+                    {% else %}
+                    <div style="width:100%; height:100%; background: linear-gradient(135deg, #1a1a1a 0%, #000 100%);"></div>
+                    {% endif %}
+                    <div class="hero-overlay"></div>
+                </div>
+                
+                <!-- Indicador de Scroll -->
+                <div class="hero-scroll-indicator">
+                    <span>Scroll</span>
+                    <div class="hero-scroll-arrow"></div>
+                </div>
+            </div>
         </div>
     </section>
+
 
     <!-- Barras de Progreso (Fuera del contenedor, una por faceta) -->
     {% for facet in facets %}
@@ -2741,11 +2836,80 @@
             
             gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
-            // Efectos GSAP Hero: Zoom-in de imagen y transición a video
+            // Efecto Intro - Curtain Reveal & Video Zoom (Estilo LeBron James)
+            const introPin = document.getElementById('intro-pin');
+            const heroCurtain = document.querySelector('.hero-curtain');
+            const videoReveal = document.querySelector('.video-reveal');
+            const introVideo = document.getElementById('introVideo');
+            
+            if (introPin && heroCurtain && videoReveal && introVideo) {
+                // Timeline principal con ScrollTrigger
+                const introTimeline = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: introPin,
+                        start: 'top top',
+                        end: '+=200vh', // 2 pantallas de scroll
+                        scrub: 1, // Vinculado directamente al scroll (suave)
+                        pin: true, // Pin del contenedor durante la animación
+                        pinSpacing: false, // Eliminar espacios
+                        anticipatePin: 1,
+                        invalidateOnRefresh: true,
+                    }
+                });
+                
+                // Paso A: Desplazar hero-curtain hacia arriba (yPercent: -100)
+                introTimeline.to(heroCurtain, {
+                    yPercent: -100,
+                    ease: 'none',
+                    duration: 0.4 // 40% del scroll total
+                }, 0);
+                
+                // Paso B: Zoom del video de scale(0.7) a scale(1) - de 70% a 100%
+                introTimeline.to(introVideo, {
+                    scale: 1, // De 0.7 a 1.0 (100%)
+                    ease: 'none',
+                    duration: 0.6 // 60% del scroll total (después del paso A)
+                }, 0.4); // Empieza cuando la cortina está a mitad de camino
+                
+                // Eliminar espacios cuando termina el pin
+                ScrollTrigger.create({
+                    trigger: introPin,
+                    start: 'bottom top',
+                    onEnter: () => {
+                        introPin.style.height = '0';
+                        introPin.style.overflow = 'hidden';
+                        introPin.style.marginBottom = '0';
+                        introPin.style.paddingBottom = '0';
+                        
+                        // Eliminar pin spacers creados por GSAP
+                        const pinSpacers = document.querySelectorAll('[data-pin-spacer]');
+                        pinSpacers.forEach(spacer => {
+                            if (spacer.contains(introPin) || 
+                                spacer.nextElementSibling === introPin ||
+                                spacer.previousElementSibling === introPin) {
+                                spacer.style.display = 'none';
+                                spacer.style.height = '0';
+                                spacer.style.margin = '0';
+                                spacer.style.padding = '0';
+                                spacer.style.visibility = 'hidden';
+                            }
+                        });
+                        
+                        // Asegurar que las facetas estén justo después sin espacio
+                        const facetsContainer = document.getElementById('facets-vertical-container');
+                        if (facetsContainer) {
+                            facetsContainer.style.marginTop = '0';
+                            facetsContainer.style.paddingTop = '0';
+                            facetsContainer.style.position = 'relative';
+                            facetsContainer.style.top = '0';
+                        }
+                    }
+                });
+            }
+            
+            // Efectos GSAP Hero: Zoom-in de imagen (si existe hero section)
             const heroSection = document.getElementById('hero');
             const heroImage = document.querySelector('.hero-image');
-            const heroVideoSection = document.getElementById('heroVideo');
-            const heroVideo = document.getElementById('heroVideoElement');
             
             if (heroSection && heroImage) {
                 // Pin del Hero section durante el scroll inicial
@@ -2766,35 +2930,11 @@
                     duration: 1,
                     ease: 'power2.out'
                 }, 0);
-                
-                // Fade-out de la imagen revelando el video (solo si hay video)
-                if (heroVideoSection && heroVideo) {
-                    // El video ya está visible detrás, solo hacemos fade-out de la imagen
-                    heroPin.to(heroImage, {
-                        opacity: 0,
-                        duration: 0.5,
-                        ease: 'power2.in'
-                    }, 0.5);
-                    
-                    // Zoom-in adicional del video durante el scroll (de 1.2 a 1.4)
-                    heroPin.to('.hero-video', {
-                        scale: 1.4,
-                        duration: 0.5,
-                        ease: 'power2.out'
-                    }, 0.5);
-                } else {
-                    // Si no hay video, solo hacer zoom de la imagen
-                    heroPin.to(heroImage, {
-                        scale: 1.2,
-                        duration: 1,
-                        ease: 'power2.out'
-                    }, 0);
-                }
             }
             
             // Controles de Mute/Unmute para todos los videos
             function setupVideoControls() {
-                // Control para el video del hero
+                // Control para el video del hero (transición inicial)
                 const heroVideo = document.getElementById('heroVideoElement');
                 const heroMuteBtn = document.getElementById('heroVideoMuteBtn');
                 const heroMuteIcon = document.getElementById('heroVideoMuteIcon');
@@ -2869,7 +3009,6 @@
                 
                 // Controles para videos en milestones
                 document.querySelectorAll('video').forEach((video, index) => {
-                    if (video.id === 'heroVideoElement') return; // Ya lo manejamos arriba
                     
                     // Crear contenedor de controles si no existe
                     let controlsContainer = video.parentElement.querySelector('.video-controls');
