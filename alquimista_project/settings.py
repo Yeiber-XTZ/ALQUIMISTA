@@ -33,11 +33,59 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-r+7dds)gsc7&xh3)5ku3^v-2j1
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'a065cb74ae4e.ngrok-free.app']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'e81b08a7b841.ngrok-free.app']
 
 # En desarrollo, permitir cualquier host si DEBUG está activo (útil para ngrok que cambia de dominio)
 if DEBUG:
     ALLOWED_HOSTS = ['*']
+
+# CSRF Trusted Origins (para ngrok y otros proxies)
+# IMPORTANTE: Si cambias el dominio de ngrok, actualiza esta lista con el nuevo dominio
+# Formato: 'https://tu-dominio.ngrok-free.app'
+CSRF_TRUSTED_ORIGINS = [
+    'https://e81b08a7b841.ngrok-free.app',
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+]
+
+# En desarrollo, agregar configuración flexible para ngrok
+if DEBUG:
+    # Permitir CSRF desde cualquier origen en desarrollo (SOLO PARA DESARROLLO)
+    # En producción, esto DEBE estar deshabilitado por seguridad
+    CSRF_COOKIE_SECURE = False  # Permitir cookies CSRF en HTTP
+    CSRF_COOKIE_HTTPONLY = False  # Permitir acceso desde JavaScript si es necesario
+    CSRF_USE_SESSIONS = False  # Usar cookies en lugar de sesiones para CSRF
+    CSRF_COOKIE_SAMESITE = 'Lax'  # Permitir cookies en contextos cross-site en desarrollo
+    
+    # Si necesitas agregar más dominios de ngrok, añádelos aquí
+    # Nota: Django no soporta wildcards en CSRF_TRUSTED_ORIGINS
+    # Si cambias el dominio de ngrok, actualiza esta lista manualmente
+    # O usa la variable de entorno CSRF_TRUSTED_ORIGINS si está disponible
+    import os
+    additional_origins = os.getenv('CSRF_TRUSTED_ORIGINS', '')
+    if additional_origins:
+        CSRF_TRUSTED_ORIGINS.extend([origin.strip() for origin in additional_origins.split(',')])
+    
+    # Agregar cualquier dominio ngrok que se detecte automáticamente
+    # Esto es útil cuando ngrok cambia de dominio frecuentemente
+    # IMPORTANTE: En producción, esto debe estar deshabilitado
+    def get_ngrok_domains():
+        """Intenta detectar dominios ngrok comunes"""
+        ngrok_domains = []
+        # Puedes agregar aquí dominios ngrok adicionales manualmente
+        # Ejemplo: ngrok_domains.append('https://nuevo-dominio.ngrok-free.app')
+        # 
+        # INSTRUCCIONES PARA AGREGAR NUEVO DOMINIO NGROK:
+        # 1. Copia el nuevo dominio de ngrok (ejemplo: https://abc123.ngrok-free.app)
+        # 2. Agrega la línea: ngrok_domains.append('https://abc123.ngrok-free.app')
+        # 3. También agrégalo a CSRF_TRUSTED_ORIGINS arriba
+        # 4. Reinicia el servidor Django
+        return ngrok_domains
+    
+    ngrok_domains = get_ngrok_domains()
+    for domain in ngrok_domains:
+        if domain not in CSRF_TRUSTED_ORIGINS:
+            CSRF_TRUSTED_ORIGINS.append(domain)
 
 
 # Application definition

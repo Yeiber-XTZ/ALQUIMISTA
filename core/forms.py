@@ -10,39 +10,72 @@ class CustomUserCreationForm(UserCreationForm):
         required=True,
         label="Correo electrónico",
         widget=forms.EmailInput(attrs={
-            'class': 'w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 text-white placeholder-white/50',
-            'placeholder': 'tu@email.com',
-            'style': 'color: #FFFFFF;'
+            'class': 'form-input',
+            'placeholder': 'tu@email.com'
         })
     )
     username = forms.CharField(
         label="Nombre de usuario",
         widget=forms.TextInput(attrs={
-            'class': 'w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 text-white placeholder-white/50',
-            'placeholder': 'Nombre de usuario',
-            'style': 'color: #FFFFFF;'
+            'class': 'form-input',
+            'placeholder': 'Nombre de usuario'
         })
     )
     password1 = forms.CharField(
         label="Contraseña",
         widget=forms.PasswordInput(attrs={
-            'class': 'w-full px-4 py-3 pr-12 bg-white/5 border border-white/20 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 text-white placeholder-white/50',
-            'placeholder': 'Contraseña',
-            'style': 'color: #FFFFFF;'
+            'class': 'form-input password-input',
+            'placeholder': 'Contraseña'
         })
     )
     password2 = forms.CharField(
         label="Confirmar contraseña",
         widget=forms.PasswordInput(attrs={
-            'class': 'w-full px-4 py-3 pr-12 bg-white/5 border border-white/20 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 text-white placeholder-white/50',
-            'placeholder': 'Confirma tu contraseña',
-            'style': 'color: #FFFFFF;'
+            'class': 'form-input password-input',
+            'placeholder': 'Confirma tu contraseña'
+        })
+    )
+    rol = forms.ChoiceField(
+        choices=[
+            ('visitante', 'Visitante'),
+            ('estudiante', 'Estudiante'),
+        ],
+        required=True,
+        label="Rol",
+        help_text="Selecciona tu rol: Visitante (acceso general) o Estudiante (acceso a material exclusivo)",
+        widget=forms.Select(attrs={
+            'class': 'form-input form-select'
+        })
+    )
+    # Campos adicionales del perfil
+    nombre = forms.CharField(
+        required=False,
+        label="Nombre",
+        widget=forms.TextInput(attrs={
+            'class': 'form-input',
+            'placeholder': 'Tu nombre completo'
+        })
+    )
+    id_usuario = forms.CharField(
+        required=False,
+        label="ID",
+        widget=forms.TextInput(attrs={
+            'class': 'form-input',
+            'placeholder': 'RUT, DNI, etc.'
+        })
+    )
+    ciudad = forms.CharField(
+        required=False,
+        label="Ciudad",
+        widget=forms.TextInput(attrs={
+            'class': 'form-input',
+            'placeholder': 'Santiago'
         })
     )
 
     class Meta:
         model = User
-        fields = ('username', 'email', 'password1', 'password2')
+        fields = ('username', 'email', 'password1', 'password2', 'rol')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -50,10 +83,19 @@ class CustomUserCreationForm(UserCreationForm):
         self.facets = Facet.objects.filter(activo=True).order_by('orden')
         
     def save(self, commit=True):
+        from .models import UserProfile
         user = super().save(commit=False)
         user.email = self.cleaned_data['email']
+        rol = self.cleaned_data.get('rol', 'visitante')
         if commit:
             user.save()
+            # Crear o actualizar el perfil del usuario
+            profile, created = UserProfile.objects.get_or_create(usuario=user)
+            profile.rol = rol
+            profile.nombre = self.cleaned_data.get('nombre', '')
+            profile.id_usuario = self.cleaned_data.get('id_usuario', '')
+            profile.ciudad = self.cleaned_data.get('ciudad', '')
+            profile.save()
         return user
 
 

@@ -29,6 +29,13 @@ class SiteSettings(models.Model):
         verbose_name="Imagen Hero",
         help_text="Imagen de fondo para la sección hero (recomendado: 1920x1080px)"
     )
+    video_hero = models.FileField(
+        upload_to='site/hero/videos/',
+        blank=True,
+        null=True,
+        verbose_name="Video Hero",
+        help_text="Video para la sección hero (opcional, formatos: mp4, webm, mov). Se mostrará después de la imagen al hacer scroll."
+    )
     descripcion_general = models.TextField(
         blank=True,
         verbose_name="Descripción General",
@@ -67,6 +74,12 @@ class SiteSettings(models.Model):
     youtube_url = models.URLField(
         blank=True,
         verbose_name="YouTube URL"
+    )
+    whatsapp_telefono = models.CharField(
+        max_length=20,
+        blank=True,
+        verbose_name="Teléfono WhatsApp",
+        help_text="Número de teléfono para WhatsApp (formato: +56912345678)"
     )
     fecha_actualizacion = models.DateTimeField(
         auto_now=True,
@@ -435,3 +448,326 @@ class UserFacetPreference(models.Model):
 
     def __str__(self):
         return f"{self.usuario.username} - {self.faceta.titulo} (Prioridad: {self.prioridad})"
+
+
+class UserProfile(models.Model):
+    """
+    Perfil extendido del usuario para incluir el rol y datos básicos.
+    """
+    ROL_CHOICES = [
+        ('visitante', 'Visitante'),
+        ('estudiante', 'Estudiante'),
+    ]
+    
+    usuario = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name='profile',
+        verbose_name="Usuario"
+    )
+    rol = models.CharField(
+        max_length=20,
+        choices=ROL_CHOICES,
+        default='visitante',
+        verbose_name="Rol",
+        help_text="Rol del usuario en el sistema"
+    )
+    nombre = models.CharField(
+        max_length=200,
+        blank=True,
+        verbose_name="Nombre",
+        help_text="Nombre completo del usuario"
+    )
+    id_usuario = models.CharField(
+        max_length=50,
+        blank=True,
+        verbose_name="ID",
+        help_text="Identificación del usuario (RUT, DNI, etc.)"
+    )
+    ciudad = models.CharField(
+        max_length=100,
+        blank=True,
+        verbose_name="Ciudad",
+        help_text="Ciudad de residencia"
+    )
+    fecha_creacion = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name="Fecha de creación"
+    )
+    fecha_actualizacion = models.DateTimeField(
+        auto_now=True,
+        verbose_name="Fecha de actualización"
+    )
+
+    class Meta:
+        verbose_name = "Perfil de Usuario"
+        verbose_name_plural = "Perfiles de Usuario"
+        indexes = [
+            models.Index(fields=['rol']),
+        ]
+
+    def __str__(self):
+        return f"{self.usuario.username} - {self.get_rol_display()}"
+
+    @property
+    def es_estudiante(self):
+        """Retorna True si el usuario es estudiante."""
+        return self.rol == 'estudiante'
+
+
+class Tematica(models.Model):
+    """
+    Temática de contenido estudiantil (ej. "Clase 1: Introducción", "Módulo 2: Avanzado").
+    """
+    titulo = models.CharField(
+        max_length=200,
+        verbose_name="Título",
+        help_text="Título de la temática"
+    )
+    descripcion = models.TextField(
+        verbose_name="Descripción",
+        help_text="Descripción de la temática",
+        blank=True
+    )
+    orden = models.IntegerField(
+        default=0,
+        verbose_name="Orden",
+        help_text="Orden de visualización (menor número = aparece primero)",
+        validators=[MinValueValidator(0)]
+    )
+    fecha_creacion = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name="Fecha de creación"
+    )
+    fecha_actualizacion = models.DateTimeField(
+        auto_now=True,
+        verbose_name="Fecha de actualización"
+    )
+    activo = models.BooleanField(
+        default=True,
+        verbose_name="Activo",
+        help_text="Desmarcar para ocultar esta temática del sitio público"
+    )
+
+    class Meta:
+        verbose_name = "Temática"
+        verbose_name_plural = "Temáticas"
+        ordering = ['orden', 'titulo']
+        indexes = [
+            models.Index(fields=['orden', 'activo']),
+        ]
+
+    def __str__(self):
+        return self.titulo
+
+
+class Material(models.Model):
+    """
+    Material de clase relacionado a una temática.
+    Puede tener múltiples PDFs y múltiples videos (archivos o URLs).
+    """
+    tematica = models.ForeignKey(
+        Tematica,
+        on_delete=models.CASCADE,
+        related_name='materiales',
+        verbose_name="Temática",
+        help_text="Temática a la que pertenece este material"
+    )
+    titulo = models.CharField(
+        max_length=200,
+        verbose_name="Título",
+        help_text="Título del material"
+    )
+    descripcion = models.TextField(
+        verbose_name="Descripción",
+        help_text="Descripción del material",
+        blank=True
+    )
+    orden = models.IntegerField(
+        default=0,
+        verbose_name="Orden",
+        help_text="Orden de visualización dentro de la temática (menor número = aparece primero)",
+        validators=[MinValueValidator(0)]
+    )
+    fecha_creacion = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name="Fecha de creación"
+    )
+    fecha_actualizacion = models.DateTimeField(
+        auto_now=True,
+        verbose_name="Fecha de actualización"
+    )
+    activo = models.BooleanField(
+        default=True,
+        verbose_name="Activo",
+        help_text="Desmarcar para ocultar este material del sitio público"
+    )
+
+    class Meta:
+        verbose_name = "Material"
+        verbose_name_plural = "Materiales"
+        ordering = ['tematica', 'orden', 'titulo']
+        indexes = [
+            models.Index(fields=['tematica', 'orden', 'activo']),
+        ]
+
+    def __str__(self):
+        return f"{self.titulo} - {self.tematica.titulo}"
+
+    @property
+    def pdfs_activos(self):
+        """Retorna todos los PDFs activos del material, ordenados por orden."""
+        return self.pdfs.filter(activo=True).order_by('orden')
+    
+    @property
+    def videos_activos(self):
+        """Retorna todos los videos activos del material, ordenados por orden."""
+        return self.videos.filter(activo=True).order_by('orden')
+
+
+class MaterialPDF(models.Model):
+    """
+    Archivo PDF relacionado a un material.
+    Permite múltiples PDFs por material.
+    """
+    material = models.ForeignKey(
+        Material,
+        on_delete=models.CASCADE,
+        related_name='pdfs',
+        verbose_name="Material",
+        help_text="Material al que pertenece este PDF"
+    )
+    archivo = models.FileField(
+        upload_to='materiales/pdfs/',
+        verbose_name="Archivo PDF",
+        help_text="Archivo PDF (formato: PDF)"
+    )
+    nombre = models.CharField(
+        max_length=200,
+        verbose_name="Nombre",
+        help_text="Nombre descriptivo del PDF (opcional, si no se proporciona se usará el nombre del archivo)",
+        blank=True
+    )
+    orden = models.IntegerField(
+        default=0,
+        verbose_name="Orden",
+        help_text="Orden de visualización (menor número = aparece primero)",
+        validators=[MinValueValidator(0)]
+    )
+    activo = models.BooleanField(
+        default=True,
+        verbose_name="Activo",
+        help_text="Desmarcar para ocultar este PDF"
+    )
+    fecha_creacion = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name="Fecha de creación"
+    )
+
+    class Meta:
+        verbose_name = "PDF de Material"
+        verbose_name_plural = "PDFs de Materiales"
+        ordering = ['material', 'orden', 'nombre']
+        indexes = [
+            models.Index(fields=['material', 'orden', 'activo']),
+        ]
+
+    def __str__(self):
+        nombre = self.nombre if self.nombre else self.archivo.name.split('/')[-1]
+        return f"{nombre} - {self.material.titulo}"
+
+
+class MaterialVideo(models.Model):
+    """
+    Video relacionado a un material.
+    Puede ser un archivo local o una URL externa (YouTube, Vimeo, etc.).
+    Permite múltiples videos por material.
+    """
+    material = models.ForeignKey(
+        Material,
+        on_delete=models.CASCADE,
+        related_name='videos',
+        verbose_name="Material",
+        help_text="Material al que pertenece este video"
+    )
+    video_url = models.URLField(
+        verbose_name="URL de Video",
+        help_text="URL de video externo (YouTube, Vimeo, etc.) - Opcional si se sube un archivo",
+        blank=True,
+        null=True
+    )
+    video_archivo = models.FileField(
+        upload_to='materiales/videos/',
+        verbose_name="Archivo de Video",
+        help_text="Archivo de video local (opcional si se proporciona una URL, formatos: mp4, webm, mov)",
+        blank=True,
+        null=True
+    )
+    nombre = models.CharField(
+        max_length=200,
+        verbose_name="Nombre",
+        help_text="Nombre descriptivo del video (opcional)",
+        blank=True
+    )
+    orden = models.IntegerField(
+        default=0,
+        verbose_name="Orden",
+        help_text="Orden de visualización (menor número = aparece primero)",
+        validators=[MinValueValidator(0)]
+    )
+    activo = models.BooleanField(
+        default=True,
+        verbose_name="Activo",
+        help_text="Desmarcar para ocultar este video"
+    )
+    fecha_creacion = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name="Fecha de creación"
+    )
+
+    class Meta:
+        verbose_name = "Video de Material"
+        verbose_name_plural = "Videos de Materiales"
+        ordering = ['material', 'orden', 'nombre']
+        indexes = [
+            models.Index(fields=['material', 'orden', 'activo']),
+        ]
+
+    def __str__(self):
+        nombre = self.nombre if self.nombre else (self.video_url or self.video_archivo.name.split('/')[-1] if self.video_archivo else "Video sin nombre")
+        return f"{nombre} - {self.material.titulo}"
+
+    def clean(self):
+        """Valida que al menos uno de los campos de video esté presente."""
+        from django.core.exceptions import ValidationError
+        if not self.video_url and not self.video_archivo:
+            raise ValidationError('Debe proporcionar una URL de video o un archivo de video.')
+
+    def get_youtube_video_id(self):
+        """Extrae el ID del video de YouTube desde la URL."""
+        if not self.video_url or 'youtube.com' not in self.video_url and 'youtu.be' not in self.video_url:
+            return None
+        
+        import re
+        patterns = [
+            r'(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})',
+            r'youtube\.com\/embed\/([a-zA-Z0-9_-]{11})',
+        ]
+        
+        for pattern in patterns:
+            match = re.search(pattern, self.video_url)
+            if match:
+                return match.group(1)
+        return None
+
+    def get_vimeo_video_id(self):
+        """Extrae el ID del video de Vimeo desde la URL."""
+        if not self.video_url or 'vimeo.com' not in self.video_url:
+            return None
+        
+        import re
+        pattern = r'vimeo\.com\/(?:.*\/)?(\d+)'
+        match = re.search(pattern, self.video_url)
+        if match:
+            return match.group(1)
+        return None

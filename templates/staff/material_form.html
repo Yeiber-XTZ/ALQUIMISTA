@@ -1,0 +1,292 @@
+{% extends "staff/base.html" %}
+
+{% block title %}{% if form_action == 'create' %}Nuevo Material{% else %}Editar Material{% endif %} - Panel de Staff{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <h1 class="text-4xl font-bold text-gray-900 mb-2">
+        {% if form_action == 'create' %}Nuevo Material{% else %}Editar Material{% endif %}
+    </h1>
+    <p class="text-gray-600">{% if form_action == 'create' %}Crea un nuevo material para el material de clase{% else %}Modifica los datos del material{% endif %}</p>
+</div>
+
+<div class="bg-white rounded-lg shadow-md p-8 max-w-4xl">
+    <form method="post" enctype="multipart/form-data" class="space-y-6" id="materialForm">
+        {% csrf_token %}
+        
+        <div>
+            <label for="tematica" class="block text-gray-700 font-semibold mb-2">Temática *</label>
+            <select id="tematica" name="tematica" required
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
+                <option value="">Selecciona una temática</option>
+                {% for tematica in tematicas %}
+                <option value="{{ tematica.id }}" {% if material and material.tematica.id == tematica.id %}selected{% endif %}>
+                    {{ tematica.titulo }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div>
+            <label for="titulo" class="block text-gray-700 font-semibold mb-2">Título *</label>
+            <input type="text" id="titulo" name="titulo" required
+                   value="{% if material %}{{ material.titulo }}{% endif %}"
+                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
+        </div>
+
+        <div>
+            <label for="descripcion" class="block text-gray-700 font-semibold mb-2">Descripción</label>
+            <textarea id="descripcion" name="descripcion" rows="4"
+                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">{% if material %}{{ material.descripcion }}{% endif %}</textarea>
+        </div>
+
+        <!-- Sección de PDFs -->
+        <div class="border-t pt-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-bold text-gray-900">Archivos PDF</h3>
+                <button type="button" onclick="agregarPDF()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition">
+                    + Agregar PDF
+                </button>
+            </div>
+            <div id="pdfs-container" class="space-y-4">
+                {% if material and material.pdfs_list %}
+                    {% for pdf in material.pdfs_list %}
+                    <div class="pdf-item border border-gray-300 rounded-lg p-4 bg-gray-50" data-pdf-id="{{ pdf.id }}">
+                        <input type="hidden" name="pdf_ids" value="{{ pdf.id }}">
+                        <div class="grid grid-cols-2 gap-4 mb-3">
+                            <div>
+                                <label class="block text-sm text-gray-600 mb-1">Nombre</label>
+                                <input type="text" name="pdf_nombre_{{ pdf.id }}" value="{{ pdf.nombre }}" 
+                                       class="w-full px-3 py-2 border border-gray-300 rounded">
+                            </div>
+                            <div>
+                                <label class="block text-sm text-gray-600 mb-1">Orden</label>
+                                <input type="number" name="pdf_orden_{{ pdf.id }}" value="{{ pdf.orden }}" min="0"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded">
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-4">
+                                <a href="{{ pdf.archivo.url }}" target="_blank" class="text-blue-600 hover:text-blue-800 text-sm">
+                                    Ver PDF actual: {{ pdf.archivo.name|slice:"20:" }}
+                                </a>
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="pdf_activo_{{ pdf.id }}" {% if pdf.activo %}checked{% endif %}
+                                           class="w-4 h-4 text-red-600 border-gray-300 rounded">
+                                    <span class="ml-2 text-sm text-gray-700">Activo</span>
+                                </label>
+                            </div>
+                            <button type="button" onclick="eliminarPDFExistente({{ pdf.id }})" class="text-red-600 hover:text-red-800 text-sm font-semibold">
+                                Eliminar
+                            </button>
+                        </div>
+                        <input type="hidden" name="pdf_delete" value="" id="pdf_delete_{{ pdf.id }}">
+                    </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Sección de Videos -->
+        <div class="border-t pt-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-bold text-gray-900">Videos</h3>
+                <div class="flex gap-2">
+                    <button type="button" onclick="agregarVideoURL()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition">
+                        + Agregar URL
+                    </button>
+                    <button type="button" onclick="agregarVideoArchivo()" class="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-lg transition">
+                        + Agregar Archivo
+                    </button>
+                </div>
+            </div>
+            <div id="videos-container" class="space-y-4">
+                {% if material and material.videos_list %}
+                    {% for video in material.videos_list %}
+                    <div class="video-item border border-gray-300 rounded-lg p-4 bg-gray-50" data-video-id="{{ video.id }}">
+                        <input type="hidden" name="video_ids" value="{{ video.id }}">
+                        <div class="grid grid-cols-2 gap-4 mb-3">
+                            <div>
+                                <label class="block text-sm text-gray-600 mb-1">Nombre</label>
+                                <input type="text" name="video_nombre_{{ video.id }}" value="{{ video.nombre }}" 
+                                       class="w-full px-3 py-2 border border-gray-300 rounded">
+                            </div>
+                            <div>
+                                <label class="block text-sm text-gray-600 mb-1">Orden</label>
+                                <input type="number" name="video_orden_{{ video.id }}" value="{{ video.orden }}" min="0"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="block text-sm text-gray-600 mb-1">URL de Video</label>
+                            <input type="url" name="video_url_{{ video.id }}" value="{{ video.video_url|default:'' }}" 
+                                   placeholder="https://www.youtube.com/watch?v=..."
+                                   class="w-full px-3 py-2 border border-gray-300 rounded">
+                        </div>
+                        {% if video.video_archivo %}
+                        <div class="mb-3">
+                            <p class="text-sm text-gray-600 mb-1">Archivo actual:</p>
+                            <a href="{{ video.video_archivo.url }}" target="_blank" class="text-blue-600 hover:text-blue-800 text-sm">
+                                {{ video.video_archivo.name|slice:"20:" }}
+                            </a>
+                        </div>
+                        {% endif %}
+                        <div class="flex items-center justify-between">
+                            <label class="flex items-center">
+                                <input type="checkbox" name="video_activo_{{ video.id }}" {% if video.activo %}checked{% endif %}
+                                       class="w-4 h-4 text-red-600 border-gray-300 rounded">
+                                <span class="ml-2 text-sm text-gray-700">Activo</span>
+                            </label>
+                            <button type="button" onclick="eliminarVideoExistente({{ video.id }})" class="text-red-600 hover:text-red-800 text-sm font-semibold">
+                                Eliminar
+                            </button>
+                        </div>
+                        <input type="hidden" name="video_delete" value="" id="video_delete_{{ video.id }}">
+                    </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 border-t pt-6">
+            <div>
+                <label for="orden" class="block text-gray-700 font-semibold mb-2">Orden</label>
+                <input type="number" id="orden" name="orden" min="0"
+                       value="{% if material %}{{ material.orden }}{% else %}0{% endif %}"
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
+            </div>
+
+            <div class="flex items-center">
+                <label class="flex items-center cursor-pointer">
+                    <input type="checkbox" id="activo" name="activo" {% if material and material.activo or not material %}checked{% endif %}
+                           class="w-5 h-5 text-red-600 border-gray-300 rounded focus:ring-red-500">
+                    <span class="ml-2 text-gray-700 font-semibold">Activo</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="flex gap-4 pt-4">
+            <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg transition">
+                {% if form_action == 'create' %}Crear Material{% else %}Guardar Cambios{% endif %}
+            </button>
+            <a href="{% url 'core:staff_materiales_list' %}" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition">
+                Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+
+<script>
+let pdfCounter = 0;
+let videoCounter = 0;
+
+function agregarPDF() {
+    const container = document.getElementById('pdfs-container');
+    const item = document.createElement('div');
+    item.className = 'pdf-item border border-gray-300 rounded-lg p-4 bg-gray-50';
+    item.innerHTML = `
+        <div class="grid grid-cols-2 gap-4 mb-3">
+            <div>
+                <label class="block text-sm text-gray-600 mb-1">Nombre (opcional)</label>
+                <input type="text" name="pdf_nombres" placeholder="Nombre del PDF"
+                       class="w-full px-3 py-2 border border-gray-300 rounded">
+            </div>
+            <div>
+                <label class="block text-sm text-gray-600 mb-1">Orden</label>
+                <input type="number" name="pdf_ordenes" value="${pdfCounter}" min="0"
+                       class="w-full px-3 py-2 border border-gray-300 rounded">
+            </div>
+        </div>
+        <div>
+            <label class="block text-sm text-gray-600 mb-1">Archivo PDF *</label>
+            <input type="file" name="archivos_pdf" accept=".pdf" required
+                   class="w-full px-3 py-2 border border-gray-300 rounded">
+        </div>
+        <div class="mt-3">
+            <button type="button" onclick="this.closest('.pdf-item').remove()" 
+                    class="text-red-600 hover:text-red-800 text-sm font-semibold">
+                Eliminar
+            </button>
+        </div>
+    `;
+    container.appendChild(item);
+    pdfCounter++;
+}
+
+function agregarVideoURL() {
+    const container = document.getElementById('videos-container');
+    const item = document.createElement('div');
+    item.className = 'video-item border border-gray-300 rounded-lg p-4 bg-gray-50';
+    item.innerHTML = `
+        <div class="grid grid-cols-2 gap-4 mb-3">
+            <div>
+                <label class="block text-sm text-gray-600 mb-1">Nombre (opcional)</label>
+                <input type="text" name="video_nombres" placeholder="Nombre del video"
+                       class="w-full px-3 py-2 border border-gray-300 rounded">
+            </div>
+            <div>
+                <label class="block text-sm text-gray-600 mb-1">Orden</label>
+                <input type="number" name="video_ordenes" value="${videoCounter}" min="0"
+                       class="w-full px-3 py-2 border border-gray-300 rounded">
+            </div>
+        </div>
+        <div>
+            <label class="block text-sm text-gray-600 mb-1">URL de Video *</label>
+            <input type="url" name="video_urls" placeholder="https://www.youtube.com/watch?v=..." required
+                   class="w-full px-3 py-2 border border-gray-300 rounded">
+        </div>
+        <div class="mt-3">
+            <button type="button" onclick="this.closest('.video-item').remove()" 
+                    class="text-red-600 hover:text-red-800 text-sm font-semibold">
+                Eliminar
+            </button>
+        </div>
+    `;
+    container.appendChild(item);
+    videoCounter++;
+}
+
+function agregarVideoArchivo() {
+    const container = document.getElementById('videos-container');
+    const item = document.createElement('div');
+    item.className = 'video-item border border-gray-300 rounded-lg p-4 bg-gray-50';
+    item.innerHTML = `
+        <div class="grid grid-cols-2 gap-4 mb-3">
+            <div>
+                <label class="block text-sm text-gray-600 mb-1">Nombre (opcional)</label>
+                <input type="text" name="video_nombres" placeholder="Nombre del video"
+                       class="w-full px-3 py-2 border border-gray-300 rounded">
+            </div>
+            <div>
+                <label class="block text-sm text-gray-600 mb-1">Orden</label>
+                <input type="number" name="video_ordenes" value="${videoCounter}" min="0"
+                       class="w-full px-3 py-2 border border-gray-300 rounded">
+            </div>
+        </div>
+        <div>
+            <label class="block text-sm text-gray-600 mb-1">Archivo de Video *</label>
+            <input type="file" name="video_archivos" accept="video/*" required
+                   class="w-full px-3 py-2 border border-gray-300 rounded">
+        </div>
+        <div class="mt-3">
+            <button type="button" onclick="this.closest('.video-item').remove()" 
+                    class="text-red-600 hover:text-red-800 text-sm font-semibold">
+                Eliminar
+            </button>
+        </div>
+    `;
+    container.appendChild(item);
+    videoCounter++;
+}
+
+function eliminarPDFExistente(id) {
+    document.getElementById('pdf_delete_' + id).value = id;
+    document.querySelector(`[data-pdf-id="${id}"]`).style.display = 'none';
+}
+
+function eliminarVideoExistente(id) {
+    document.getElementById('video_delete_' + id).value = id;
+    document.querySelector(`[data-video-id="${id}"]`).style.display = 'none';
+}
+</script>
+{% endblock %}

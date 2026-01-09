@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Material de Clase - {% if site_settings %}{{ site_settings.nombre_sitio }}{% else %}ALQUIMISTA NELSON{% endif %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800;900&family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-primary: #FFFFFF;
+            --color-secondary: #000000;
+            --color-tertiary: #B8212A;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(180deg, #000000 0%, #0a0a0a 100%);
+            color: #FFFFFF;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        /* Fondo animado sutil */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(184, 33, 42, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(184, 33, 42, 0.03) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        /* Header mejorado */
+        .main-header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Hero Section */
+        .hero-section {
+            position: relative;
+            padding: 6rem 0 4rem;
+            text-align: center;
+            z-index: 1;
+        }
+        
+        .hero-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(3rem, 8vw, 5.5rem);
+            font-weight: 900;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #FFFFFF 0%, rgba(255, 255, 255, 0.8) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+        
+        .hero-subtitle {
+            font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 400;
+            letter-spacing: 0.02em;
+        }
+        
+        /* Temática Card mejorada */
+        .tematica-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 3rem;
+            margin-bottom: 3rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .tematica-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--color-tertiary), transparent);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        
+        .tematica-card:hover {
+            border-color: rgba(184, 33, 42, 0.5);
+            transform: translateY(-8px);
+            box-shadow: 0 20px 60px rgba(184, 33, 42, 0.15);
+        }
+        
+        .tematica-card:hover::before {
+            opacity: 1;
+        }
+        
+        .tematica-header {
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .tematica-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(2rem, 4vw, 2.5rem);
+            font-weight: 800;
+            letter-spacing: -0.01em;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .tematica-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--color-tertiary), #ff4757);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .tematica-descripcion {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.7);
+            max-width: 800px;
+        }
+        
+        /* Material Item mejorado */
+        .material-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-left: 4px solid var(--color-tertiary);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+        
+        .material-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-left-width: 6px;
+            transform: translateX(8px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .material-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: #FFFFFF;
+        }
+        
+        .material-descripcion {
+            font-size: 1rem;
+            line-height: 1.7;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 1.5rem;
+        }
+        
+        /* Botones mejorados */
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.875rem 1.75rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .btn span {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .btn-pdf {
+            background: linear-gradient(135deg, var(--color-tertiary), #ff4757);
+            color: #FFFFFF;
+            box-shadow: 0 4px 16px rgba(184, 33, 42, 0.3);
+        }
+        
+        .btn-pdf:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(184, 33, 42, 0.5);
+        }
+        
+        .btn-video {
+            background: linear-gradient(135deg, #1e40af, #3b82f6);
+            color: #FFFFFF;
+            box-shadow: 0 4px 16px rgba(30, 64, 175, 0.3);
+        }
+        
+        .btn-video:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(30, 64, 175, 0.5);
+        }
+        
+        .btn-icon {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+        
+        /* Estado vacío */
+        .empty-state {
+            text-align: center;
+            padding: 6rem 2rem;
+        }
+        
+        .empty-state-icon {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 2rem;
+            opacity: 0.3;
+        }
+        
+        .empty-state-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .empty-state-text {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        /* Botón flotante WhatsApp */
+        .whatsapp-fab {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #25D366;
+            color: #FFFFFF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3100;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+            text-decoration: none;
+        }
+        
+        .whatsapp-fab svg {
+            width: 32px;
+            height: 32px;
+        }
+        
+        .whatsapp-fab:hover {
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 8px 30px rgba(37, 211, 102, 0.6);
+            background: #128C7E;
+            animation: heartbeat 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes heartbeat {
+            0%, 100% {
+                transform: translateY(-4px) scale(1.05);
+            }
+            50% {
+                transform: translateY(-4px) scale(1.15);
+            }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: 4rem 0 3rem;
+            }
+            
+            .tematica-card {
+                padding: 2rem 1.5rem;
+                border-radius: 16px;
+            }
+            
+            .material-item {
+                padding: 1.5rem;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <div class="container mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="{% url 'core:index' %}" class="flex items-center gap-3 group">
+                {% if site_settings and site_settings.logo %}
+                <img src="{{ site_settings.logo.url }}" alt="Logo" class="h-10 transition-transform group-hover:scale-105">
+                {% endif %}
+                <span class="text-xl font-bold font-['Space_Grotesk'] tracking-tight">ALQUIMISTA</span>
+            </a>
+            <nav class="flex items-center gap-6">
+                <a href="{% url 'core:index' %}" class="text-white/80 hover:text-white transition-colors font-medium">Inicio</a>
+                <a href="{% url 'core:material_clase' %}" class="text-red-500 font-semibold relative">
+                    Material de Clase
+                    <span class="absolute -bottom-1 left-0 right-0 h-0.5 bg-red-500"></span>
+                </a>
+                {% if user.is_authenticated %}
+                <a href="{% url 'core:logout' %}" class="text-white/80 hover:text-white transition-colors font-medium">Cerrar Sesión</a>
+                {% else %}
+                <a href="{% url 'core:login' %}" class="text-white/80 hover:text-white transition-colors font-medium">Iniciar Sesión</a>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container mx-auto px-6">
+            <h1 class="hero-title">Material de Clase</h1>
+            <p class="hero-subtitle">Contenido exclusivo para estudiantes</p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-6 pb-16 relative z-10">
+        {% if tematicas %}
+        <div class="max-w-6xl mx-auto">
+            {% for tematica in tematicas %}
+            <div class="tematica-card">
+                <div class="tematica-header">
+                    <h2 class="tematica-title">
+                        <span class="tematica-icon">
+                            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                            </svg>
+                        </span>
+                        {{ tematica.titulo }}
+                    </h2>
+                    {% if tematica.descripcion %}
+                    <p class="tematica-descripcion">{{ tematica.descripcion }}</p>
+                    {% endif %}
+                </div>
+
+                {% if tematica.materiales.all %}
+                <div class="materials-list">
+                    {% for material in tematica.materiales.all %}
+                    <div class="material-item">
+                        <h3 class="material-title">{{ material.titulo }}</h3>
+                        {% if material.descripcion %}
+                        <p class="material-descripcion">{{ material.descripcion }}</p>
+                        {% endif %}
+                        
+                        <!-- PDFs -->
+                        {% if material.pdfs_activos %}
+                        <div class="mb-4">
+                            <h4 class="text-sm font-semibold text-white/80 mb-2 uppercase tracking-wide">Archivos PDF</h4>
+                            <div class="btn-group">
+                                {% for pdf in material.pdfs_activos %}
+                                <a href="{{ pdf.archivo.url }}" target="_blank" class="btn btn-pdf">
+                                    <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                                    </svg>
+                                    <span>{% if pdf.nombre %}{{ pdf.nombre }}{% else %}PDF {{ forloop.counter }}{% endif %}</span>
+                                </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Videos -->
+                        {% if material.videos_activos %}
+                        <div>
+                            <h4 class="text-sm font-semibold text-white/80 mb-2 uppercase tracking-wide">Videos</h4>
+                            <div class="btn-group">
+                                {% for video in material.videos_activos %}
+                                {% if video.video_url %}
+                                <a href="{{ video.video_url }}" target="_blank" class="btn btn-video">
+                                    <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    <span>{% if video.nombre %}{{ video.nombre }}{% else %}Video {{ forloop.counter }}{% endif %}</span>
+                                </a>
+                                {% elif video.video_archivo %}
+                                <a href="{{ video.video_archivo.url }}" target="_blank" class="btn btn-video">
+                                    <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    <span>{% if video.nombre %}{{ video.nombre }}{% else %}Video {{ forloop.counter }}{% endif %}</span>
+                                </a>
+                                {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <p class="text-white/40 italic">No hay materiales disponibles para esta temática aún.</p>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <svg class="empty-state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+            </svg>
+            <h2 class="empty-state-title">No hay temáticas disponibles aún</h2>
+            <p class="empty-state-text">El contenido estará disponible pronto.</p>
+        </div>
+        {% endif %}
+    </main>
+
+    {% include 'core/includes/footer.html' %}
+    
+    <!-- Botón flotante WhatsApp -->
+    {% if site_settings and site_settings.whatsapp_telefono %}
+    <a href="https://wa.me/{{ site_settings.whatsapp_telefono|slice:'1:' }}" 
+       target="_blank" 
+       rel="noopener noreferrer" 
+       class="whatsapp-fab" 
+       aria-label="Contactar por WhatsApp"
+       id="whatsappFabMaterial">
+        <svg fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+        </svg>
+    </a>
+    {% endif %}
+</body>
+</html>

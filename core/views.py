@@ -5,8 +5,8 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Q, Prefetch
 from django.http import HttpResponse
 from django.urls import reverse
-from .models import Facet, Milestone, ContactMessage, SiteSettings, MilestoneImage, UserFacetPreference
-from .decorators import staff_required
+from .models import Facet, Milestone, ContactMessage, SiteSettings, MilestoneImage, UserFacetPreference, Tematica, Material, MaterialPDF, MaterialVideo
+from .decorators import staff_required, estudiante_required
 from .forms import CustomUserCreationForm, FacetSelectionForm, LoginForm, FacetManagementForm
 
 def index(request):
@@ -193,12 +193,16 @@ def staff_site_settings(request):
             settings.twitter_url = request.POST.get('twitter_url', '')
             settings.linkedin_url = request.POST.get('linkedin_url', '')
             settings.youtube_url = request.POST.get('youtube_url', '')
+            settings.whatsapp_telefono = request.POST.get('whatsapp_telefono', '')
             
             if 'logo' in request.FILES:
                 settings.logo = request.FILES['logo']
             
             if 'imagen_hero' in request.FILES:
                 settings.imagen_hero = request.FILES['imagen_hero']
+            
+            if 'video_hero' in request.FILES:
+                settings.video_hero = request.FILES['video_hero']
             
             settings.save()
             messages.success(request, 'Configuración del sitio actualizada exitosamente.')
@@ -588,3 +592,296 @@ def manage_facets(request):
         'facets_data': facets_data,
         'site_settings': site_settings,
     })
+
+
+# ==================== CONTENIDO ESTUDIANTIL ====================
+
+@estudiante_required
+def material_clase(request):
+    """
+    Vista para mostrar el material de clase exclusivo para estudiantes.
+    """
+    site_settings = SiteSettings.load()
+    tematicas = Tematica.objects.filter(activo=True).order_by('orden').prefetch_related(
+        Prefetch(
+            'materiales',
+            queryset=Material.objects.filter(activo=True).order_by('orden').prefetch_related(
+                Prefetch(
+                    'pdfs',
+                    queryset=MaterialPDF.objects.filter(activo=True).order_by('orden')
+                ),
+                Prefetch(
+                    'videos',
+                    queryset=MaterialVideo.objects.filter(activo=True).order_by('orden')
+                )
+            )
+        )
+    )
+    
+    context = {
+        'tematicas': tematicas,
+        'site_settings': site_settings,
+    }
+    return render(request, 'core/material_clase.html', context)
+
+
+# ==================== STAFF - GESTIÓN DE TEMÁTICAS Y MATERIALES ====================
+
+@staff_required
+def staff_tematicas_list(request):
+    """Lista de todas las temáticas."""
+    tematicas = Tematica.objects.all().annotate(
+        num_materiales=Count('materiales')
+    ).order_by('orden', 'titulo')
+    return render(request, 'staff/tematicas_list.html', {'tematicas': tematicas})
+
+@staff_required
+def staff_tematica_create(request):
+    """Crear una nueva temática."""
+    if request.method == 'POST':
+        try:
+            tematica = Tematica.objects.create(
+                titulo=request.POST.get('titulo'),
+                descripcion=request.POST.get('descripcion', ''),
+                orden=int(request.POST.get('orden', 0)),
+                activo=request.POST.get('activo') == 'on'
+            )
+            messages.success(request, f'Temática "{tematica.titulo}" creada exitosamente.')
+            return redirect('core:staff_tematicas_list')
+        except Exception as e:
+            messages.error(request, f'Error al crear la temática: {str(e)}')
+    return render(request, 'staff/tematica_form.html', {'form_action': 'create'})
+
+@staff_required
+def staff_tematica_edit(request, pk):
+    """Editar una temática existente."""
+    tematica = get_object_or_404(Tematica, pk=pk)
+    if request.method == 'POST':
+        try:
+            tematica.titulo = request.POST.get('titulo')
+            tematica.descripcion = request.POST.get('descripcion', '')
+            tematica.orden = int(request.POST.get('orden', 0))
+            tematica.activo = request.POST.get('activo') == 'on'
+            tematica.save()
+            messages.success(request, f'Temática "{tematica.titulo}" actualizada exitosamente.')
+            return redirect('core:staff_tematicas_list')
+        except Exception as e:
+            messages.error(request, f'Error al actualizar la temática: {str(e)}')
+    return render(request, 'staff/tematica_form.html', {'tematica': tematica, 'form_action': 'edit'})
+
+@staff_required
+def staff_tematica_delete(request, pk):
+    """Eliminar una temática."""
+    tematica = get_object_or_404(Tematica, pk=pk)
+    if request.method == 'POST':
+        tematica.delete()
+        messages.success(request, 'Temática eliminada exitosamente.')
+        return redirect('core:staff_tematicas_list')
+    return render(request, 'staff/tematica_delete.html', {'tematica': tematica})
+
+@staff_required
+def staff_materiales_list(request):
+    """Lista de todos los materiales."""
+    materiales = Material.objects.all().select_related('tematica').order_by('tematica__orden', 'orden', 'titulo')
+    return render(request, 'staff/materiales_list.html', {'materiales': materiales})
+
+@staff_required
+def staff_material_create(request):
+    """Crear un nuevo material."""
+    tematicas = Tematica.objects.filter(activo=True).order_by('orden')
+    if request.method == 'POST':
+        try:
+            tematica = get_object_or_404(Tematica, pk=request.POST.get('tematica'))
+            material = Material.objects.create(
+                tematica=tematica,
+                titulo=request.POST.get('titulo'),
+                descripcion=request.POST.get('descripcion', ''),
+                orden=int(request.POST.get('orden', 0)),
+                activo=request.POST.get('activo') == 'on'
+            )
+            
+            # Procesar múltiples PDFs
+            pdf_files = request.FILES.getlist('archivos_pdf')
+            pdf_nombres = request.POST.getlist('pdf_nombres')
+            pdf_ordenes = request.POST.getlist('pdf_ordenes')
+            
+            for i, pdf_file in enumerate(pdf_files):
+                nombre = pdf_nombres[i] if i < len(pdf_nombres) and pdf_nombres[i] else ''
+                orden = int(pdf_ordenes[i]) if i < len(pdf_ordenes) and pdf_ordenes[i] else i
+                MaterialPDF.objects.create(
+                    material=material,
+                    archivo=pdf_file,
+                    nombre=nombre,
+                    orden=orden
+                )
+            
+            # Procesar múltiples videos
+            video_urls = request.POST.getlist('video_urls')
+            video_archivos = request.FILES.getlist('video_archivos')
+            video_nombres = request.POST.getlist('video_nombres')
+            video_ordenes = request.POST.getlist('video_ordenes')
+            
+            # Procesar videos por URL
+            for i, video_url in enumerate(video_urls):
+                if video_url.strip():
+                    nombre = video_nombres[i] if i < len(video_nombres) and video_nombres[i] else ''
+                    orden = int(video_ordenes[i]) if i < len(video_ordenes) and video_ordenes[i] else i
+                    MaterialVideo.objects.create(
+                        material=material,
+                        video_url=video_url,
+                        nombre=nombre,
+                        orden=orden
+                    )
+            
+            # Procesar videos por archivo
+            for i, video_file in enumerate(video_archivos):
+                nombre = video_nombres[len(video_urls) + i] if len(video_nombres) > len(video_urls) + i and video_nombres[len(video_urls) + i] else ''
+                orden = int(video_ordenes[len(video_urls) + i]) if len(video_ordenes) > len(video_urls) + i and video_ordenes[len(video_urls) + i] else len(video_urls) + i
+                MaterialVideo.objects.create(
+                    material=material,
+                    video_archivo=video_file,
+                    nombre=nombre,
+                    orden=orden
+                )
+            
+            messages.success(request, f'Material "{material.titulo}" creado exitosamente.')
+            return redirect('core:staff_materiales_list')
+        except Exception as e:
+            messages.error(request, f'Error al crear el material: {str(e)}')
+    return render(request, 'staff/material_form.html', {'form_action': 'create', 'tematicas': tematicas})
+
+@staff_required
+def staff_material_edit(request, pk):
+    """Editar un material existente."""
+    material = get_object_or_404(Material, pk=pk)
+    tematicas = Tematica.objects.filter(activo=True).order_by('orden')
+    if request.method == 'POST':
+        try:
+            tematica = get_object_or_404(Tematica, pk=request.POST.get('tematica'))
+            material.tematica = tematica
+            material.titulo = request.POST.get('titulo')
+            material.descripcion = request.POST.get('descripcion', '')
+            material.orden = int(request.POST.get('orden', 0))
+            material.activo = request.POST.get('activo') == 'on'
+            material.save()
+            
+            # Procesar múltiples PDFs nuevos
+            pdf_files = request.FILES.getlist('archivos_pdf')
+            pdf_nombres = request.POST.getlist('pdf_nombres')
+            pdf_ordenes = request.POST.getlist('pdf_ordenes')
+            
+            for i, pdf_file in enumerate(pdf_files):
+                nombre = pdf_nombres[i] if i < len(pdf_nombres) and pdf_nombres[i] else ''
+                orden = int(pdf_ordenes[i]) if i < len(pdf_ordenes) and pdf_ordenes[i] else material.pdfs.count() + i
+                MaterialPDF.objects.create(
+                    material=material,
+                    archivo=pdf_file,
+                    nombre=nombre,
+                    orden=orden
+                )
+            
+            # Actualizar PDFs existentes
+            pdf_ids = request.POST.getlist('pdf_ids')
+            for pdf_id in pdf_ids:
+                if pdf_id:
+                    try:
+                        pdf = MaterialPDF.objects.get(pk=pdf_id, material=material)
+                        pdf_nombre_key = f'pdf_nombre_{pdf_id}'
+                        pdf_orden_key = f'pdf_orden_{pdf_id}'
+                        pdf_activo_key = f'pdf_activo_{pdf_id}'
+                        
+                        if pdf_nombre_key in request.POST:
+                            pdf.nombre = request.POST[pdf_nombre_key]
+                        if pdf_orden_key in request.POST:
+                            pdf.orden = int(request.POST[pdf_orden_key])
+                        pdf.activo = pdf_activo_key in request.POST
+                        pdf.save()
+                    except MaterialPDF.DoesNotExist:
+                        pass
+            
+            # Eliminar PDFs marcados para eliminar
+            pdf_delete_ids = request.POST.getlist('pdf_delete')
+            for pdf_id in pdf_delete_ids:
+                try:
+                    MaterialPDF.objects.filter(pk=pdf_id, material=material).delete()
+                except:
+                    pass
+            
+            # Procesar múltiples videos nuevos
+            video_urls = request.POST.getlist('video_urls')
+            video_archivos = request.FILES.getlist('video_archivos')
+            video_nombres = request.POST.getlist('video_nombres')
+            video_ordenes = request.POST.getlist('video_ordenes')
+            
+            # Procesar videos por URL nuevos
+            for i, video_url in enumerate(video_urls):
+                if video_url.strip():
+                    nombre = video_nombres[i] if i < len(video_nombres) and video_nombres[i] else ''
+                    orden = int(video_ordenes[i]) if i < len(video_ordenes) and video_ordenes[i] else material.videos.count() + i
+                    MaterialVideo.objects.create(
+                        material=material,
+                        video_url=video_url,
+                        nombre=nombre,
+                        orden=orden
+                    )
+            
+            # Procesar videos por archivo nuevos
+            for i, video_file in enumerate(video_archivos):
+                nombre = video_nombres[len(video_urls) + i] if len(video_nombres) > len(video_urls) + i and video_nombres[len(video_urls) + i] else ''
+                orden = int(video_ordenes[len(video_urls) + i]) if len(video_ordenes) > len(video_urls) + i and video_ordenes[len(video_urls) + i] else material.videos.count() + len(video_urls) + i
+                MaterialVideo.objects.create(
+                    material=material,
+                    video_archivo=video_file,
+                    nombre=nombre,
+                    orden=orden
+                )
+            
+            # Actualizar videos existentes
+            video_ids = request.POST.getlist('video_ids')
+            for video_id in video_ids:
+                if video_id:
+                    try:
+                        video = MaterialVideo.objects.get(pk=video_id, material=material)
+                        video_nombre_key = f'video_nombre_{video_id}'
+                        video_url_key = f'video_url_{video_id}'
+                        video_orden_key = f'video_orden_{video_id}'
+                        video_activo_key = f'video_activo_{video_id}'
+                        
+                        if video_nombre_key in request.POST:
+                            video.nombre = request.POST[video_nombre_key]
+                        if video_url_key in request.POST:
+                            video.video_url = request.POST[video_url_key] or None
+                        if video_orden_key in request.POST:
+                            video.orden = int(request.POST[video_orden_key])
+                        video.activo = video_activo_key in request.POST
+                        video.save()
+                    except MaterialVideo.DoesNotExist:
+                        pass
+            
+            # Eliminar videos marcados para eliminar
+            video_delete_ids = request.POST.getlist('video_delete')
+            for video_id in video_delete_ids:
+                try:
+                    MaterialVideo.objects.filter(pk=video_id, material=material).delete()
+                except:
+                    pass
+            
+            messages.success(request, f'Material "{material.titulo}" actualizado exitosamente.')
+            return redirect('core:staff_materiales_list')
+        except Exception as e:
+            messages.error(request, f'Error al actualizar el material: {str(e)}')
+    
+    # Precargar PDFs y videos para el formulario
+    material.pdfs_list = material.pdfs.all().order_by('orden')
+    material.videos_list = material.videos.all().order_by('orden')
+    return render(request, 'staff/material_form.html', {'material': material, 'form_action': 'edit', 'tematicas': tematicas})
+
+@staff_required
+def staff_material_delete(request, pk):
+    """Eliminar un material."""
+    material = get_object_or_404(Material, pk=pk)
+    if request.method == 'POST':
+        material.delete()
+        messages.success(request, 'Material eliminado exitosamente.')
+        return redirect('core:staff_materiales_list')
+    return render(request, 'staff/material_delete.html', {'material': material})
