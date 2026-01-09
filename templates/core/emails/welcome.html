@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bienvenido/a a {{ nombre_sitio }}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333333;
+            background-color: #f5f5f5;
+        }
+        
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+        }
+        
+        .email-header {
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+            padding: 40px 30px;
+            text-align: center;
+        }
+        
+        .email-header h1 {
+            color: #ffffff;
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            letter-spacing: 0.05em;
+        }
+        
+        .email-header .logo-text {
+            background: linear-gradient(135deg, #B8212A, #ff4757);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .email-body {
+            padding: 40px 30px;
+        }
+        
+        .welcome-message {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .welcome-message h2 {
+            color: #000000;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        
+        .welcome-message p {
+            color: #666666;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        .user-info {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-left: 4px solid #B8212A;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 8px;
+        }
+        
+        .user-info-item {
+            margin-bottom: 10px;
+        }
+        
+        .user-info-label {
+            font-weight: 600;
+            color: #333333;
+            display: inline-block;
+            min-width: 120px;
+        }
+        
+        .user-info-value {
+            color: #666666;
+        }
+        
+        .role-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #B8212A, #ff4757);
+            color: #ffffff;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        
+        .features-section {
+            margin: 30px 0;
+        }
+        
+        .features-section h3 {
+            color: #000000;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .feature-item {
+            padding: 15px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 3px solid #B8212A;
+        }
+        
+        .feature-item strong {
+            color: #B8212A;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .cta-button {
+            display: block;
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .cta-button a {
+            display: inline-block;
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #B8212A, #ff4757);
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 16px;
+            transition: transform 0.2s;
+        }
+        
+        .cta-button a:hover {
+            transform: translateY(-2px);
+        }
+        
+        .student-exclusive {
+            background: linear-gradient(135deg, rgba(184, 33, 42, 0.1) 0%, rgba(184, 33, 42, 0.05) 100%);
+            border: 2px solid #B8212A;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 30px 0;
+            text-align: center;
+        }
+        
+        .student-exclusive h4 {
+            color: #B8212A;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        
+        .student-exclusive p {
+            color: #666666;
+            font-size: 15px;
+            line-height: 1.8;
+        }
+        
+        .email-footer {
+            background: #000000;
+            color: #ffffff;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .email-footer p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        
+        .email-footer a {
+            color: #B8212A;
+            text-decoration: none;
+        }
+        
+        .social-links {
+            margin-top: 20px;
+        }
+        
+        .social-links a {
+            display: inline-block;
+            margin: 0 10px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+        }
+        
+        @media only screen and (max-width: 600px) {
+            .email-body {
+                padding: 30px 20px;
+            }
+            
+            .email-header {
+                padding: 30px 20px;
+            }
+            
+            .welcome-message h2 {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <!-- Header -->
+        <div class="email-header">
+            <h1 class="logo-text">{{ nombre_sitio }}</h1>
+            <p style="color: rgba(255, 255, 255, 0.8); margin-top: 10px;">Tu cuenta ha sido creada exitosamente</p>
+        </div>
+        
+        <!-- Body -->
+        <div class="email-body">
+            <div class="welcome-message">
+                <h2>¡Bienvenido/a, {{ nombre }}! 🎉</h2>
+                <p>Estamos emocionados de tenerte como parte de nuestra comunidad.</p>
+                <p>Tu cuenta ha sido creada exitosamente y ya puedes comenzar a explorar todo el contenido disponible.</p>
+            </div>
+            
+            <!-- Información del Usuario -->
+            <div class="user-info">
+                <div class="user-info-item">
+                    <span class="user-info-label">Usuario:</span>
+                    <span class="user-info-value">{{ username }}</span>
+                </div>
+                <div class="user-info-item">
+                    <span class="user-info-label">Nombre:</span>
+                    <span class="user-info-value">{{ nombre }}</span>
+                </div>
+                <div class="user-info-item">
+                    <span class="user-info-label">Rol:</span>
+                    <span class="user-info-value">{{ rol }}</span>
+                </div>
+                <div class="role-badge">{{ rol }}</div>
+            </div>
+            
+            <!-- Sección Especial para Estudiantes -->
+            {% if es_estudiante %}
+            <div class="student-exclusive">
+                <h4>🎓 Acceso Exclusivo para Estudiantes</h4>
+                <p>
+                    Como estudiante, tienes acceso exclusivo al <strong>Material de Clase</strong>, 
+                    donde encontrarás recursos educativos, PDFs, videos y contenido especializado 
+                    para complementar tu aprendizaje.
+                </p>
+                <p style="margin-top: 15px;">
+                    <strong>¡No olvides visitar la sección de Material de Clase en tu perfil!</strong>
+                </p>
+            </div>
+            {% endif %}
+            
+            <!-- Características -->
+            <div class="features-section">
+                <h3>¿Qué puedes hacer ahora?</h3>
+                <ul class="feature-list">
+                    <li class="feature-item">
+                        <strong>✨ Explorar Facetas</strong>
+                        Descubre las diferentes facetas de contenido personalizadas según tus intereses.
+                    </li>
+                    <li class="feature-item">
+                        <strong>📚 Ver Hitos</strong>
+                        Explora los hitos y momentos importantes en cada faceta.
+                    </li>
+                    {% if es_estudiante %}
+                    <li class="feature-item">
+                        <strong>🎓 Material de Clase</strong>
+                        Accede a contenido exclusivo, PDFs y videos educativos.
+                    </li>
+                    {% endif %}
+                    <li class="feature-item">
+                        <strong>💬 Contactar</strong>
+                        Envíanos un mensaje si tienes preguntas o sugerencias.
+                    </li>
+                </ul>
+            </div>
+            
+            <!-- Call to Action -->
+            <div class="cta-button">
+                <a href="{{ site_url }}/" style="color: #ffffff;">
+                    Comenzar a Explorar →
+                </a>
+            </div>
+            
+            <!-- Información Adicional -->
+            <div style="margin-top: 40px; padding-top: 30px; border-top: 1px solid #e9ecef;">
+                <p style="color: #666666; font-size: 14px; text-align: center; line-height: 1.8;">
+                    Si tienes alguna pregunta o necesitas ayuda, no dudes en contactarnos.
+                    {% if email_contacto %}
+                    <br>Puedes escribirnos a: <a href="mailto:{{ email_contacto }}" style="color: #B8212A;">{{ email_contacto }}</a>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="email-footer">
+            <p><strong>{{ nombre_sitio }}</strong></p>
+            <p>Gracias por unirte a nuestra comunidad</p>
+            <div class="social-links">
+                <p style="color: rgba(255, 255, 255, 0.6); font-size: 12px; margin-top: 20px;">
+                    Este es un email automático, por favor no respondas a este mensaje.
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -210,4 +210,23 @@ CACHES = {
     }
 }
 
+# Email Configuration
+EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
+EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_PORT = int(os.getenv('EMAIL_PORT', '587'))
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
+EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL', 'False') == 'True'  # Para puerto 465
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'noreply@alquimista.com')
+SERVER_EMAIL = DEFAULT_FROM_EMAIL
+
+# Logging para diagnosticar problemas de email
+import logging
+logger = logging.getLogger(__name__)
+if EMAIL_BACKEND == 'django.core.mail.backends.smtp.EmailBackend':
+    logger.info(f"Email configurado para SMTP: {EMAIL_HOST}:{EMAIL_PORT}, Usuario: {EMAIL_HOST_USER}")
+else:
+    logger.warning(f"Email usando backend: {EMAIL_BACKEND}")
+
 # Note: Error handlers are defined in urls.py, not in settings.py

@@ -623,7 +623,7 @@
         .hero-image-container {
             position: absolute;
             inset: 0;
-            z-index: 1;
+            z-index: 2; /* Encima del video */
         }
         
         .hero-image {
@@ -645,14 +645,15 @@
             z-index: 2;
         }
         
-        /* Hero Video Section */
+        /* Hero Video Section - Detrás de la imagen */
         .hero-video-section {
-            width: 100vw;
-            height: 100vh;
-            position: relative;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             overflow: hidden;
-            opacity: 0;
-            visibility: hidden;
+            z-index: 0; /* Detrás de la imagen del hero */
         }
         
         .hero-video-container {
@@ -666,7 +667,123 @@
             height: 100%;
             object-fit: cover;
             object-position: center;
-            transform: scale(1);
+            transform: scale(1.2); /* Zoom inicial para ocupar toda la pantalla */
+        }
+        
+        /* Controles de video - Estilo LeBron James */
+        .video-controls {
+            position: absolute;
+            bottom: 32px;
+            right: 32px;
+            z-index: 100;
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        
+        .video-mute-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            font-size: 20px;
+            user-select: none;
+            -webkit-user-select: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Efecto de brillo al hover */
+        .video-mute-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.4s ease, height 0.4s ease;
+        }
+        
+        .video-mute-btn:hover::before {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .video-mute-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: scale(1.1);
+            border-color: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+        }
+        
+        .video-mute-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .video-mute-btn.muted {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .video-mute-btn.muted:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        /* Icono con animación suave */
+        .video-mute-btn span {
+            transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.3s ease;
+            display: inline-block;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .video-mute-btn:hover span {
+            transform: scale(1.1);
+        }
+        
+        .video-mute-btn:active span {
+            transform: scale(0.9);
+        }
+        
+        /* Animación de pulso sutil cuando está muteado */
+        .video-mute-btn.muted span {
+            animation: pulseMute 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulseMute {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+        
+        /* Responsive para móviles */
+        @media (max-width: 768px) {
+            .video-controls {
+                bottom: 20px;
+                right: 20px;
+            }
+            
+            .video-mute-btn {
+                width: 44px;
+                height: 44px;
+                font-size: 18px;
+            }
         }
         
         .hero-video-overlay {
@@ -2372,9 +2489,28 @@
         </div>
     </div>
 
-    <!-- Hero Section - Imagen en Primer Plano -->
+    <!-- Hero Section - Video detrás, Imagen en Primer Plano -->
     <main id="main-content">
     <section class="hero-section" id="hero" role="banner">
+        <!-- Hero Video Section (Detrás de la imagen) -->
+        {% if site_settings and site_settings.video_hero %}
+        <div class="hero-video-section" id="heroVideo">
+            <div class="hero-video-container">
+                <video class="hero-video" id="heroVideoElement" autoplay muted loop playsinline preload="auto">
+                    <source src="{{ site_settings.video_hero.url }}" type="video/mp4">
+                    <source src="{{ site_settings.video_hero.url }}" type="video/webm">
+                    Tu navegador no soporta el elemento de video.
+                </video>
+                <div class="hero-video-overlay"></div>
+                <div class="video-controls">
+                    <button class="video-mute-btn" id="heroVideoMuteBtn" aria-label="Mute/Unmute video" title="Mute/Unmute">
+                        <span id="heroVideoMuteIcon">🔊</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
         <!-- Logo en Esquina Superior Izquierda -->
         <div class="hero-logo-fixed">
             {% if site_settings and site_settings.logo %}
@@ -2399,20 +2535,6 @@
             <div class="hero-scroll-arrow"></div>
         </div>
     </section>
-
-    <!-- Hero Video Section (Oculta inicialmente) -->
-    {% if site_settings and site_settings.video_hero %}
-    <section class="hero-video-section" id="heroVideo" role="banner">
-        <div class="hero-video-container">
-            <video class="hero-video" id="heroVideoElement" autoplay muted loop playsinline>
-                <source src="{{ site_settings.video_hero.url }}" type="video/mp4">
-                <source src="{{ site_settings.video_hero.url }}" type="video/webm">
-                Tu navegador no soporta el elemento de video.
-            </video>
-            <div class="hero-video-overlay"></div>
-        </div>
-    </section>
-    {% endif %}
 
     <!-- Barras de Progreso (Fuera del contenedor, una por faceta) -->
     {% for facet in facets %}
@@ -2645,29 +2767,18 @@
                     ease: 'power2.out'
                 }, 0);
                 
-                // Fade-out de la imagen y fade-in del video (solo si hay video)
+                // Fade-out de la imagen revelando el video (solo si hay video)
                 if (heroVideoSection && heroVideo) {
-                    // Mostrar la sección de video
-                    gsap.set(heroVideoSection, {
-                        opacity: 0,
-                        visibility: 'visible'
-                    });
-                    
+                    // El video ya está visible detrás, solo hacemos fade-out de la imagen
                     heroPin.to(heroImage, {
                         opacity: 0,
                         duration: 0.5,
                         ease: 'power2.in'
                     }, 0.5);
                     
-                    heroPin.to(heroVideoSection, {
-                        opacity: 1,
-                        duration: 0.5,
-                        ease: 'power2.out'
-                    }, 0.5);
-                    
-                    // Zoom-in del video (1.0 a 1.2)
+                    // Zoom-in adicional del video durante el scroll (de 1.2 a 1.4)
                     heroPin.to('.hero-video', {
-                        scale: 1.2,
+                        scale: 1.4,
                         duration: 0.5,
                         ease: 'power2.out'
                     }, 0.5);
@@ -2679,6 +2790,182 @@
                         ease: 'power2.out'
                     }, 0);
                 }
+            }
+            
+            // Controles de Mute/Unmute para todos los videos
+            function setupVideoControls() {
+                // Control para el video del hero
+                const heroVideo = document.getElementById('heroVideoElement');
+                const heroMuteBtn = document.getElementById('heroVideoMuteBtn');
+                const heroMuteIcon = document.getElementById('heroVideoMuteIcon');
+                
+                if (heroVideo && heroMuteBtn && heroMuteIcon) {
+                    // Función para actualizar el estado del botón
+                    const updateMuteButton = () => {
+                        heroMuteIcon.textContent = heroVideo.muted ? '🔇' : '🔊';
+                        heroMuteBtn.classList.toggle('muted', heroVideo.muted);
+                        heroMuteBtn.setAttribute('aria-label', heroVideo.muted ? 'Unmute video' : 'Mute video');
+                        heroMuteBtn.setAttribute('title', heroVideo.muted ? 'Click para escuchar' : 'Click para silenciar');
+                    };
+                    
+                    // Event listener para toggle mute/unmute
+                    heroMuteBtn.addEventListener('click', async (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        try {
+                            // Si está muteado, desmutear y reproducir
+                            if (heroVideo.muted) {
+                                heroVideo.muted = false;
+                                
+                                // Asegurar que el video esté reproduciéndose
+                                if (heroVideo.paused) {
+                                    await heroVideo.play();
+                                }
+                                
+                                // Establecer volumen al máximo
+                                heroVideo.volume = 1.0;
+                            } else {
+                                // Si tiene sonido, mutear
+                                heroVideo.muted = true;
+                            }
+                            
+                            updateMuteButton();
+                        } catch (error) {
+                            console.error('Error al cambiar el estado del audio:', error);
+                            // Si falla, al menos cambiar el estado visual
+                            heroVideo.muted = !heroVideo.muted;
+                            updateMuteButton();
+                        }
+                    });
+                    
+                    // Permitir interacción del usuario para desmutear
+                    // Al hacer click en cualquier parte del video, permitir desmutear
+                    heroVideo.addEventListener('click', async () => {
+                        if (heroVideo.muted) {
+                            try {
+                                heroVideo.muted = false;
+                                heroVideo.volume = 1.0;
+                                if (heroVideo.paused) {
+                                    await heroVideo.play();
+                                }
+                                updateMuteButton();
+                            } catch (error) {
+                                console.log('Interacción requerida para audio:', error);
+                            }
+                        }
+                    });
+                    
+                    // Actualizar estado inicial
+                    updateMuteButton();
+                    
+                    // Sincronizar con cambios externos al estado muted
+                    heroVideo.addEventListener('volumechange', updateMuteButton);
+                    heroVideo.addEventListener('play', () => {
+                        // Cuando el video se reproduce, actualizar el botón
+                        updateMuteButton();
+                    });
+                }
+                
+                // Controles para videos en milestones
+                document.querySelectorAll('video').forEach((video, index) => {
+                    if (video.id === 'heroVideoElement') return; // Ya lo manejamos arriba
+                    
+                    // Crear contenedor de controles si no existe
+                    let controlsContainer = video.parentElement.querySelector('.video-controls');
+                    if (!controlsContainer) {
+                        controlsContainer = document.createElement('div');
+                        controlsContainer.className = 'video-controls';
+                        controlsContainer.style.position = 'absolute';
+                        controlsContainer.style.bottom = '24px';
+                        controlsContainer.style.right = '24px';
+                        controlsContainer.style.zIndex = '100';
+                        
+                        const muteBtn = document.createElement('button');
+                        muteBtn.className = 'video-mute-btn';
+                        muteBtn.setAttribute('aria-label', 'Mute/Unmute video');
+                        muteBtn.setAttribute('title', 'Mute/Unmute');
+                        
+                        const muteIcon = document.createElement('span');
+                        muteIcon.textContent = video.muted ? '🔇' : '🔊';
+                        muteBtn.appendChild(muteIcon);
+                        
+                        // Función para actualizar el estado del botón
+                        const updateMuteButton = () => {
+                            muteIcon.textContent = video.muted ? '🔇' : '🔊';
+                            muteBtn.classList.toggle('muted', video.muted);
+                            muteBtn.setAttribute('aria-label', video.muted ? 'Unmute video' : 'Mute video');
+                            muteBtn.setAttribute('title', video.muted ? 'Click para escuchar' : 'Click para silenciar');
+                        };
+                        
+                        muteBtn.addEventListener('click', async (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            
+                            try {
+                                // Si está muteado, desmutear y reproducir
+                                if (video.muted) {
+                                    video.muted = false;
+                                    
+                                    // Asegurar que el video esté reproduciéndose
+                                    if (video.paused) {
+                                        await video.play();
+                                    }
+                                    
+                                    // Establecer volumen al máximo
+                                    video.volume = 1.0;
+                                } else {
+                                    // Si tiene sonido, mutear
+                                    video.muted = true;
+                                }
+                                
+                                updateMuteButton();
+                            } catch (error) {
+                                console.error('Error al cambiar el estado del audio:', error);
+                                // Si falla, al menos cambiar el estado visual
+                                video.muted = !video.muted;
+                                updateMuteButton();
+                            }
+                        });
+                        
+                        // Permitir interacción del usuario para desmutear
+                        video.addEventListener('click', async () => {
+                            if (video.muted) {
+                                try {
+                                    video.muted = false;
+                                    video.volume = 1.0;
+                                    if (video.paused) {
+                                        await video.play();
+                                    }
+                                    updateMuteButton();
+                                } catch (error) {
+                                    console.log('Interacción requerida para audio:', error);
+                                }
+                            }
+                        });
+                        
+                        // Sincronizar con cambios externos
+                        video.addEventListener('volumechange', updateMuteButton);
+                        video.addEventListener('play', () => {
+                            updateMuteButton();
+                        });
+                        
+                        controlsContainer.appendChild(muteBtn);
+                        video.parentElement.style.position = 'relative';
+                        video.parentElement.appendChild(controlsContainer);
+                        
+                        // Actualizar icono inicial
+                        muteIcon.textContent = video.muted ? '🔇' : '🔊';
+                        muteBtn.classList.toggle('muted', video.muted);
+                    }
+                });
+            }
+            
+            // Inicializar controles de video cuando el DOM esté listo
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', setupVideoControls);
+            } else {
+                setupVideoControls();
             }
             
             // Menú Hamburguesa Overlay

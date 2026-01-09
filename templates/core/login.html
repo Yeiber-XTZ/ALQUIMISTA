@@ -367,6 +367,12 @@
             </button>
 
             <div class="text-center">
+                <a href="{% url 'core:password_reset' %}" class="text-red-500 hover:text-red-400 text-sm">
+                    ¿Olvidaste tu contraseña?
+                </a>
+            </div>
+
+            <div class="text-center">
                 <p class="text-gray-400">
                     ¿No tienes cuenta? 
                     <a href="{% url 'core:register' %}" class="text-red-500 hover:text-red-400">Regístrate</a>

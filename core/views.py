@@ -465,14 +465,35 @@ def register(request):
                 except Facet.DoesNotExist:
                     pass
             
+            # Enviar email de bienvenida
+            try:
+                from .emails import send_welcome_email
+                send_welcome_email(user, site_settings)
+            except Exception as e:
+                # Si falla el email, no interrumpir el registro
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.error(f'Error al enviar email de bienvenida: {str(e)}')
+            
             # Iniciar sesión automáticamente
             username = user_form.cleaned_data.get('username')
             password = user_form.cleaned_data.get('password1')
             user = authenticate(username=username, password=password)
             if user:
                 login(request, user)
-                messages.success(request, f'¡Bienvenido, {username}! Tu cuenta ha sido creada exitosamente.')
-                return redirect('core:index')
+                # Obtener el nombre del usuario o username
+                nombre_usuario = user.profile.nombre if hasattr(user, 'profile') and user.profile.nombre else username
+                rol_usuario = user.profile.get_rol_display() if hasattr(user, 'profile') else 'Visitante'
+                
+                # Mensaje personalizado según el rol
+                if hasattr(user, 'profile') and user.profile.es_estudiante:
+                    mensaje_bienvenida = f'¡Bienvenido/a, {nombre_usuario}! 🎓 Tu cuenta de Estudiante ha sido creada exitosamente. Revisa tu correo para más información. Ahora tienes acceso exclusivo al Material de Clase.'
+                else:
+                    mensaje_bienvenida = f'¡Bienvenido/a, {nombre_usuario}! ✨ Tu cuenta ha sido creada exitosamente. Revisa tu correo para más información. Explora las diferentes facetas y descubre contenido único.'
+                
+                messages.success(request, mensaje_bienvenida)
+                # Redirigir con parámetro para mostrar modal de bienvenida
+                return redirect(reverse('core:index') + '?welcome=1')
         
         return render(request, 'core/register.html', {
             'user_form': user_form,
