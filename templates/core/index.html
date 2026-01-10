@@ -649,11 +649,11 @@
         #intro-pin {
             position: relative;
             width: 100vw;
-            height: 700vh; /* Altura para el scroll del pin - mucho más lento */
+            height: 100vh; /* Altura para el scroll del pin - mucho más lento */
             background: #000000;
             margin: 0;
             padding: 0;
-            overflow: hidden;
+            overflow: visible;
         }
         
         .sticky-wrapper {
@@ -2912,51 +2912,36 @@
             
             if (introPin && heroCurtain && videoReveal && introVideo) {
                 // Timeline principal con ScrollTrigger
-                const introTimeline = gsap.timeline({
-                    scrollTrigger: {
-                        trigger: introPin,
-                        start: 'top top',
-                        end: '+=600vh', // 6 pantallas de scroll - mucho más lento para sentir el zoom
-                        scrub: 1, // Vinculado directamente al scroll (suave)
-                        pin: true, // Pin del contenedor durante la animación
-                        pinSpacing: false, // Eliminar espacios
-                        anticipatePin: 1,
-                        invalidateOnRefresh: true,
-                    }
-                });
+                // REEMPLAZA TU BLOQUE DE introTimeline POR ESTE:
+const introTimeline = gsap.timeline({
+    scrollTrigger: {
+        trigger: introPin,
+        start: 'top top',
+        end: '+=400vh', // Ajusta este valor (400vh-600vh) para controlar qué tan lento es el zoom
+        scrub: 1,
+        pin: true, 
+        pinSpacing: true, // ¡ESTA ES LA CLAVE! Crea el espacio necesario y empuja las facetas
+        anticipatePin: 1,
+        invalidateOnRefresh: true,
+    }
+});
+
+// Paso A: Desplazar hero-curtain hacia arriba
+introTimeline.to(heroCurtain, {
+    yPercent: -100,
+    ease: 'none',
+    duration: 1 // Usamos duraciones relativas (1 de 5 totales)
+}, 0);
+
+// Paso B: Zoom del video (ajustamos el selector al video real)
+// Nota: Asegúrate de que el video tenga inicialmente transform: scale(0.7) en CSS
+introTimeline.to("#introVideo", {
+    scale: 1,
+    ease: 'none',
+    duration: 4 // El zoom dura el resto del scroll
+}, 1); // Empieza justo cuando la cortina termina de subir
                 
-                // Paso A: Desplazar hero-curtain hacia arriba (yPercent: -100)
-                introTimeline.to(heroCurtain, {
-                    yPercent: -100,
-                    ease: 'none',
-                    duration: 0.15 // 15% del scroll total - rápido para revelar el video
-                }, 0);
                 
-                // Paso B: Zoom del video de scale(0.7) a scale(1) - de 70% a 100%
-                introTimeline.to(introVideo, {
-                    scale: 1, // De 0.7 a 1.0 (100%)
-                    ease: 'none',
-                    duration: 0.85 // 85% del scroll total - zoom extremadamente lento y gradual
-                }, 0.15); // Empieza después de que la cortina se haya ido
-                
-                // Eliminar espacios cuando termina el pin
-                ScrollTrigger.create({
-                    trigger: introPin,
-                    start: 'bottom top',
-                    onEnter: () => {
-                        introPin.style.height = '0';
-                        introPin.style.overflow = 'hidden';
-                        introPin.style.marginBottom = '0';
-                        introPin.style.paddingBottom = '0';
-                        
-                        // Asegurar que las facetas estén justo después sin espacio
-                        const facetsContainer = document.getElementById('facets-vertical-container');
-                        if (facetsContainer) {
-                            facetsContainer.style.marginTop = '0';
-                            facetsContainer.style.paddingTop = '0';
-                        }
-                    }
-                });
             }
             
             // Efectos GSAP Hero: Zoom-in de imagen (si existe hero section)
