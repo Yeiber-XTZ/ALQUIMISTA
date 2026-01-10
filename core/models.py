@@ -160,6 +160,17 @@ class Facet(models.Model):
         verbose_name="Activo",
         help_text="Desmarcar para ocultar esta faceta del sitio público"
     )
+    COLOR_FONDO_CHOICES = [
+        ('negro', 'Negro'),
+        ('blanco', 'Blanco'),
+    ]
+    color_fondo = models.CharField(
+        max_length=10,
+        choices=COLOR_FONDO_CHOICES,
+        default='negro',
+        verbose_name="Color de Fondo",
+        help_text="Color de fondo para esta faceta (Negro o Blanco)"
+    )
 
     class Meta:
         verbose_name = "Faceta"

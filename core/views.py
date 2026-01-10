@@ -235,7 +235,8 @@ def staff_facet_create(request):
                 titulo=request.POST.get('titulo'),
                 descripcion=request.POST.get('descripcion', ''),
                 orden=int(request.POST.get('orden', 0)),
-                activo=request.POST.get('activo') == 'on'
+                activo=request.POST.get('activo') == 'on',
+                color_fondo=request.POST.get('color_fondo', 'negro')
             )
             if 'imagen_hero' in request.FILES:
                 facet.imagen_hero = request.FILES['imagen_hero']
@@ -256,6 +257,7 @@ def staff_facet_edit(request, pk):
             facet.descripcion = request.POST.get('descripcion', '')
             facet.orden = int(request.POST.get('orden', 0))
             facet.activo = request.POST.get('activo') == 'on'
+            facet.color_fondo = request.POST.get('color_fondo', 'negro')
             if 'imagen_hero' in request.FILES:
                 facet.imagen_hero = request.FILES['imagen_hero']
             facet.save()
