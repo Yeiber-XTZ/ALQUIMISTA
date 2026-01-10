@@ -235,27 +235,8 @@
             box-sizing: border-box;
         }
         
-        /* Ocultar todas las scrollbars */
-        * {
-            scrollbar-width: none; /* Firefox */
-            -ms-overflow-style: none; /* IE y Edge */
-        }
-        
-        *::-webkit-scrollbar {
-            display: none; /* Chrome, Safari, Opera */
-            width: 0;
-            height: 0;
-        }
-        
         html {
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-        }
-        
-        html::-webkit-scrollbar {
-            display: none;
-            width: 0;
-            height: 0;
+            scroll-behavior: smooth;
         }
         
         body {
@@ -266,14 +247,6 @@
             background: #000000;
             color: #FFFFFF;
             cursor: none;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-        }
-        
-        body::-webkit-scrollbar {
-            display: none;
-            width: 0;
-            height: 0;
         }
         
         /* Screen reader only */
@@ -1426,8 +1399,6 @@
             padding: 3rem 4rem;
             padding-top: 3rem;
             z-index: 25;
-            overflow-y: auto;
-            overflow-x: hidden;
             justify-content: flex-start;
         }
         
@@ -1441,8 +1412,6 @@
             padding-top: 4rem;
             justify-content: flex-start;
             align-items: flex-start;
-            overflow-y: auto;
-            overflow-x: hidden;
         }
         
         /* Layout 6: Texto arriba más compacto */
@@ -1453,8 +1422,6 @@
             padding-top: 3rem;
             justify-content: flex-start;
             align-items: flex-start;
-            overflow-y: auto;
-            overflow-x: hidden;
         }
         
         /* Layout 2 y 5: Texto a la izquierda */
@@ -1464,8 +1431,6 @@
             justify-content: flex-start;
             align-items: flex-start;
             padding-top: 4rem;
-            overflow-y: auto;
-            overflow-x: hidden;
         }
         
         /* Layout 2 y 5: Imagen a la derecha */
@@ -1512,13 +1477,26 @@
         
         .milestone-slide-description {
             font-size: clamp(1rem, 1.5vw, 1.25rem);
-            line-height: 1.8;
-            color: rgba(255, 255, 255, 0.9);
-            max-width: 500px;
+            line-height: 1.9;
+            color: rgba(255, 255, 255, 0.95);
+            max-width: 600px;
             word-wrap: break-word;
             overflow-wrap: break-word;
             hyphens: auto;
             overflow: visible;
+            text-align: justify;
+            margin-top: 0.5rem;
+        }
+        
+        /* Mejorar legibilidad en layouts específicos */
+        .milestone-slide-layout.layout-2 .milestone-slide-description,
+        .milestone-slide-layout.layout-5 .milestone-slide-description {
+            max-width: 90%;
+        }
+        
+        .milestone-slide-layout.layout-3 .milestone-slide-description {
+            max-width: 800px;
+            text-align: center;
         }
         
         /* Layout Alternativo: Texto Centrado (para hitos sin imagen principal) */
@@ -1531,8 +1509,6 @@
             padding-top: 4rem;
             text-align: center;
             height: 100vh;
-            overflow-y: auto;
-            overflow-x: hidden;
         }
         
         /* Título de Faceta - Layout tipo LeBron (Texto izquierda, Imagen derecha) */
@@ -2903,7 +2879,6 @@
             }
             
             gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
-
             // Efecto Intro - Curtain Reveal & Video Zoom (Estilo LeBron James)
             const introPin = document.getElementById('intro-pin');
             const heroCurtain = document.querySelector('.hero-curtain');
@@ -3492,6 +3467,61 @@ introTimeline.to("#introVideo", {
                 // Asignar layouts variados a los milestones DESPUÉS de inicializar todo
                 assignMilestoneLayouts();
                 
+                // Auto-ajuste de imágenes según tamaño natural
+                function autoAdjustImageSizes() {
+                    const images = document.querySelectorAll('.milestone-slide-main-image:not([data-size-assigned])');
+                    
+                    images.forEach(img => {
+                        if (img.complete) {
+                            assignImageSize(img);
+                        } else {
+                            img.addEventListener('load', () => assignImageSize(img), { once: true });
+                        }
+                    });
+                }
+                
+                function assignImageSize(img) {
+                    const naturalWidth = img.naturalWidth;
+                    const naturalHeight = img.naturalHeight;
+                    const aspectRatio = naturalWidth / naturalHeight;
+                    const area = naturalWidth * naturalHeight;
+                    
+                    // Si ya tiene una clase de tamaño asignada, no hacer nada
+                    if (img.classList.contains('tamaño-pequeña') || 
+                        img.classList.contains('tamaño-mediana') || 
+                        img.classList.contains('tamaño-grande')) {
+                        img.setAttribute('data-size-assigned', 'true');
+                        return;
+                    }
+                    
+                    // Definir umbrales para tamaño
+                    // Pequeña: < 400,000 píxeles o ratio muy vertical/horizontal
+                    // Grande: > 1,200,000 píxeles
+                    // Mediana: todo lo demás
+                    let sizeClass = 'tamaño-mediana'; // Default
+                    
+                    if (area < 400000 || aspectRatio < 0.6 || aspectRatio > 2.5) {
+                        sizeClass = 'tamaño-pequeña';
+                    } else if (area > 1200000 && aspectRatio >= 0.7 && aspectRatio <= 1.8) {
+                        sizeClass = 'tamaño-grande';
+                    }
+                    
+                    img.classList.add(sizeClass);
+                    img.setAttribute('data-size-assigned', 'true');
+                    
+                    // Aplicar también el tamaño según el layout
+                    const slide = img.closest('.milestone-slide');
+                    if (slide) {
+                        const layout = slide.querySelector('.milestone-slide-layout');
+                        if (layout) {
+                            const layoutClass = Array.from(layout.classList).find(c => c.startsWith('layout-'));
+                            if (layoutClass) {
+                                // Los estilos CSS ya manejan los tamaños por layout
+                            }
+                        }
+                    }
+                }
+                
                 // Activar primera sección de texto visible al cargar
                 setTimeout(() => {
                     const firstVisibleText = document.querySelector('.milestone-slide-text-section');
@@ -3503,6 +3533,9 @@ introTimeline.to("#introVideo", {
                     if (firstVisibleSlide) {
                         firstVisibleSlide.classList.add('active');
                     }
+                    
+                    // Auto-ajustar tamaños de imágenes
+                    autoAdjustImageSizes();
                 }, 500);
                 
                 // Ocultar Hero al hacer scroll a la primera faceta
