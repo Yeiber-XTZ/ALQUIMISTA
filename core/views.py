@@ -204,6 +204,9 @@ def staff_site_settings(request):
             if 'video_hero' in request.FILES:
                 settings.video_hero = request.FILES['video_hero']
             
+            if 'imagen_loading' in request.FILES:
+                settings.imagen_loading = request.FILES['imagen_loading']
+            
             settings.save()
             messages.success(request, 'Configuración del sitio actualizada exitosamente.')
             return redirect('core:staff_site_settings')

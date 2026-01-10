@@ -96,6 +96,29 @@
             </div>
         </div>
         
+        <!-- Loading Screen -->
+        <div class="border-b border-gray-200 pb-6">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">Pantalla de Carga (Loading)</h2>
+            
+            <div class="space-y-4">
+                <div>
+                    <label for="imagen_loading" class="block text-gray-700 font-semibold mb-2">Imagen del Loading</label>
+                    {% if settings.imagen_loading %}
+                    <div class="mb-4">
+                        <img src="{{ settings.imagen_loading.url }}" alt="Imagen loading actual" class="max-w-xs rounded-lg border border-gray-300">
+                        <p class="text-sm text-gray-500 mt-2">Imagen loading actual</p>
+                    </div>
+                    {% endif %}
+                    <input type="file" 
+                           id="imagen_loading" 
+                           name="imagen_loading" 
+                           accept="image/*"
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
+                    <p class="text-sm text-gray-500 mt-2">Imagen que se muestra en el centro de la pantalla de carga (recomendado: 200x200px o más). Si no se selecciona, se usará el logo del sitio.</p>
+                </div>
+            </div>
+        </div>
+        
         <!-- Información de Contacto -->
         <div class="border-b border-gray-200 pb-6">
             <h2 class="text-2xl font-bold text-gray-900 mb-4">Información de Contacto</h2>

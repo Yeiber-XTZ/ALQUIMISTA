@@ -36,6 +36,13 @@ class SiteSettings(models.Model):
         verbose_name="Video Hero",
         help_text="Video para la sección hero (opcional, formatos: mp4, webm, mov). Se mostrará después de la imagen al hacer scroll."
     )
+    imagen_loading = models.ImageField(
+        upload_to='site/loading/',
+        blank=True,
+        null=True,
+        verbose_name="Imagen de Loading",
+        help_text="Imagen que se muestra en el centro de la pantalla de carga (recomendado: 200x200px o más). Si no se selecciona, se usará el logo del sitio."
+    )
     descripcion_general = models.TextField(
         blank=True,
         verbose_name="Descripción General",
