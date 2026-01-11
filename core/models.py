@@ -641,6 +641,11 @@ class Material(models.Model):
     def videos_activos(self):
         """Retorna todos los videos activos del material, ordenados por orden."""
         return self.videos.filter(activo=True).order_by('orden')
+    
+    @property
+    def presentaciones_activas(self):
+        """Retorna todas las presentaciones activas del material, ordenadas por orden."""
+        return self.presentaciones.filter(activo=True).order_by('orden')
 
 
 class MaterialPDF(models.Model):
@@ -789,3 +794,55 @@ class MaterialVideo(models.Model):
         if match:
             return match.group(1)
         return None
+
+
+class MaterialPresentacion(models.Model):
+    """
+    Presentación o diapositiva relacionada a un material.
+    Permite múltiples presentaciones por material (PowerPoint, PDF, Google Slides, etc.).
+    """
+    material = models.ForeignKey(
+        Material,
+        on_delete=models.CASCADE,
+        related_name='presentaciones',
+        verbose_name="Material",
+        help_text="Material al que pertenece esta presentación"
+    )
+    archivo = models.FileField(
+        upload_to='materiales/presentaciones/',
+        verbose_name="Archivo de Presentación",
+        help_text="Archivo de presentación (formatos: ppt, pptx, pdf, odp)"
+    )
+    nombre = models.CharField(
+        max_length=200,
+        verbose_name="Nombre",
+        help_text="Nombre descriptivo de la presentación (opcional)",
+        blank=True
+    )
+    orden = models.IntegerField(
+        default=0,
+        verbose_name="Orden",
+        help_text="Orden de visualización (menor número = aparece primero)",
+        validators=[MinValueValidator(0)]
+    )
+    activo = models.BooleanField(
+        default=True,
+        verbose_name="Activo",
+        help_text="Desmarcar para ocultar esta presentación"
+    )
+    fecha_creacion = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name="Fecha de creación"
+    )
+
+    class Meta:
+        verbose_name = "Presentación de Material"
+        verbose_name_plural = "Presentaciones de Materiales"
+        ordering = ['material', 'orden', 'nombre']
+        indexes = [
+            models.Index(fields=['material', 'orden', 'activo']),
+        ]
+
+    def __str__(self):
+        nombre = self.nombre if self.nombre else self.archivo.name.split('/')[-1]
+        return f"{nombre} - {self.material.titulo}"

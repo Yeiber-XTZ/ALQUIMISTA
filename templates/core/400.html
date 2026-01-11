@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>400 - Solicitud incorrecta | {% if site_settings %}{{ site_settings.nombre_sitio }}{% else %}ALQUIMISTA{% endif %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800;900&family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-primary: #FFFFFF;
+            --color-secondary: #000000;
+            --color-tertiary: #B8212A;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000000;
+            color: #FFFFFF;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .error-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at center, rgba(184, 33, 42, 0.1) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .error-container {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 2rem;
+            max-width: 800px;
+        }
+        
+        .error-code {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(8rem, 20vw, 12rem);
+            font-weight: 900;
+            line-height: 1;
+            color: var(--color-tertiary);
+            margin-bottom: 1rem;
+            letter-spacing: -0.05em;
+        }
+        
+        .error-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+        
+        .error-message {
+            font-size: clamp(1rem, 2vw, 1.25rem);
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 3rem;
+            line-height: 1.6;
+        }
+        
+        .error-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .error-button {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, var(--color-tertiary) 0%, #ff4757 100%);
+            color: #FFFFFF;
+            text-decoration: none;
+            border-radius: 8px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .error-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(184, 33, 42, 0.4);
+        }
+        
+        .error-button-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .error-button-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .error-container {
+            animation: fadeIn 0.8s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="error-bg"></div>
+    <div class="error-container">
+        <div class="error-code">400</div>
+        <h1 class="error-title">Solicitud incorrecta</h1>
+        <p class="error-message">
+            La solicitud que intentaste realizar es incorrecta o inválida.
+            <br>
+            Por favor, verifica los datos e intenta nuevamente.
+        </p>
+        <div class="error-actions">
+            <a href="{% url 'core:index' %}" class="error-button">Ir al inicio</a>
+            <a href="javascript:history.back()" class="error-button error-button-secondary">Volver</a>
+        </div>
+    </div>
+</body>
+</html>

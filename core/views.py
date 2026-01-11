@@ -5,7 +5,8 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Q, Prefetch
 from django.http import HttpResponse
 from django.urls import reverse
-from .models import Facet, Milestone, ContactMessage, SiteSettings, MilestoneImage, UserFacetPreference, Tematica, Material, MaterialPDF, MaterialVideo
+from .models import Facet, Milestone, ContactMessage, SiteSettings, MilestoneImage, UserFacetPreference, Tematica, Material, MaterialPDF, MaterialVideo, MaterialPresentacion, UserProfile
+from django.contrib.auth.models import User
 from .decorators import staff_required, estudiante_required
 from .forms import CustomUserCreationForm, FacetSelectionForm, LoginForm, FacetManagementForm
 
@@ -553,8 +554,17 @@ def user_logout(request):
     return redirect('core:index')
 
 
-@login_required
 # Error handlers
+def handler400(request, exception):
+    """Custom 400 error handler."""
+    site_settings = SiteSettings.load()
+    return render(request, 'core/400.html', {'site_settings': site_settings}, status=400)
+
+def handler403(request, exception):
+    """Custom 403 error handler."""
+    site_settings = SiteSettings.load()
+    return render(request, 'core/403.html', {'site_settings': site_settings}, status=403)
+
 def handler404(request, exception):
     """Custom 404 error handler."""
     site_settings = SiteSettings.load()
@@ -639,6 +649,10 @@ def material_clase(request):
                 Prefetch(
                     'videos',
                     queryset=MaterialVideo.objects.filter(activo=True).order_by('orden')
+                ),
+                Prefetch(
+                    'presentaciones',
+                    queryset=MaterialPresentacion.objects.filter(activo=True).order_by('orden')
                 )
             )
         )
@@ -770,6 +784,21 @@ def staff_material_create(request):
                     orden=orden
                 )
             
+            # Procesar múltiples presentaciones
+            presentacion_files = request.FILES.getlist('archivos_presentacion')
+            presentacion_nombres = request.POST.getlist('presentacion_nombres')
+            presentacion_ordenes = request.POST.getlist('presentacion_ordenes')
+            
+            for i, presentacion_file in enumerate(presentacion_files):
+                nombre = presentacion_nombres[i] if i < len(presentacion_nombres) and presentacion_nombres[i] else ''
+                orden = int(presentacion_ordenes[i]) if i < len(presentacion_ordenes) and presentacion_ordenes[i] else i
+                MaterialPresentacion.objects.create(
+                    material=material,
+                    archivo=presentacion_file,
+                    nombre=nombre,
+                    orden=orden
+                )
+            
             messages.success(request, f'Material "{material.titulo}" creado exitosamente.')
             return redirect('core:staff_materiales_list')
         except Exception as e:
@@ -892,14 +921,57 @@ def staff_material_edit(request, pk):
                 except:
                     pass
             
+            # Procesar múltiples presentaciones nuevas
+            presentacion_files = request.FILES.getlist('archivos_presentacion')
+            presentacion_nombres = request.POST.getlist('presentacion_nombres')
+            presentacion_ordenes = request.POST.getlist('presentacion_ordenes')
+            
+            for i, presentacion_file in enumerate(presentacion_files):
+                nombre = presentacion_nombres[i] if i < len(presentacion_nombres) and presentacion_nombres[i] else ''
+                orden = int(presentacion_ordenes[i]) if i < len(presentacion_ordenes) and presentacion_ordenes[i] else material.presentaciones.count() + i
+                MaterialPresentacion.objects.create(
+                    material=material,
+                    archivo=presentacion_file,
+                    nombre=nombre,
+                    orden=orden
+                )
+            
+            # Actualizar presentaciones existentes
+            presentacion_ids = request.POST.getlist('presentacion_ids')
+            for presentacion_id in presentacion_ids:
+                if presentacion_id:
+                    try:
+                        presentacion = MaterialPresentacion.objects.get(pk=presentacion_id, material=material)
+                        presentacion_nombre_key = f'presentacion_nombre_{presentacion_id}'
+                        presentacion_orden_key = f'presentacion_orden_{presentacion_id}'
+                        presentacion_activo_key = f'presentacion_activo_{presentacion_id}'
+                        
+                        if presentacion_nombre_key in request.POST:
+                            presentacion.nombre = request.POST[presentacion_nombre_key]
+                        if presentacion_orden_key in request.POST:
+                            presentacion.orden = int(request.POST[presentacion_orden_key])
+                        presentacion.activo = presentacion_activo_key in request.POST
+                        presentacion.save()
+                    except MaterialPresentacion.DoesNotExist:
+                        pass
+            
+            # Eliminar presentaciones marcadas para eliminar
+            presentacion_delete_ids = request.POST.getlist('presentacion_delete')
+            for presentacion_id in presentacion_delete_ids:
+                try:
+                    MaterialPresentacion.objects.filter(pk=presentacion_id, material=material).delete()
+                except:
+                    pass
+            
             messages.success(request, f'Material "{material.titulo}" actualizado exitosamente.')
             return redirect('core:staff_materiales_list')
         except Exception as e:
             messages.error(request, f'Error al actualizar el material: {str(e)}')
     
-    # Precargar PDFs y videos para el formulario
+    # Precargar PDFs, videos y presentaciones para el formulario
     material.pdfs_list = material.pdfs.all().order_by('orden')
     material.videos_list = material.videos.all().order_by('orden')
+    material.presentaciones_list = material.presentaciones.all().order_by('orden')
     return render(request, 'staff/material_form.html', {'material': material, 'form_action': 'edit', 'tematicas': tematicas})
 
 @staff_required
@@ -911,3 +983,96 @@ def staff_material_delete(request, pk):
         messages.success(request, 'Material eliminado exitosamente.')
         return redirect('core:staff_materiales_list')
     return render(request, 'staff/material_delete.html', {'material': material})
+
+
+# ==================== STAFF - GESTIÓN DE USUARIOS ====================
+
+@staff_required
+def staff_users_list(request):
+    """Lista de todos los usuarios con filtros y búsqueda."""
+    from django.contrib.auth.models import User
+    
+    # Estadísticas
+    total_usuarios = User.objects.count()
+    usuarios_estudiantes = UserProfile.objects.filter(rol='estudiante').count()
+    usuarios_visitantes = UserProfile.objects.filter(rol='visitante').count()
+    usuarios_staff = User.objects.filter(is_staff=True).count()
+    superusuarios = User.objects.filter(is_superuser=True).count()
+    
+    stats = {
+        'total_usuarios': total_usuarios,
+        'usuarios_estudiantes': usuarios_estudiantes,
+        'usuarios_visitantes': usuarios_visitantes,
+        'usuarios_staff': usuarios_staff,
+        'superusuarios': superusuarios,
+    }
+    
+    # Búsqueda y filtros
+    search_query = request.GET.get('q', '').strip()
+    rol_filter = request.GET.get('rol', '').strip()
+    
+    # Obtener usuarios con sus perfiles
+    users = User.objects.select_related('profile').all()
+    
+    # Aplicar búsqueda
+    if search_query:
+        users = users.filter(
+            Q(username__icontains=search_query) |
+            Q(email__icontains=search_query) |
+            Q(profile__id_usuario__icontains=search_query)
+        )
+    
+    # Aplicar filtro de rol
+    if rol_filter:
+        if rol_filter == 'estudiante':
+            users = users.filter(profile__rol='estudiante')
+        elif rol_filter == 'visitante':
+            users = users.filter(profile__rol='visitante')
+        elif rol_filter == 'staff':
+            users = users.filter(is_staff=True)
+        elif rol_filter == 'superuser':
+            users = users.filter(is_superuser=True)
+    
+    users = users.order_by('-date_joined')
+    
+    return render(request, 'staff/users_list.html', {
+        'users': users,
+        'stats': stats,
+        'search_query': search_query,
+        'rol_filter': rol_filter,
+    })
+
+@staff_required
+def staff_user_edit_permissions(request, pk):
+    """Editar permisos de un usuario."""
+    from django.contrib.auth.models import User
+    
+    user_obj = get_object_or_404(User, pk=pk)
+    
+    # Obtener o crear perfil
+    profile, created = UserProfile.objects.get_or_create(usuario=user_obj)
+    
+    # Verificar si el usuario actual puede editar superusuarios
+    can_edit_superuser = request.user.is_superuser
+    
+    if request.method == 'POST':
+        try:
+            # Actualizar permisos de staff
+            user_obj.is_staff = 'is_staff' in request.POST
+            user_obj.save()
+            
+            # Actualizar permisos de superusuario (solo si el usuario actual es superusuario)
+            if can_edit_superuser:
+                user_obj.is_superuser = 'is_superuser' in request.POST
+                user_obj.save()
+            
+            messages.success(request, f'Permisos de "{user_obj.username}" actualizados exitosamente.')
+            return redirect('core:staff_users_list')
+        except Exception as e:
+            messages.error(request, f'Error al actualizar los permisos: {str(e)}')
+    
+    return render(request, 'staff/user_edit_permissions.html', {
+        'user_obj': user_obj,
+        'profile': profile,
+        'can_edit_superuser': can_edit_superuser,
+    })

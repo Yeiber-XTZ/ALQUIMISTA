@@ -93,5 +93,9 @@ urlpatterns = [
     path('staff/materiales/nuevo/', views.staff_material_create, name='staff_material_create'),
     path('staff/materiales/<int:pk>/editar/', views.staff_material_edit, name='staff_material_edit'),
     path('staff/materiales/<int:pk>/eliminar/', views.staff_material_delete, name='staff_material_delete'),
+    
+    # Staff - Usuarios
+    path('staff/usuarios/', views.staff_users_list, name='staff_users_list'),
+    path('staff/usuarios/<int:pk>/permisos/', views.staff_user_edit_permissions, name='staff_user_edit_permissions'),
 ]
 

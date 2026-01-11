@@ -159,15 +159,26 @@ DATABASES = {
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        'OPTIONS': {
+            'user_attributes': ('username', 'email'),
+            'max_similarity': 0.7,
+        },
+        'MESSAGE': 'La contraseña es demasiado similar a tu nombre de usuario o email.',
     },
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'OPTIONS': {
+            'min_length': 8,
+        },
+        'MESSAGE': 'La contraseña debe tener al menos 8 caracteres.',
     },
     {
         'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        'MESSAGE': 'Esta contraseña es muy común. Por favor, elige una contraseña más segura.',
     },
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        'MESSAGE': 'La contraseña no puede ser completamente numérica.',
     },
 ]
 

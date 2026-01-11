@@ -9,6 +9,11 @@ class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField(
         required=True,
         label="Correo electrónico",
+        error_messages={
+            'required': 'El correo electrónico es obligatorio.',
+            'invalid': 'Por favor, ingresa un correo electrónico válido.',
+            'unique': 'Este correo electrónico ya está registrado.',
+        },
         widget=forms.EmailInput(attrs={
             'class': 'form-input',
             'placeholder': 'tu@email.com'
@@ -16,24 +21,43 @@ class CustomUserCreationForm(UserCreationForm):
     )
     username = forms.CharField(
         label="Nombre de usuario",
+        min_length=3,
+        max_length=150,
+        error_messages={
+            'required': 'El nombre de usuario es obligatorio.',
+            'min_length': 'El nombre de usuario debe tener al menos 3 caracteres.',
+            'max_length': 'El nombre de usuario no puede exceder 150 caracteres.',
+            'unique': 'Este nombre de usuario ya está en uso.',
+            'invalid': 'El nombre de usuario solo puede contener letras, números y los caracteres @/./+/-/_.',
+        },
         widget=forms.TextInput(attrs={
             'class': 'form-input',
             'placeholder': 'Nombre de usuario'
-        })
+        }),
+        help_text='Requerido. 3-150 caracteres. Solo letras, números y @/./+/-/_.'
     )
     password1 = forms.CharField(
         label="Contraseña",
+        error_messages={
+            'required': 'La contraseña es obligatoria.',
+        },
         widget=forms.PasswordInput(attrs={
             'class': 'form-input password-input',
             'placeholder': 'Contraseña'
-        })
+        }),
+        help_text='Mínimo 8 caracteres. No puede ser completamente numérica ni muy similar a tu información personal.'
     )
     password2 = forms.CharField(
         label="Confirmar contraseña",
+        error_messages={
+            'required': 'Debes confirmar tu contraseña.',
+            'password_mismatch': 'Las contraseñas no coinciden.',
+        },
         widget=forms.PasswordInput(attrs={
             'class': 'form-input password-input',
             'placeholder': 'Confirma tu contraseña'
-        })
+        }),
+        help_text='Ingresa la misma contraseña que antes para verificación.'
     )
     rol = forms.ChoiceField(
         choices=[
