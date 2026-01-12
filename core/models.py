@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.text import slugify
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 
 
@@ -305,7 +306,6 @@ class Milestone(models.Model):
             return None
         
         import re
-        # Patrones para diferentes formatos de YouTube
         patterns = [
             r'(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})',
             r'youtube\.com\/embed\/([a-zA-Z0-9_-]{11})',
@@ -323,7 +323,6 @@ class Milestone(models.Model):
             return None
         
         import re
-        # Patrón para Vimeo
         pattern = r'vimeo\.com\/(?:.*\/)?(\d+)'
         match = re.search(pattern, self.video_url)
         if match:
@@ -762,7 +761,6 @@ class MaterialVideo(models.Model):
 
     def clean(self):
         """Valida que al menos uno de los campos de video esté presente."""
-        from django.core.exceptions import ValidationError
         if not self.video_url and not self.video_archivo:
             raise ValidationError('Debe proporcionar una URL de video o un archivo de video.')
 

@@ -1,6 +1,5 @@
 """
 Django settings for alquimista project.
-ADAPTADO DEL PROYECTO PARCHAOO (PRODUCCIÓN READY)
 """
 
 from datetime import timedelta
@@ -109,11 +108,11 @@ else:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.mysql",
-            "NAME": os.environ.get("MYSQL_DB"),
-            "USER": os.environ.get("MYSQL_USER"),
-            "PASSWORD": os.environ.get("MYSQL_PASSWORD"),
-            "HOST": os.environ.get("MYSQL_HOST"),
-            "PORT": os.environ.get("MYSQL_PORT"),
+            "NAME": os.environ.get("DB_NAME"),
+            "USER": os.environ.get("DB_USER"),
+            "PASSWORD": os.environ.get("DB_PASSWORD"),
+            "HOST": os.environ.get("DB_HOST"),
+            "PORT": os.environ.get("DB_PORT"),
             "CONN_MAX_AGE": 60,
             "OPTIONS": {
                 "charset": "utf8mb4",
@@ -136,9 +135,6 @@ else:
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [BASE_DIR / "static"]
-
-# Whitenoise comprimirá los archivos y creará hashes únicos
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 
 # 2. MEDIA FILES (Imágenes subidas) -> Se sirven con GCS o Local

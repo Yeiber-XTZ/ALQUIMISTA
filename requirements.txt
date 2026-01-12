@@ -1,16 +1,11 @@
-# Django Framework
+asgiref==3.11.0
+cachetools==6.2.4
+certifi==2026.1.4
+charset-normalizer==3.4.4
+dj-database-url==3.0.1
 Django==4.2.27
-
-# Database
-mysqlclient==2.2.7
-python-dotenv==1.0.0
-gunicorn==23.0.0
-whitenoise==6.6.0
-# Environment Variables
-python-dotenv==1.2.1
+django-cors-headers==4.9.0
 django-storages==1.14.2
-# Image Processing
-Pillow==11.3.0
 google-api-core==2.28.1
 google-auth==2.45.0
 google-cloud-core==2.5.0
@@ -18,4 +13,19 @@ google-cloud-storage==2.18.1
 google-crc32c==1.8.0
 google-resumable-media==2.8.0
 googleapis-common-protos==1.72.0
-dj-database-url==3.0.1
+gunicorn==23.0.0
+idna==3.11
+mysqlclient==2.2.7
+packaging==25.0
+pillow==11.3.0
+proto-plus==1.27.0
+protobuf==6.33.3
+pyasn1==0.6.1
+pyasn1_modules==0.4.2
+python-dotenv==1.2.1
+requests==2.32.5
+rsa==4.9.1
+sqlparse==0.5.5
+tzdata==2025.3
+urllib3==2.6.3
+whitenoise==6.6.0

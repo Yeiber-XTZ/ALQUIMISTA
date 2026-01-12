@@ -10,12 +10,20 @@ from django.contrib.auth.models import User
 from .decorators import staff_required, estudiante_required
 from .forms import CustomUserCreationForm, FacetSelectionForm, LoginForm, FacetManagementForm
 
+def get_client_ip(request):
+    """
+    Función auxiliar para obtener la IP real del cliente en Cloud Run / Proxies.
+    """
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
+
 def index(request):
     """
     Vista principal del sitio público.
-    Muestra todas las facetas con sus hitos en formato de scroll horizontal.
-    Cada hito es una diapositiva completa.
-    Si el usuario está autenticado, solo muestra las facetas que ha seleccionado.
     """
     # Obtener configuración del sitio
     site_settings = SiteSettings.load()
@@ -82,17 +90,18 @@ def index(request):
 
 def contact(request):
     """
-    Página de contacto (GET) y procesamiento (POST) con validación mejorada.
+    Página de contacto con validación y Rate Limiting compatible con Cloud Run.
     """
     site_settings = SiteSettings.load()
     
     if request.method == 'POST':
-        # Rate limiting básico - evitar spam (10 mensajes por hora por IP)
+       
         from django.core.cache import cache
         from django.utils import timezone
-        from datetime import timedelta
         
-        ip_address = request.META.get('REMOTE_ADDR', '')
+        ip_address = get_client_ip(request)
+        # ---------------------------------
+
         cache_key = f'contact_rate_limit_{ip_address}'
         message_count = cache.get(cache_key, 0)
         
@@ -137,6 +146,7 @@ def contact(request):
             cache.set(cache_key, message_count + 1, 3600)  # 1 hora
             messages.success(request, '¡Mensaje enviado correctamente! Te responderemos pronto.')
         except Exception as e:
+            print(f"Error enviando contacto: {e}") 
             messages.error(request, 'Hubo un error al enviar el mensaje. Por favor intenta nuevamente.')
         
         return redirect('core:contact')
@@ -179,7 +189,8 @@ def staff_dashboard(request):
 @staff_required
 def staff_site_settings(request):
     """Editar configuración general del sitio."""
-    from .models import SiteSettings
+    # NOTA: Al subir archivos aquí (settings.logo = ...), 
+    # Django usará automáticamente Google Cloud Storage gracias a settings.py
     settings = SiteSettings.load()
     
     if request.method == 'POST':
@@ -196,6 +207,7 @@ def staff_site_settings(request):
             settings.youtube_url = request.POST.get('youtube_url', '')
             settings.whatsapp_telefono = request.POST.get('whatsapp_telefono', '')
             
+            # Manejo de archivos seguro para GCS
             if 'logo' in request.FILES:
                 settings.logo = request.FILES['logo']
             
