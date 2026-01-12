@@ -186,9 +186,24 @@ class Facet(models.Model):
         return self.titulo
 
     def save(self, *args, **kwargs):
-        """Auto-genera el slug desde el título si no se proporciona."""
+        """
+        Auto-genera el slug único incrementando un contador si ya existe.
+        CORREGIDO: Evita el error (1062, Duplicate entry).
+        """
+        # Solo generamos el slug si está vacío (creación o si se borró manualmente)
         if not self.slug:
-            self.slug = slugify(self.titulo)
+            base_slug = slugify(self.titulo)
+            slug = base_slug
+            counter = 1
+            
+            # Verificamos si existe CUALQUIER faceta con este slug (activa o inactiva)
+            # exclude(pk=self.pk) es importante para permitir editar el mismo objeto sin chocar consigo mismo
+            while Facet.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+                slug = f'{base_slug}-{counter}'
+                counter += 1
+            
+            self.slug = slug
+            
         super().save(*args, **kwargs)
 
 
