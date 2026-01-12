@@ -1,6 +1,11 @@
-Django>=4.2,<5.0
-mysqlclient>=2.2.0
-python-dotenv>=1.0.0
-Pillow>=10.0.0
+# Django Framework
+Django==4.2.27
 
+# Database
+mysqlclient==2.2.7
 
+# Environment Variables
+python-dotenv==1.2.1
+
+# Image Processing
+Pillow==11.3.0

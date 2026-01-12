@@ -522,6 +522,10 @@ def user_login(request):
     site_settings = SiteSettings.load()
     
     if request.user.is_authenticated:
+        # Si ya está autenticado y viene de una URL de staff, redirigir al staff dashboard
+        next_url = request.GET.get('next', '')
+        if next_url and '/staff/' in next_url:
+            return redirect('core:staff_dashboard')
         return redirect('core:index')
     
     if request.method == 'POST':
@@ -533,16 +537,29 @@ def user_login(request):
             if user:
                 login(request, user)
                 messages.success(request, f'¡Bienvenido de nuevo, {username}!')
-                next_url = request.GET.get('next', 'core:index')
-                return redirect(next_url)
+                # Obtener la URL de destino desde POST o GET
+                next_url = request.POST.get('next') or request.GET.get('next', '')
+                if next_url:
+                    # Validar que next_url no sea una URL externa por seguridad
+                    from django.utils.http import url_has_allowed_host_and_scheme
+                    if url_has_allowed_host_and_scheme(next_url, allowed_hosts=None):
+                        return redirect(next_url)
+                # Si no hay next_url o no es válida, redirigir según si es staff
+                if user.is_staff and '/staff/' in request.path:
+                    return redirect('core:staff_dashboard')
+                return redirect('core:index')
             else:
                 messages.error(request, 'Usuario o contraseña incorrectos.')
     else:
         form = LoginForm()
     
+    # Pasar next_url al template para incluirlo en el formulario
+    next_url = request.GET.get('next', '')
+    
     return render(request, 'core/login.html', {
         'form': form,
         'site_settings': site_settings,
+        'next_url': next_url,
     })
 
 

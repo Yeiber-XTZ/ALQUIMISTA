@@ -332,6 +332,9 @@
 
         <form method="post" class="form-container rounded-2xl p-8 space-y-6">
             {% csrf_token %}
+            {% if next_url %}
+            <input type="hidden" name="next" value="{{ next_url }}">
+            {% endif %}
             
             {% if form.non_field_errors %}
             <div class="bg-red-900/30 border border-red-500 rounded-lg p-4">

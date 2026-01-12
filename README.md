@@ -24,14 +24,9 @@ Sitio web dinámico con experiencia de scroll horizontal tipo galería, inspirad
    pip install -r requirements.txt
    ```
 
-4. **Ejecutar migraciones (opción 1 - manual):**
+4. **Ejecutar migraciones:**
    ```bash
    python manage.py migrate
-   ```
-   
-   **O usar el script de inicialización (opción 2 - recomendado):**
-   ```bash
-   python setup.py
    ```
 
 5. **Crear superusuario (para el panel de staff):**
@@ -48,8 +43,7 @@ Sitio web dinámico con experiencia de scroll horizontal tipo galería, inspirad
 7. **Acceder al sitio:**
    - Frontend público: http://127.0.0.1:8000/
    - Panel de staff: http://127.0.0.1:8000/staff/
-
-📖 **Para más detalles, consulta [SETUP.md](SETUP.md)**
+   - Django Admin: http://127.0.0.1:8000/admin/
 
 ## 📁 Estructura del Proyecto
 

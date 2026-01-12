@@ -33,7 +33,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-r+7dds)gsc7&xh3)5ku3^v-2j1
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'e81b08a7b841.ngrok-free.app']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '1f82ee11a546.ngrok-free.app']
 
 # En desarrollo, permitir cualquier host si DEBUG está activo (útil para ngrok que cambia de dominio)
 if DEBUG:
@@ -43,7 +43,7 @@ if DEBUG:
 # IMPORTANTE: Si cambias el dominio de ngrok, actualiza esta lista con el nuevo dominio
 # Formato: 'https://tu-dominio.ngrok-free.app'
 CSRF_TRUSTED_ORIGINS = [
-    'https://e81b08a7b841.ngrok-free.app',
+    'https://1f82ee11a546.ngrok-free.app',
     'http://localhost:8000',
     'http://127.0.0.1:8000',
 ]

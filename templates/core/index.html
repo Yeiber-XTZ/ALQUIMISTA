@@ -1103,6 +1103,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            overflow: hidden;
             background: #000000;
             z-index: 1;
         }
@@ -1111,18 +1112,6 @@
         .milestone-slide-layout.layout-3 .milestone-slide-image-section,
         .milestone-slide-layout.layout-6 .milestone-slide-image-section {
             height: auto;
-        }
-        
-        /* Imágenes de diferentes tamaños según layout */
-        .milestone-slide-image-container {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            background: #000000;
         }
         
         /* Layout 4: Imagen centrada grande */
@@ -3781,6 +3770,7 @@ introTimeline.to("#introVideo", {
                     }
                 });
             });
+            
             
             // Efectos de Distorsión en Imágenes
             const distortionImages = document.querySelectorAll('.distortion-effect img');
